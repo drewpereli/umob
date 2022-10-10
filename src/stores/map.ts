@@ -3,8 +3,8 @@ import { defineStore } from 'pinia';
 export const useMap = defineStore('map', {
   state: () => ({
     tiles: [] as Tile[][],
-    width: 20,
-    height: 20,
+    width: 80,
+    height: 80,
   }),
   getters: {
     tileAt() {

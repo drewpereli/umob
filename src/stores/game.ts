@@ -107,6 +107,10 @@ class Actor {
 
     this.move(tile);
   }
+
+  get coords(): Coords {
+    return { x: this.x, y: this.y };
+  }
 }
 
 class Player extends Actor {

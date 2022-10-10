@@ -1,14 +1,19 @@
 <script lang="ts">
-import { useMap } from '@/stores/map';
+import { useCamera } from '@/stores/camera';
 import { defineComponent } from 'vue';
 import GameTile from './GameTile.vue';
 
 export default defineComponent({
   components: { GameTile },
   setup() {
-    const map = useMap();
+    const camera = useCamera();
 
-    return { tiles: map.tiles };
+    return { camera };
+  },
+  computed: {
+    tiles() {
+      return this.camera.displayTiles;
+    },
   },
 });
 </script>
