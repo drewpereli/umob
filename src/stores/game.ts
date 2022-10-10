@@ -80,6 +80,7 @@ class Actor {
   timeUntilNextAction = 0;
 
   char = 'd';
+  readonly color: string = 'white';
 
   move(tile: Tile) {
     if (!this.canAct) return;
@@ -126,4 +127,5 @@ class Actor {
 
 class Player extends Actor {
   char = '@';
+  color = 'yellow';
 }

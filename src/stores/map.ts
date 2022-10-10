@@ -40,11 +40,13 @@ export class Tile {
 abstract class Terrain {
   abstract readonly char: string;
   abstract readonly moveTimeMultiplier: number | null;
+  readonly color: string = '#ccc';
 }
 
 export class Floor extends Terrain {
   char = '•';
   moveTimeMultiplier = 1;
+  color = 'gray';
 }
 
 export class Wall extends Terrain {

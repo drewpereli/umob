@@ -13,17 +13,21 @@ export default defineComponent({
     return { game };
   },
   computed: {
+    actor() {
+      return this.game.actorAt(this.tile);
+    },
     char() {
-      const actor = this.game.actorAt(this.tile);
-
-      return actor?.char ?? this.tile.terrain.char;
+      return this.actor?.char ?? this.tile.terrain.char;
+    },
+    color() {
+      return this.actor?.color ?? this.tile.terrain.color;
     },
   },
 });
 </script>
 
 <template>
-  <div class="game-tile">
+  <div class="game-tile" :style="{ color: color }">
     {{ char }}
   </div>
 </template>
@@ -37,5 +41,6 @@ export default defineComponent({
   align-items: center;
   justify-content: center;
   font-weight: bold;
+  font-size: 24px;
 }
 </style>
