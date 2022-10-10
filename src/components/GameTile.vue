@@ -16,10 +16,18 @@ export default defineComponent({
     actor() {
       return this.game.actorAt(this.tile);
     },
+    visible() {
+      const visibleTileIds = this.game.visibleTiles.map((tile) => tile.id);
+      return visibleTileIds.includes(this.tile.id);
+    },
     char() {
+      if (!this.visible) return '';
+
       return this.actor?.char ?? this.tile.terrain.char;
     },
     color() {
+      if (!this.visible) return 'black';
+
       return this.actor?.color ?? this.tile.terrain.color;
     },
   },

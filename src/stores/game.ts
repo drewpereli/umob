@@ -1,3 +1,4 @@
+import { PermissiveFov } from 'permissive-fov';
 import { defineStore } from 'pinia';
 import random from 'random';
 import { Floor, Tile, useMap } from './map';
@@ -12,6 +13,7 @@ export const useGame = defineStore('game', {
     ] as Actor[],
     currTime: 0,
     map: useMap(),
+    fovUtil: null as unknown as PermissiveFov,
   }),
   getters: {
     allActors: (state) => [state.player, ...state.actors],
@@ -21,6 +23,21 @@ export const useGame = defineStore('game', {
           (actor) => actor.x === coords.x && actor.y === coords.y
         );
       };
+    },
+    visibleTiles() {
+      const visibleTiles: Tile[] = [];
+
+      this.fovUtil.compute(
+        this.player.x,
+        this.player.y,
+        10,
+        (x: number, y: number) => {
+          const tile = this.map.tileAt({ x, y });
+          visibleTiles.push(tile);
+        }
+      );
+
+      return visibleTiles;
     },
   },
   actions: {
@@ -37,6 +54,14 @@ export const useGame = defineStore('game', {
 
       this.player.x = tile.x;
       this.player.y = tile.y;
+
+      const fov = new PermissiveFov(
+        this.map.width,
+        this.map.height,
+        (x: number, y: number) => this.map.tileAt({ x, y }).isTransparent
+      );
+
+      this.fovUtil = fov;
     },
     movePlayer({ x, y }: { x?: number; y?: number }) {
       const targetCoords: Coords = {

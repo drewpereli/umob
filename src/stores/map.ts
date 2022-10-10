@@ -35,6 +35,14 @@ export class Tile {
   get canMoveTo() {
     return this.terrain.moveTimeMultiplier !== null;
   }
+
+  get isTransparent() {
+    return this.terrain instanceof Floor;
+  }
+
+  get id() {
+    return `${this.x},${this.y}`;
+  }
 }
 
 abstract class Terrain {
