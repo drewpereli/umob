@@ -1,11 +1,11 @@
 <script lang="ts">
 import { useGame } from '@/stores/game';
+import { Tile } from '@/stores/map';
 import { defineComponent } from 'vue';
 
 export default defineComponent({
   props: {
-    x: { type: Number, required: true },
-    y: { type: Number, required: true },
+    tile: { type: Tile, required: true },
   },
   setup() {
     const game = useGame();
@@ -14,25 +14,24 @@ export default defineComponent({
   },
   computed: {
     char() {
-      const actor = this.game.allActors.find(
-        (actor) => actor.x === this.x && actor.y === this.y
-      );
+      const actor = this.game.actorAt(this.tile);
 
-      return actor?.char || '';
+      return actor?.char ?? this.tile.terrain.char;
     },
   },
 });
 </script>
 
 <template>
-  <div class="game-tile">{{ char }}</div>
+  <div class="game-tile">
+    {{ char }}
+  </div>
 </template>
 
 <style scoped>
 .game-tile {
   width: 32px;
   height: 32px;
-  border: 1px solid gray;
   background-color: black;
   display: flex;
   align-items: center;

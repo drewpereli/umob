@@ -3,26 +3,26 @@ import { useGame } from '@/stores/game';
 import { defineComponent } from 'vue';
 import GameTiles from './GameTiles.vue';
 
-const length = 20;
-
 export default defineComponent({
   components: { GameTiles },
   methods: {
     keyLeft() {
-      this.game.move({ x: -1 });
+      this.game.movePlayer({ x: -1 });
     },
     keyRight() {
-      this.game.move({ x: 1 });
+      this.game.movePlayer({ x: 1 });
     },
     keyUp() {
-      this.game.move({ y: -1 });
+      this.game.movePlayer({ y: -1 });
     },
     keyDown() {
-      this.game.move({ y: 1 });
+      this.game.movePlayer({ y: 1 });
     },
   },
   setup() {
     const game = useGame();
+
+    game.initialize();
 
     return { game };
   },

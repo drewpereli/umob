@@ -1,23 +1,22 @@
 <script lang="ts">
+import { useMap } from '@/stores/map';
 import { defineComponent } from 'vue';
 import GameTile from './GameTile.vue';
 
-const length = 20;
-
 export default defineComponent({
-  data() {
-    return { length };
-  },
   components: { GameTile },
+  setup() {
+    const map = useMap();
+
+    return { tiles: map.tiles };
+  },
 });
 </script>
 
 <template>
   <div class="game-tiles">
-    <template v-for="y in length" :key="y">
-      <template v-for="x in length" :key="x">
-        <GameTile :x="x" :y="y" />
-      </template>
+    <template v-for="(tile, idx) in tiles" :key="idx">
+      <GameTile :tile="tile" />
     </template>
   </div>
 </template>
@@ -27,5 +26,6 @@ export default defineComponent({
   display: grid;
   grid-template-columns: repeat(20, auto);
   grid-template-rows: repeat(20, auto);
+  width: 400px;
 }
 </style>

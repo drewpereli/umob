@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 import random from 'random';
+import { Tile, useMap } from './map';
 
 export const useGame = defineStore('game', {
   state: () => ({
@@ -8,28 +9,39 @@ export const useGame = defineStore('game', {
       new Actor({ x: 2, y: 4 }),
       new Actor({ x: 15, y: 14 }),
       new Actor({ x: 11, y: 10 }),
-    ],
+    ] as Actor[],
     currTime: 0,
+    map: useMap(),
   }),
   getters: {
     allActors: (state) => [state.player, ...state.actors],
-    tileHasActor() {
-      return ({ x, y }: { x: number; y: number }) => {
-        return this.allActors.some((actor) => actor.x === x && actor.y === y);
+    actorAt() {
+      return (coords: Coords) => {
+        return this.allActors.find(
+          (actor) => actor.x === coords.x && actor.y === coords.y
+        );
       };
     },
   },
   actions: {
-    move({ x, y }: { x?: number; y?: number }) {
-      if (
-        this.tileHasActor({
-          x: this.player.x + (x ?? 0),
-          y: this.player.y + (y ?? 0),
-        })
-      )
-        return;
+    initialize() {
+      this.map.generate();
+    },
+    movePlayer({ x, y }: { x?: number; y?: number }) {
+      const targetCoords: Coords = {
+        x: this.player.x + (x ?? 0),
+        y: this.player.y + (y ?? 0),
+      };
 
-      this.player.move({ x, y });
+      if (this.actorAt(targetCoords)) return;
+
+      const targetTile = this.map.tileAt(targetCoords);
+
+      if (!targetTile) return;
+
+      if (!targetTile.canMoveTo) return;
+
+      this.player.move(targetTile);
 
       while (!this.player.canAct) {
         this.actors.forEach((actor) => actor.act(this));
@@ -58,12 +70,13 @@ class Actor {
 
   char = 'd';
 
-  move({ x, y }: { x?: number; y?: number }) {
+  move(tile: Tile) {
     if (!this.canAct) return;
 
-    this.x += x ?? 0;
-    this.y += y ?? 0;
-    this.timeUntilNextAction = this.moveTime;
+    this.x = tile.x;
+    this.y = tile.y;
+    this.timeUntilNextAction =
+      this.moveTime * (tile.terrain.moveTimeMultiplier as number);
   }
 
   tick() {
@@ -76,13 +89,23 @@ class Actor {
     return this.timeUntilNextAction === 0;
   }
 
-  act(state: { tileHasActor: (coords: { x: number; y: number }) => boolean }) {
+  act(state: {
+    actorAt: (coords: { x: number; y: number }) => Actor | undefined;
+    map: ReturnType<typeof useMap>;
+  }) {
     const x = random.int(0, 1) * 2 - 1;
     const y = random.int(0, 1) * 2 - 1;
+    const coords = { x: this.x + x, y: this.y + y };
 
-    if (state.tileHasActor({ x: this.x + x, y: this.y + y })) return;
+    if (state.actorAt(coords)) return;
 
-    this.move({ x, y });
+    const tile = state.map.tileAt(coords);
+
+    if (!tile) return;
+
+    if (!tile.canMoveTo) return;
+
+    this.move(tile);
   }
 }
 
