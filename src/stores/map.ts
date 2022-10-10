@@ -1,3 +1,4 @@
+import { generate } from '@/utils/map-generation';
 import { defineStore } from 'pinia';
 
 export const useMap = defineStore('map', {
@@ -15,22 +16,7 @@ export const useMap = defineStore('map', {
   },
   actions: {
     generate() {
-      for (let y = 0; y < this.height; y++) {
-        const row: Tile[] = [];
-
-        for (let x = 0; x < this.width; x++) {
-          const atEdge =
-            x === 0 || x === this.width - 1 || y === 0 || y === this.height - 1;
-
-          const terrain = atEdge ? new Wall() : new Floor();
-
-          const tile = new Tile({ x, y, terrain });
-
-          row.push(tile);
-        }
-
-        this.tiles.push(row);
-      }
+      this.tiles = generate(this.width, this.height);
     },
   },
 });
@@ -56,12 +42,12 @@ abstract class Terrain {
   abstract readonly moveTimeMultiplier: number | null;
 }
 
-class Floor extends Terrain {
+export class Floor extends Terrain {
   char = '•';
   moveTimeMultiplier = 1;
 }
 
-class Wall extends Terrain {
+export class Wall extends Terrain {
   char = '#';
   moveTimeMultiplier = null;
 }
