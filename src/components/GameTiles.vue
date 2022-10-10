@@ -15,17 +15,18 @@ export default defineComponent({
 
 <template>
   <div class="game-tiles">
-    <template v-for="(tile, idx) in tiles" :key="idx">
-      <GameTile :tile="tile" />
+    <template v-for="(tileRow, rowIdx) in tiles" :key="rowIdx">
+      <div class="row">
+        <template v-for="(tile, colIdx) in tileRow" :key="colIdx">
+          <GameTile :tile="tile" />
+        </template>
+      </div>
     </template>
   </div>
 </template>
 
 <style scoped>
-.game-tiles {
-  display: grid;
-  grid-template-columns: repeat(20, auto);
-  grid-template-rows: repeat(20, auto);
-  width: 400px;
+.game-tiles > .row {
+  display: flex;
 }
 </style>

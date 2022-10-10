@@ -2,22 +2,22 @@ import { defineStore } from 'pinia';
 
 export const useMap = defineStore('map', {
   state: () => ({
-    tiles: [] as Tile[],
+    tiles: [] as Tile[][],
     width: 20,
     height: 20,
   }),
   getters: {
     tileAt() {
       return (coords: Coords) => {
-        return this.tiles.find(
-          (tile) => tile.x === coords.x && tile.y === coords.y
-        );
+        return this.tiles[coords.y][coords.x];
       };
     },
   },
   actions: {
     generate() {
       for (let y = 0; y < this.height; y++) {
+        const row: Tile[] = [];
+
         for (let x = 0; x < this.width; x++) {
           const atEdge =
             x === 0 || x === this.width - 1 || y === 0 || y === this.height - 1;
@@ -26,8 +26,10 @@ export const useMap = defineStore('map', {
 
           const tile = new Tile({ x, y, terrain });
 
-          this.tiles.push(tile);
+          row.push(tile);
         }
+
+        this.tiles.push(row);
       }
     },
   },
