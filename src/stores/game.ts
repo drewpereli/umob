@@ -1,14 +1,14 @@
 import { defineStore } from 'pinia';
 import random from 'random';
-import { Tile, useMap } from './map';
+import { Floor, Tile, useMap } from './map';
 
 export const useGame = defineStore('game', {
   state: () => ({
-    player: new Player({ x: 10, y: 10 }),
+    player: new Player({ x: 0, y: 0 }),
     actors: [
-      new Actor({ x: 2, y: 4 }),
-      new Actor({ x: 15, y: 14 }),
-      new Actor({ x: 11, y: 10 }),
+      // new Actor({ x: 2, y: 4 }),
+      // new Actor({ x: 15, y: 14 }),
+      // new Actor({ x: 11, y: 10 }),
     ] as Actor[],
     currTime: 0,
     map: useMap(),
@@ -26,6 +26,17 @@ export const useGame = defineStore('game', {
   actions: {
     initialize() {
       this.map.generate();
+
+      // Get random floor tile for player
+      const floorTiles = this.map.tiles
+        .flat()
+        .filter((tile) => tile.terrain instanceof Floor);
+
+      const idx = random.int(0, floorTiles.length - 1);
+      const tile = floorTiles[idx];
+
+      this.player.x = tile.x;
+      this.player.y = tile.y;
     },
     movePlayer({ x, y }: { x?: number; y?: number }) {
       const targetCoords: Coords = {
