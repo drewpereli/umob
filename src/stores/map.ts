@@ -1,5 +1,13 @@
+import bresenham from '@/utils/bresnham';
 import { generate } from '@/utils/map-generation';
 import { defineStore } from 'pinia';
+
+export enum Dir {
+  Up,
+  Right,
+  Down,
+  Left,
+}
 
 export const useMap = defineStore('map', {
   state: () => ({
@@ -11,6 +19,24 @@ export const useMap = defineStore('map', {
     tileAt() {
       return (coords: Coords) => {
         return this.tiles[coords.y][coords.x];
+      };
+    },
+    tilesBetween() {
+      return (t1: Tile, t2: Tile) => {
+        const coords = bresenham(t1, t2);
+
+        return coords.map(this.tileAt);
+      };
+    },
+    adjacentTile() {
+      return (tile: Tile, dir: Dir): Tile | undefined => {
+        const xDiff = dir === Dir.Left ? -1 : dir === Dir.Right ? 1 : 0;
+        const yDiff = dir === Dir.Up ? -1 : dir === Dir.Down ? 1 : 0;
+
+        const x = tile.x + xDiff;
+        const y = tile.y + yDiff;
+
+        return this.tileAt({ x, y });
       };
     },
   },

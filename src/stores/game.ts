@@ -3,8 +3,17 @@ import { defineStore } from 'pinia';
 import random from 'random';
 import { Floor, Tile, useMap } from './map';
 
+interface State {
+  player: Player;
+  actors: Actor[];
+  currTime: number;
+  map: ReturnType<typeof useMap>;
+  fovUtil: PermissiveFov;
+  selectedTile: Tile | null;
+}
+
 export const useGame = defineStore('game', {
-  state: () => ({
+  state: (): State => ({
     player: new Player({ x: 0, y: 0 }),
     actors: [
       // new Actor({ x: 2, y: 4 }),
@@ -14,6 +23,7 @@ export const useGame = defineStore('game', {
     currTime: 0,
     map: useMap(),
     fovUtil: null as unknown as PermissiveFov,
+    selectedTile: null,
   }),
   getters: {
     allActors: (state) => [state.player, ...state.actors],
@@ -38,6 +48,15 @@ export const useGame = defineStore('game', {
       );
 
       return visibleTiles;
+    },
+    tilesBetweenPlayerAndSelected(): Tile[] {
+      const selectedTile = this.selectedTile;
+
+      if (!selectedTile) return [];
+
+      const playerTile = this.map.tileAt(this.player);
+
+      return this.map.tilesBetween(playerTile, selectedTile);
     },
   },
   actions: {
@@ -153,4 +172,10 @@ class Actor {
 class Player extends Actor {
   char = '@';
   color = 'yellow';
+  inventory = [new Gun()];
+  equippedWeapon = this.inventory[0];
+}
+
+class Gun {
+  damage = 10;
 }

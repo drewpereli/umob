@@ -24,7 +24,7 @@ export const useCamera = defineStore('camera', {
       });
     },
     cameraCenter(): Coords {
-      let { x, y } = this.game.player.coords;
+      let { x, y } = this._idealCameraCenter;
 
       if (x < this.viewRadius) x = this.viewRadius;
 
@@ -37,6 +37,10 @@ export const useCamera = defineStore('camera', {
         y = this.map.height - this.viewRadius;
 
       return { x, y };
+    },
+    // Camera center but it might be out of bounds
+    _idealCameraCenter(): Coords {
+      return this.game.selectedTile ?? this.map.tileAt(this.game.player);
     },
   },
 });

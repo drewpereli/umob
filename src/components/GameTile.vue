@@ -30,12 +30,27 @@ export default defineComponent({
 
       return this.actor?.color ?? this.tile.terrain.color;
     },
+    bgColor() {
+      const selectedTilesIds = this.game.tilesBetweenPlayerAndSelected.map(
+        (t) => t.id
+      );
+
+      if (this.tile.id === this.game.selectedTile?.id) {
+        return '#880';
+      }
+
+      if (selectedTilesIds.includes(this.tile.id)) {
+        return '#550';
+      }
+
+      return 'black';
+    },
   },
 });
 </script>
 
 <template>
-  <div class="game-tile" :style="{ color: color }">
+  <div class="game-tile" :style="{ color: color, backgroundColor: bgColor }">
     {{ char }}
   </div>
 </template>
