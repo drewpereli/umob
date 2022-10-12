@@ -2,7 +2,7 @@ import { ActionUiState } from '@/utils/action-handlers';
 import { PermissiveFov } from 'permissive-fov';
 import { defineStore } from 'pinia';
 import random from 'random';
-import { Floor, Tile, useMap } from './map';
+import { Floor, Tile, useMap, Wall } from './map';
 
 interface State {
   player: Player;
@@ -59,7 +59,32 @@ export const useGame = defineStore('game', {
 
       const playerTile = this.map.tileAt(this.player);
 
-      return this.map.tilesBetween(playerTile, selectedTile);
+      return this.map.tilesBetween(playerTile, selectedTile).slice(1);
+    },
+    tilesAimedAt(): Tile[] {
+      if (this.actionUiState !== ActionUiState.Aiming) return [];
+
+      let penetrationRemaining = this.player.equippedWeapon.penetration;
+
+      const tiles: Tile[] = [];
+
+      const tilesBetween = this.tilesBetweenPlayerAndSelected;
+
+      for (const tile of tilesBetween) {
+        tiles.push(tile);
+
+        const actor = this.actorAt(tile);
+
+        penetrationRemaining -= tile.terrain.penetrationBlock;
+
+        if (actor) {
+          penetrationRemaining -= actor.penetrationBlock;
+        }
+
+        if (penetrationRemaining < 0) break;
+      }
+
+      return tiles;
     },
   },
   actions: {
@@ -126,6 +151,8 @@ class Actor {
 
   timeUntilNextAction = 0;
 
+  penetrationBlock = 1;
+
   char = 'd';
   readonly color: string = 'white';
 
@@ -181,4 +208,5 @@ class Player extends Actor {
 
 class Gun {
   damage = 10;
+  penetration = 0;
 }

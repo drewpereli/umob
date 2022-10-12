@@ -75,6 +75,7 @@ abstract class Terrain {
   abstract readonly char: string;
   abstract readonly moveTimeMultiplier: number | null;
   readonly color: string = '#ccc';
+  readonly penetrationBlock: number = 0;
 }
 
 export class Floor extends Terrain {
@@ -86,4 +87,5 @@ export class Floor extends Terrain {
 export class Wall extends Terrain {
   char = '#';
   moveTimeMultiplier = null;
+  penetrationBlock = 2;
 }
