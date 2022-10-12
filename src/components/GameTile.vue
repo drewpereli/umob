@@ -21,14 +21,31 @@ export default defineComponent({
       return visibleTileIds.includes(this.tile.id);
     },
     char() {
-      if (!this.visible) return '';
+      if (this.visible) {
+        return this.actor?.char ?? this.tile.terrain.char;
+      }
 
-      return this.actor?.char ?? this.tile.terrain.char;
+      if (this.tile.terrainLastSeenByPlayer) {
+        return this.tile.terrainLastSeenByPlayer.char;
+      }
+
+      return '';
     },
     mainLayerStyle() {
       if (!this.visible) return {};
 
       return { color: this.actor?.color ?? this.tile.terrain.color };
+    },
+    visibilityLayerStyle() {
+      let backgroundColor = 'black';
+
+      if (this.visible) {
+        backgroundColor = 'transparent';
+      } else if (this.tile.terrainLastSeenByPlayer) {
+        backgroundColor = 'rgba(0,0,0,0.5)';
+      }
+
+      return { backgroundColor };
     },
     uiLayerStyle() {
       let backgroundColor = 'transparent';
@@ -50,6 +67,7 @@ export default defineComponent({
 <template>
   <div class="game-tile">
     <div class="main-layer" :style="mainLayerStyle">{{ char }}</div>
+    <div :style="visibilityLayerStyle" />
     <div :style="uiLayerStyle" />
   </div>
 </template>

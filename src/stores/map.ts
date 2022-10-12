@@ -58,6 +58,8 @@ export class Tile {
   readonly y;
   terrain;
 
+  terrainLastSeenByPlayer?: Terrain;
+
   get canMoveTo() {
     return this.terrain.moveTimeMultiplier !== null;
   }
@@ -68,6 +70,10 @@ export class Tile {
 
   get id() {
     return `${this.x},${this.y}`;
+  }
+
+  onPlayerSees() {
+    this.terrainLastSeenByPlayer = { ...this.terrain };
   }
 }
 

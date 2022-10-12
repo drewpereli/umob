@@ -50,6 +50,8 @@ export const useGame = defineStore('game', {
         }
       );
 
+      visibleTiles.forEach((tile) => tile.onPlayerSees());
+
       return visibleTiles;
     },
     tilesBetweenPlayerAndSelected(): Tile[] {
