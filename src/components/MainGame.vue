@@ -7,8 +7,17 @@ import GameTiles from './GameTiles.vue';
 export default defineComponent({
   components: { GameTiles },
   methods: {
-    onKey({ key }: KeyboardEvent) {
-      actionHandlers[this.game.actionUiState][key](this.game);
+    async onKey({ key }: KeyboardEvent) {
+      if (this.onKeyIsRunning) return;
+
+      this.onKeyIsRunning = true;
+
+      try {
+        actionHandlers[this.game.actionUiState][key](this.game);
+      } finally {
+        await new Promise((res) => setTimeout(res, 0));
+        this.onKeyIsRunning = false;
+      }
     },
   },
   setup() {
@@ -18,9 +27,10 @@ export default defineComponent({
 
     return { game };
   },
-  data(): { uiState: ActionUiState } {
+  data() {
     return {
       uiState: ActionUiState.Default,
+      onKeyIsRunning: false,
     };
   },
 });
