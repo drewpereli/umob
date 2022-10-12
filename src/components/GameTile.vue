@@ -53,15 +53,14 @@ export default defineComponent({
   </div>
 </template>
 
-<style scoped>
-.game-tile {
-  width: 32px;
-  height: 32px;
-  background-color: black;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
-  font-size: 24px;
-}
+<style scoped lang="stylus">
+.game-tile
+  width: 32px
+  height: 32px
+  background-color: black
+  display: flex
+  align-items: center
+  justify-content: center
+  font-weight: bold
+  font-size: 24px
 </style>
