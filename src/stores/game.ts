@@ -1,3 +1,4 @@
+import { ActionUiState } from '@/utils/action-handlers';
 import { PermissiveFov } from 'permissive-fov';
 import { defineStore } from 'pinia';
 import random from 'random';
@@ -10,6 +11,7 @@ interface State {
   map: ReturnType<typeof useMap>;
   fovUtil: PermissiveFov;
   selectedTile: Tile | null;
+  actionUiState: ActionUiState;
 }
 
 export const useGame = defineStore('game', {
@@ -24,6 +26,7 @@ export const useGame = defineStore('game', {
     map: useMap(),
     fovUtil: null as unknown as PermissiveFov,
     selectedTile: null,
+    actionUiState: ActionUiState.Default,
   }),
   getters: {
     allActors: (state) => [state.player, ...state.actors],
