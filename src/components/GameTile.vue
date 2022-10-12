@@ -25,42 +25,52 @@ export default defineComponent({
 
       return this.actor?.char ?? this.tile.terrain.char;
     },
-    color() {
-      if (!this.visible) return 'black';
+    mainLayerStyle() {
+      if (!this.visible) return {};
 
-      return this.actor?.color ?? this.tile.terrain.color;
+      return { color: this.actor?.color ?? this.tile.terrain.color };
     },
-    bgColor() {
+    uiLayerStyle() {
+      let backgroundColor = 'transparent';
+
       const aimedTileIds = this.game.tilesAimedAt.map((t) => t.id);
 
       if (this.tile.id === this.game.selectedTile?.id) {
-        return '#880';
+        backgroundColor = 'rgba(136,136,0,0.75)';
+      } else if (aimedTileIds.includes(this.tile.id)) {
+        backgroundColor = 'rgba(85,85,0,0.75)';
       }
 
-      if (aimedTileIds.includes(this.tile.id)) {
-        return '#550';
-      }
-
-      return 'black';
+      return { backgroundColor };
     },
   },
 });
 </script>
 
 <template>
-  <div class="game-tile" :style="{ color: color, backgroundColor: bgColor }">
-    {{ char }}
+  <div class="game-tile">
+    <div class="main-layer" :style="mainLayerStyle">{{ char }}</div>
+    <div :style="uiLayerStyle" />
   </div>
 </template>
 
 <style scoped lang="stylus">
 .game-tile
-  width: 32px
-  height: 32px
-  background-color: black
-  display: flex
-  align-items: center
-  justify-content: center
-  font-weight: bold
-  font-size: 24px
+  length = 32px
+  width length
+  height length
+  background-color black
+  font-size 0.75 * length
+  position relative
+
+  & > div
+    position absolute
+    width 100%
+    height 100%
+
+  .main-layer {
+    display flex
+    align-items center
+    justify-content center
+  }
 </style>
