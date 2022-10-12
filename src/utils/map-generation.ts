@@ -1,8 +1,18 @@
 import { Floor, Tile, Wall } from '@/stores/map';
+import { debugOptions } from './debug-options';
 
 type Map = Tile[][];
 
 export function generate(width: number, height: number): Map {
+  if (debugOptions.smallMap) {
+    width = 21;
+    height = 21;
+  }
+
+  if (debugOptions.emptyMap) {
+    return generateEmpty(width, height);
+  }
+
   const tileArr = generateLevel({ x: width, y: height }).tiles;
 
   const map: Map = [];
@@ -24,6 +34,28 @@ export function generate(width: number, height: number): Map {
   });
 
   return map;
+}
+
+export function generateEmpty(width: number, height: number): Map {
+  return Array.from({ length: height }).map((_, y) => {
+    return Array.from({ length: width }).map((_, x) => {
+      const onEdge = x === 0 || y === 0 || x === width - 1 || y === height - 1;
+
+      if (onEdge) {
+        return new Tile({
+          x,
+          y,
+          terrain: new Wall(),
+        });
+      } else {
+        return new Tile({
+          x,
+          y,
+          terrain: new Floor(),
+        });
+      }
+    });
+  });
 }
 
 // generate a random level with rooms
