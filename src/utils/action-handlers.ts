@@ -41,6 +41,9 @@ export const actionHandlers: Record<
       game.selectedTile = null;
       game.actionUiState = ActionUiState.Default;
     },
+    f: (game) => {
+      game.playerFireWeapon();
+    },
   },
 };
 

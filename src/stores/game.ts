@@ -18,7 +18,7 @@ export const useGame = defineStore('game', {
   state: (): State => ({
     player: new Player({ x: 0, y: 0 }),
     actors: [
-      // new Actor({ x: 2, y: 4 }),
+      new Actor({ x: 2, y: 4 }),
       // new Actor({ x: 15, y: 14 }),
       // new Actor({ x: 11, y: 10 }),
     ] as Actor[],
@@ -88,6 +88,11 @@ export const useGame = defineStore('game', {
 
       return tiles;
     },
+    actorsAimedAt(): Actor[] {
+      return this.tilesAimedAt
+        .map((tile) => this.actorAt(tile))
+        .filter((t): t is Actor => !!t);
+    },
   },
   actions: {
     initialize() {
@@ -128,14 +133,25 @@ export const useGame = defineStore('game', {
 
       this.player.move(targetTile);
 
+      this._tickUntilPlayerCanAct();
+    },
+    playerFireWeapon() {
+      this.player.fireWeapon(this.actorsAimedAt);
+      this._tickUntilPlayerCanAct();
+    },
+    _tickUntilPlayerCanAct() {
       while (!this.player.canAct) {
         this.actors.forEach((actor) => actor.act(this));
+        this._cullDeadActors();
         this._tick();
       }
     },
     _tick() {
       this.allActors.forEach((actor) => actor.tick());
       this.currTime++;
+    },
+    _cullDeadActors() {
+      this.actors = this.actors.filter((actor) => !actor.isDead);
     },
   },
 });
@@ -149,11 +165,17 @@ class Actor {
   x;
   y;
 
+  health = 100;
+
   moveTime = 10;
+  attackTime = 2;
 
   timeUntilNextAction = 0;
 
   penetrationBlock = 1;
+
+  inventory = [new Gun()];
+  equippedWeapon = this.inventory[0];
 
   char = 'd';
   readonly color: string = 'white';
@@ -167,6 +189,21 @@ class Actor {
       this.moveTime * (tile.terrain.moveTimeMultiplier as number);
   }
 
+  fireWeapon(actors: Actor[]) {
+    console.log(actors);
+
+    if (!this.canAct) return;
+
+    actors.forEach((actor) => actor.receiveFire(this.equippedWeapon.damage));
+
+    this.timeUntilNextAction =
+      this.attackTime * this.equippedWeapon.attackTimeMultiplier;
+  }
+
+  receiveFire(damage: number) {
+    this.health -= damage;
+  }
+
   tick() {
     if (this.timeUntilNextAction > 0) {
       this.timeUntilNextAction--;
@@ -174,7 +211,11 @@ class Actor {
   }
 
   get canAct() {
-    return this.timeUntilNextAction === 0;
+    return this.timeUntilNextAction === 0 && !this.isDead;
+  }
+
+  get isDead() {
+    return this.health <= 0;
   }
 
   act(state: {
@@ -204,11 +245,10 @@ class Actor {
 class Player extends Actor {
   char = '@';
   color = 'yellow';
-  inventory = [new Gun()];
-  equippedWeapon = this.inventory[0];
 }
 
 class Gun {
-  damage = 10;
+  damage = 1000;
   penetration = 0;
+  attackTimeMultiplier = 1;
 }

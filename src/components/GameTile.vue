@@ -48,17 +48,26 @@ export default defineComponent({
       return { backgroundColor };
     },
     uiLayerStyle() {
-      let backgroundColor = 'transparent';
+      const style = {
+        backgroundColor: 'transparent',
+      };
 
-      const aimedTileIds = this.game.tilesAimedAt.map((t) => t.id);
-
-      if (this.tile.id === this.game.selectedTile?.id) {
-        backgroundColor = 'rgba(136,136,0,0.75)';
-      } else if (aimedTileIds.includes(this.tile.id)) {
-        backgroundColor = 'rgba(85,85,0,0.75)';
+      if (this.tileHasActorAimedAt) {
+        style.backgroundColor = 'rgba(136,0,0,0.5)';
+      } else if (this.tile.id === this.game.selectedTile?.id) {
+        style.backgroundColor = 'rgba(136,136,0,0.75)';
+      } else if (this.tileIsAimedAt) {
+        style.backgroundColor = 'rgba(85,85,0,0.75)';
       }
 
-      return { backgroundColor };
+      return style;
+    },
+    tileIsAimedAt() {
+      const aimedTileIds = this.game.tilesAimedAt.map((t) => t.id);
+      return aimedTileIds.includes(this.tile.id);
+    },
+    tileHasActorAimedAt() {
+      return this.tileIsAimedAt && !!this.game.actorAt(this.tile);
     },
   },
 });
