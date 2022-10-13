@@ -6,7 +6,7 @@ import {
 import { useGame } from '@/stores/game';
 import { distance, type Tile } from '@/stores/map';
 import { debugOptions } from '@/utils/debug-options';
-import { ShotGun } from './gun';
+import { Pistol, ShotGun } from './gun';
 
 enum Mood {
   Hostile = 'hostile',
@@ -23,14 +23,16 @@ export default class Actor {
 
   health = 100;
 
-  moveTime = 10;
-  attackTime = 10;
+  moveTime = 2;
+  attackTime = 2;
 
   timeUntilNextAction = 0;
 
   penetrationBlock = 1;
 
-  inventory = [new ShotGun()];
+  viewRange = 10;
+
+  inventory = [new Pistol()];
   equippedWeapon = this.inventory[0];
 
   char = 'd';
@@ -89,19 +91,23 @@ export default class Actor {
     if (this.mood === Mood.Hostile) {
       if (this.canAttackPlayer) return this.fireWeapon([this.game.player]);
 
-      const coordsPathToPlayer = this.game.map.pathBetween(
-        this.coords,
-        this.game.player.coords,
-        this
-      );
+      if (this.canSeePlayer) {
+        const coordsPathToPlayer = this.game.map.pathBetween(
+          this.coords,
+          this.game.player.coords,
+          this
+        );
 
-      const coordsTowardsPlayer = coordsPathToPlayer[1];
+        const coordsTowardsPlayer = coordsPathToPlayer[1];
 
-      const tile = this.game.map.tileAt(coordsTowardsPlayer);
+        if (!coordsTowardsPlayer) return;
 
-      if (!this.canMoveTo(tile)) return;
+        const tile = this.game.map.tileAt(coordsTowardsPlayer);
 
-      this.move(tile);
+        if (!this.canMoveTo(tile)) return;
+
+        this.move(tile);
+      }
     }
   }
 
@@ -110,6 +116,7 @@ export default class Actor {
   }
 
   get canAttackPlayer() {
+    if (!this.canSeePlayer) return false;
     if (!this.equippedWeapon) return false;
 
     const dist = distance(this, this.game.player);
@@ -118,13 +125,19 @@ export default class Actor {
 
     const tilesBetween = this.game.map
       .tilesBetween(this, this.game.player)
-      .slice(1);
+      .slice(1, -1);
 
     const aimIsBlocked = tilesBetween.some(
       (tile) => tile.terrain.penetrationBlock > 0
     );
 
     return !aimIsBlocked;
+  }
+
+  get canSeePlayer() {
+    if (distance(this, this.game.player) > this.viewRange) return false;
+
+    return true;
   }
 
   canMoveTo(tile: Tile) {

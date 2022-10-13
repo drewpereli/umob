@@ -11,3 +11,8 @@ export class ShotGun extends Gun {
   spread = 20;
   range = 10;
 }
+
+export class Pistol extends Gun {
+  damage = 5;
+  range = 5;
+}
