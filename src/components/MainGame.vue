@@ -33,11 +33,14 @@ export default defineComponent({
       onKeyIsRunning: false,
     };
   },
+  mounted() {
+    (this.$refs.mainGame as HTMLElement).focus();
+  },
 });
 </script>
 
 <template>
-  <div @keydown="onKey" tabindex="1" class="main-game">
+  <div @keydown="onKey" tabindex="1" class="main-game" ref="mainGame">
     <GameTiles />
   </div>
 </template>
