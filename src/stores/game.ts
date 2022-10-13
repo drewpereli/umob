@@ -1,6 +1,7 @@
 import Actor from '@/entities/actor';
 import { Player } from '@/entities/player';
 import { ActionUiState } from '@/utils/action-handlers';
+import { debugOptions } from '@/utils/debug-options';
 import { random } from '@/utils/random';
 import { PermissiveFov } from 'permissive-fov';
 import { defineStore } from 'pinia';
@@ -133,13 +134,15 @@ export const useGame = defineStore('game', {
 
       this.actors.push(player);
 
-      Array.from({ length: 40 }).forEach(() => {
-        let tile = this.map.randomFloorTile();
+      if (debugOptions.extraEnemies) {
+        Array.from({ length: debugOptions.extraEnemies }).forEach(() => {
+          let tile = this.map.randomFloorTile();
 
-        while (this.actorAt(tile)) tile = this.map.randomFloorTile();
+          while (this.actorAt(tile)) tile = this.map.randomFloorTile();
 
-        this.actors.push(new Actor(tile));
-      });
+          this.actors.push(new Actor(tile));
+        });
+      }
     },
     movePlayer({ x, y }: { x?: number; y?: number }) {
       const targetCoords: Coords = {
