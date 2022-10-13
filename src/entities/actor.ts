@@ -5,6 +5,7 @@ import {
 } from '@/stores/animations';
 import { useGame } from '@/stores/game';
 import { distance, type Tile } from '@/stores/map';
+import { debugOptions } from '@/utils/debug-options';
 import Gun from './gun';
 
 enum Mood {
@@ -81,6 +82,8 @@ export default class Actor {
   }
 
   act() {
+    if (debugOptions.docileEnemies) return;
+
     if (!this.canAct) return;
 
     if (this.mood === Mood.Hostile) {
