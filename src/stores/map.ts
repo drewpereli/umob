@@ -3,6 +3,7 @@ import { generate } from '@/utils/map-generation';
 import { defineStore } from 'pinia';
 import pathfinding from 'pathfinding';
 import type Actor from '@/entities/actor';
+import { debugOptions } from '@/utils/debug-options';
 
 export enum Dir {
   Up,
@@ -14,8 +15,8 @@ export enum Dir {
 export const useMap = defineStore('map', {
   state: () => ({
     tiles: [] as Tile[][],
-    width: 80,
-    height: 80,
+    width: debugOptions.smallMap ? 21 : 80,
+    height: debugOptions.smallMap ? 21 : 80,
   }),
   getters: {
     tileAt() {

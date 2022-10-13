@@ -110,7 +110,7 @@ export const useGame = defineStore('game', {
       this.fovUtil = fov;
 
       this.actors.push(player);
-      this.actors.push(new Actor({ x: 10, y: 10 }));
+      // this.actors.push(new Actor({ x: 10, y: 10 }));
     },
     movePlayer({ x, y }: { x?: number; y?: number }) {
       const targetCoords: Coords = {

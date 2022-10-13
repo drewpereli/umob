@@ -4,11 +4,6 @@ import { debugOptions } from './debug-options';
 type Map = Tile[][];
 
 export function generate(width: number, height: number): Map {
-  if (debugOptions.smallMap) {
-    width = 21;
-    height = 21;
-  }
-
   if (debugOptions.emptyMap) {
     return generateEmpty(width, height);
   }

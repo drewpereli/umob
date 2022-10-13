@@ -28,13 +28,13 @@ export const useCamera = defineStore('camera', {
 
       if (x < this.viewRadius) x = this.viewRadius;
 
-      if (x > this.map.width - this.viewRadius)
-        x = this.map.width - this.viewRadius;
+      if (x > this.map.width - this.viewRadius - 1)
+        x = this.map.width - this.viewRadius - 1;
 
       if (y < this.viewRadius) y = this.viewRadius;
 
-      if (y > this.map.height - this.viewRadius)
-        y = this.map.height - this.viewRadius;
+      if (y > this.map.height - this.viewRadius - 1)
+        y = this.map.height - this.viewRadius - 1;
 
       return { x, y };
     },

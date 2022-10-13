@@ -56,7 +56,6 @@ export default defineComponent({
 <style scoped lang="stylus">
 .main-game
   display relative
-  border 1px solid white
 
   &:focus
     outline none
