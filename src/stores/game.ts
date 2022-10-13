@@ -5,7 +5,15 @@ import { random } from '@/utils/random';
 import { PermissiveFov } from 'permissive-fov';
 import { defineStore } from 'pinia';
 import { useAnimations } from './animations';
-import { distance, Floor, Tile, useMap } from './map';
+import {
+  angle,
+  angularDistance,
+  coordsEqual,
+  distance,
+  Floor,
+  Tile,
+  useMap,
+} from './map';
 
 export const useGame = defineStore('game', {
   state: () => ({
@@ -54,11 +62,29 @@ export const useGame = defineStore('game', {
       return this.map.tilesBetween(playerTile, selectedTile).slice(1);
     },
     tilesAimedAt(): Tile[] {
-      if (this.actionUiState !== ActionUiState.Aiming) return [];
+      if (this.actionUiState !== ActionUiState.Aiming || !this.selectedTile)
+        return [];
 
-      let penetrationRemaining = this.player.equippedWeapon.penetration;
+      const weapon = this.player.equippedWeapon;
+
+      let penetrationRemaining = weapon.penetration;
 
       const tiles: Tile[] = [];
+
+      if (weapon.spread) {
+        const tilesInRadius = this.map
+          .tilesInRadius(this.player, weapon.range)
+          .filter((tile) => !coordsEqual(tile, this.player));
+
+        const aimAngle = angle(this.player, this.selectedTile);
+
+        return tilesInRadius.filter((t) => {
+          const tileAngle = angle(this.player, t);
+          const diff = angularDistance(aimAngle, tileAngle);
+
+          return diff <= weapon.spread;
+        });
+      }
 
       const tilesBetween = this.tilesBetweenPlayerAndSelected;
 
@@ -91,12 +117,7 @@ export const useGame = defineStore('game', {
     initialize() {
       this.map.generate();
 
-      // Get random floor tile for player
-      const floorTiles = this.map.tiles
-        .flat()
-        .filter((tile) => tile.terrain instanceof Floor);
-
-      const tile = random.arrayElement(floorTiles);
+      const tile = this.map.randomFloorTile();
 
       const player = new Player(tile);
 
@@ -109,7 +130,14 @@ export const useGame = defineStore('game', {
       this.fovUtil = fov;
 
       this.actors.push(player);
-      // this.actors.push(new Actor({ x: 10, y: 10 }));
+
+      Array.from({ length: 40 }).forEach(() => {
+        let tile = this.map.randomFloorTile();
+
+        while (this.actorAt(tile)) tile = this.map.randomFloorTile();
+
+        this.actors.push(new Actor(tile));
+      });
     },
     movePlayer({ x, y }: { x?: number; y?: number }) {
       const targetCoords: Coords = {

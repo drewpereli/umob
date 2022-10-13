@@ -6,7 +6,7 @@ import {
 import { useGame } from '@/stores/game';
 import { distance, type Tile } from '@/stores/map';
 import { debugOptions } from '@/utils/debug-options';
-import Gun from './gun';
+import { ShotGun } from './gun';
 
 enum Mood {
   Hostile = 'hostile',
@@ -30,7 +30,7 @@ export default class Actor {
 
   penetrationBlock = 1;
 
-  inventory = [new Gun()];
+  inventory = [new ShotGun()];
   equippedWeapon = this.inventory[0];
 
   char = 'd';

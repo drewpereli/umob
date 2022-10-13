@@ -73,6 +73,23 @@ export const useMap = defineStore('map', {
         return random.arrayElement(floorTiles);
       };
     },
+    tilesInRadius() {
+      return (center: Coords, radius: number) => {
+        const rowStart = Math.max(center.y - radius, 0);
+        const rowEnd = center.y + radius;
+        const colStart = Math.max(center.x - radius, 0);
+        const colEnd = center.x + radius;
+
+        const square = this.tiles
+          .slice(rowStart, rowEnd)
+          .map((row) => {
+            return row.slice(colStart, colEnd);
+          })
+          .flat();
+
+        return square.filter((tile) => distance(center, tile) <= radius);
+      };
+    },
   },
   actions: {
     generate() {
@@ -130,10 +147,18 @@ export class Wall extends Terrain {
   penetrationBlock = 2;
 }
 
-function coordsEqual(c1: Coords, c2: Coords) {
+export function coordsEqual(c1: Coords, c2: Coords) {
   return c1.x === c2.x && c1.y === c2.y;
 }
 
 export function distance(c1: Coords, c2: Coords) {
   return Math.sqrt((c2.x - c1.x) ** 2 + (c2.y - c1.y) ** 2);
+}
+
+export function angle(c1: Coords, c2: Coords) {
+  return Math.atan2(c2.y - c1.y, c2.x - c1.x) * (180 / Math.PI);
+}
+
+export function angularDistance(sourceA: number, targetA: number) {
+  return Math.abs(((((targetA - sourceA + 180) % 360) + 360) % 360) - 180);
 }

@@ -3,7 +3,7 @@ const debugMode = true;
 const activeOptions = {
   emptyMap: true,
   smallMap: true,
-  randomWallsInEmptyMap: 10,
+  randomWallsInEmptyMap: 0,
   docileEnemies: true,
 };
 
