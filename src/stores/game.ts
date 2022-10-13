@@ -5,7 +5,7 @@ import { PermissiveFov } from 'permissive-fov';
 import { defineStore } from 'pinia';
 import random from 'random';
 import { useAnimations } from './animations';
-import { Floor, Tile, useMap } from './map';
+import { distance, Floor, Tile, useMap } from './map';
 
 export const useGame = defineStore('game', {
   state: () => ({
@@ -63,6 +63,9 @@ export const useGame = defineStore('game', {
       const tilesBetween = this.tilesBetweenPlayerAndSelected;
 
       for (const tile of tilesBetween) {
+        if (distance(this.player, tile) > this.player.equippedWeapon.range)
+          break;
+
         tiles.push(tile);
 
         const actor = this.actorAt(tile);
