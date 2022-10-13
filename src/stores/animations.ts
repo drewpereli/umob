@@ -41,8 +41,6 @@ export const useAnimations = defineStore('animations', {
   }),
   actions: {
     async runAnimations() {
-      if (this.animations.length === 0) return;
-
       this.animations.forEach((animation) => (animation.isRunning = true));
 
       await new Promise((res) => setTimeout(res, ANIMATION_DURATION));

@@ -132,7 +132,9 @@ export const useGame = defineStore('game', {
       this._tickUntilPlayerCanAct();
     },
     async _tickUntilPlayerCanAct() {
-      await this.animations.runAnimations();
+      if (this.animations.animations.length) {
+        await this.animations.runAnimations();
+      }
 
       while (!this.player.canAct) {
         this.nonPlayerActors.forEach((actor) => actor.act());
