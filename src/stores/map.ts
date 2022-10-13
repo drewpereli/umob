@@ -4,6 +4,7 @@ import { defineStore } from 'pinia';
 import pathfinding from 'pathfinding';
 import type Actor from '@/entities/actor';
 import { debugOptions } from '@/utils/debug-options';
+import { random } from '@/utils/random';
 
 export enum Dir {
   Up,
@@ -61,6 +62,15 @@ export const useMap = defineStore('map', {
         const path = finder.findPath(from.x, from.y, to.x, to.y, grid);
 
         return path.map(([x, y]) => ({ x, y }));
+      };
+    },
+    randomFloorTile() {
+      return () => {
+        const floorTiles: Tile[] = this.tiles
+          .flat()
+          .filter((tile) => tile.terrain instanceof Floor);
+
+        return random.arrayElement(floorTiles);
       };
     },
   },
