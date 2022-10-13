@@ -1,11 +1,27 @@
 import { Floor, Tile, Wall } from '@/stores/map';
 import { debugOptions } from './debug-options';
+import { random } from './random';
 
 type Map = Tile[][];
 
 export function generate(width: number, height: number): Map {
   if (debugOptions.emptyMap) {
-    return generateEmpty(width, height);
+    const map = generateEmpty(width, height);
+
+    if (debugOptions.randomWallsInEmptyMap) {
+      const openTiles = map.flatMap((row) => {
+        return row.filter((tile) => tile.terrain instanceof Floor);
+      });
+
+      const randOpen = random.arrayElements(
+        openTiles,
+        debugOptions.randomWallsInEmptyMap
+      );
+
+      randOpen.forEach((tile) => (tile.terrain = new Wall()));
+    }
+
+    return map;
   }
 
   const tileArr = generateLevel({ x: width, y: height }).tiles;
