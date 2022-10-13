@@ -1,5 +1,5 @@
 export default class Gun {
-  damage = 1000;
+  damage = 10;
   penetration = 0;
   attackTimeMultiplier = 1;
   range = 3;

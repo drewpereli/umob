@@ -4,8 +4,12 @@ import {
   type GameAnimation,
 } from '@/stores/animations';
 import { useGame } from '@/stores/game';
-import type { Tile } from '@/stores/map';
+import { distance, type Tile } from '@/stores/map';
 import Gun from './gun';
+
+enum Mood {
+  Hostile = 'hostile',
+}
 
 export default class Actor {
   constructor({ x, y }: { x: number; y: number }) {
@@ -19,7 +23,7 @@ export default class Actor {
   health = 100;
 
   moveTime = 10;
-  attackTime = 2;
+  attackTime = 10;
 
   timeUntilNextAction = 0;
 
@@ -31,11 +35,12 @@ export default class Actor {
   char = 'd';
   readonly color: string = 'white';
 
-  // readonly map = useMap();
   readonly game = useGame();
   readonly animationsStore = useAnimations();
 
   animations: GameAnimation[] = [];
+
+  mood = Mood.Hostile;
 
   move(tile: Tile) {
     if (!this.canAct) return;
@@ -47,8 +52,6 @@ export default class Actor {
   }
 
   fireWeapon(actors: Actor[]) {
-    console.log(actors);
-
     if (!this.canAct) return;
 
     actors.forEach((actor) => actor.receiveFire(this.equippedWeapon.damage));
@@ -80,23 +83,45 @@ export default class Actor {
   act() {
     if (!this.canAct) return;
 
-    const coordsPathToPlayer = this.game.map.pathBetween(
-      this.coords,
-      this.game.player.coords,
-      this
-    );
+    if (this.mood === Mood.Hostile) {
+      if (this.canAttackPlayer) return this.fireWeapon([this.game.player]);
 
-    const coordsTowardsPlayer = coordsPathToPlayer[1];
+      const coordsPathToPlayer = this.game.map.pathBetween(
+        this.coords,
+        this.game.player.coords,
+        this
+      );
 
-    const tile = this.game.map.tileAt(coordsTowardsPlayer);
+      const coordsTowardsPlayer = coordsPathToPlayer[1];
 
-    if (!this.canMoveTo(tile)) return;
+      const tile = this.game.map.tileAt(coordsTowardsPlayer);
 
-    this.move(tile);
+      if (!this.canMoveTo(tile)) return;
+
+      this.move(tile);
+    }
   }
 
   get coords(): Coords {
     return { x: this.x, y: this.y };
+  }
+
+  get canAttackPlayer() {
+    if (!this.equippedWeapon) return false;
+
+    const dist = distance(this, this.game.player);
+
+    if (dist > this.equippedWeapon.range) return false;
+
+    const tilesBetween = this.game.map
+      .tilesBetween(this, this.game.player)
+      .slice(1);
+
+    const aimIsBlocked = tilesBetween.some(
+      (tile) => tile.terrain.penetrationBlock > 0
+    );
+
+    return !aimIsBlocked;
   }
 
   canMoveTo(tile: Tile) {

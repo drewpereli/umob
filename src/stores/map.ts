@@ -24,8 +24,8 @@ export const useMap = defineStore('map', {
       };
     },
     tilesBetween() {
-      return (t1: Tile, t2: Tile) => {
-        const coords = bresenham(t1, t2);
+      return (c1: Coords, c2: Coords) => {
+        const coords = bresenham(c1, c2);
 
         return coords.map(this.tileAt);
       };
