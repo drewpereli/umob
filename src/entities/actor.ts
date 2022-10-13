@@ -1,3 +1,8 @@
+import {
+  DamageAnimation,
+  useAnimations,
+  type GameAnimation,
+} from '@/stores/animations';
 import { useGame } from '@/stores/game';
 import type { Tile } from '@/stores/map';
 import random from 'random';
@@ -29,6 +34,9 @@ export default class Actor {
 
   // readonly map = useMap();
   readonly game = useGame();
+  readonly animationsStore = useAnimations();
+
+  animations: GameAnimation[] = [];
 
   move(tile: Tile) {
     if (!this.canAct) return;
@@ -52,6 +60,8 @@ export default class Actor {
 
   receiveFire(damage: number) {
     this.health -= damage;
+    const animation = new DamageAnimation(this);
+    this.animationsStore.addAnimation(animation);
   }
 
   tick() {

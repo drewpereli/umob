@@ -36,6 +36,20 @@ export default defineComponent({
 
       return { color: this.actor?.color ?? this.tile.terrain.color };
     },
+    mainLayerClasses() {
+      if (!this.actor) return [];
+
+      const animations = this.actor.animations.filter((anim) => anim.isRunning);
+
+      if (animations.length === 0) return [];
+
+      return [
+        'animate',
+        ...animations.map((anim) => {
+          return anim.type;
+        }),
+      ];
+    },
     visibilityLayerStyle() {
       let backgroundColor = 'black';
 
@@ -75,7 +89,9 @@ export default defineComponent({
 
 <template>
   <div class="game-tile">
-    <div class="main-layer" :style="mainLayerStyle">{{ char }}</div>
+    <div class="main-layer" :style="mainLayerStyle" :class="mainLayerClasses">
+      {{ char }}
+    </div>
     <div :style="visibilityLayerStyle" />
     <div :style="uiLayerStyle" />
   </div>
@@ -95,9 +111,22 @@ export default defineComponent({
     width 100%
     height 100%
 
-  .main-layer {
+  .main-layer
     display flex
     align-items center
     justify-content center
-  }
+
+    &.animate
+      &.damage
+        animation-name damage-pulse
+        animation-iteration-count infinite
+        animation-duration .15s
+        animation-timing-function step-end
+
+        @keyframes damage-pulse
+          for i in 0..4
+            0%
+              color alpha(red, 0.4) !important
+            50%
+              color initial
 </style>

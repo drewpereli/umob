@@ -4,6 +4,7 @@ import { ActionUiState } from '@/utils/action-handlers';
 import { PermissiveFov } from 'permissive-fov';
 import { defineStore } from 'pinia';
 import random from 'random';
+import { useAnimations } from './animations';
 import { Floor, Tile, useMap } from './map';
 
 export const useGame = defineStore('game', {
@@ -12,8 +13,9 @@ export const useGame = defineStore('game', {
     currTime: 0,
     map: useMap(),
     fovUtil: null as unknown as PermissiveFov,
-    selectedTile: null,
+    selectedTile: null as null | Tile,
     actionUiState: ActionUiState.Default,
+    animations: useAnimations(),
   }),
   getters: {
     player: (state) => state.actors[0],
@@ -129,7 +131,9 @@ export const useGame = defineStore('game', {
       this.player.fireWeapon(this.actorsAimedAt);
       this._tickUntilPlayerCanAct();
     },
-    _tickUntilPlayerCanAct() {
+    async _tickUntilPlayerCanAct() {
+      await this.animations.runAnimations();
+
       while (!this.player.canAct) {
         this.nonPlayerActors.forEach((actor) => actor.act());
         this._cullDeadActors();
