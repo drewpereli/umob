@@ -41,7 +41,7 @@ export const useGame = defineStore('game', {
       this.fovUtil.compute(
         this.player.x,
         this.player.y,
-        10,
+        this.player.viewRange,
         (x: number, y: number) => {
           const tile = this.map.tileAt({ x, y });
           visibleTiles.push(tile);
@@ -71,7 +71,9 @@ export const useGame = defineStore('game', {
 
       const tiles: Tile[] = [];
 
-      if (weapon.spread) {
+      const spread = weapon.spread;
+
+      if (spread) {
         const tilesInRadius = this.map
           .tilesInRadius(this.player, weapon.range)
           .filter((tile) => !coordsEqual(tile, this.player));
@@ -82,7 +84,7 @@ export const useGame = defineStore('game', {
           const tileAngle = angle(this.player, t);
           const diff = angularDistance(aimAngle, tileAngle);
 
-          return diff <= weapon.spread;
+          return diff <= spread;
         });
       }
 

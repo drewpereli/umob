@@ -1,4 +1,4 @@
-const debugMode = true;
+const debugMode = false;
 
 const activeOptions = {
   emptyMap: true,
