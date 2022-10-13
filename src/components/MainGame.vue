@@ -35,21 +35,12 @@ export default defineComponent({
   mounted() {
     (this.$refs.mainGame as HTMLElement).focus();
   },
-  computed: {
-    gameOver() {
-      return this.game.actionUiState === ActionUiState.GameOver;
-    },
-  },
 });
 </script>
 
 <template>
   <div @keydown="onKey" tabindex="1" class="main-game" ref="mainGame">
     <GameTiles />
-
-    <div v-if="gameOver" class="game-over-container">
-      <div class="message">You Died</div>
-    </div>
   </div>
 </template>
 
@@ -59,25 +50,4 @@ export default defineComponent({
 
   &:focus
     outline none
-
-  .game-over-container
-    position absolute
-    top 0
-    left 0
-    width 100%
-    height 100%
-    display flex
-    align-items center
-    justify-content center
-
-    .message
-      display flex
-      align-items center
-      justify-content center
-      background-color black
-      padding 2rem 4rem
-      border 1px solid gray
-      font-size 3rem
-      font-weight bold
-      color red
 </style>
