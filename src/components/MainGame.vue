@@ -3,9 +3,10 @@ import { useGame } from '@/stores/game';
 import { actionHandlers, ActionUiState } from '@/utils/action-handlers';
 import { defineComponent } from 'vue';
 import GameTiles from './GameTiles.vue';
+import PlayerStatus from './PlayerStatus.vue';
 
 export default defineComponent({
-  components: { GameTiles },
+  components: { GameTiles, PlayerStatus },
   methods: {
     async onKey({ key }: KeyboardEvent) {
       if (this.onKeyIsRunning) return;
@@ -40,13 +41,16 @@ export default defineComponent({
 
 <template>
   <div @keydown="onKey" tabindex="1" class="main-game" ref="mainGame">
+    <PlayerStatus />
+
     <GameTiles />
   </div>
 </template>
 
 <style scoped lang="stylus">
 .main-game
-  display relative
+  display flex
+  gap 2rem
 
   &:focus
     outline none

@@ -22,6 +22,7 @@ export default class Actor {
   y;
 
   health = 100;
+  maxHealth = 100;
 
   moveTime = 2;
   attackTime = 2;
@@ -64,7 +65,7 @@ export default class Actor {
   }
 
   receiveFire(damage: number) {
-    this.health -= damage;
+    this.health = Math.max(this.health - damage, 0);
     const animation = new DamageAnimation(this);
     this.animationsStore.addAnimation(animation);
   }
