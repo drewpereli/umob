@@ -4,15 +4,15 @@ import { Dir } from '@/stores/map';
 export enum ActionUiState {
   Default = 'default',
   Aiming = 'aiming',
+  GameOver = 'game-over',
 }
 
 type Game = ReturnType<typeof useGame>;
 
 type KeyHandler = (game: Game) => unknown;
 
-export const actionHandlers: Record<
-  ActionUiState,
-  Record<string, KeyHandler>
+export const actionHandlers: Partial<
+  Record<ActionUiState, Record<string, KeyHandler>>
 > = {
   [ActionUiState.Default]: {
     ArrowUp: (game) => game.movePlayer({ y: -1 }),

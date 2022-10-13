@@ -132,6 +132,9 @@ export const useGame = defineStore('game', {
       this.player.fireWeapon(this.actorsAimedAt);
       this._tickUntilPlayerCanAct();
     },
+    onPlayerDie() {
+      this.actionUiState = ActionUiState.GameOver;
+    },
     async _tickUntilPlayerCanAct() {
       if (this.animations.animations.length) {
         await this.animations.runAnimations();
@@ -139,6 +142,9 @@ export const useGame = defineStore('game', {
 
       while (!this.player.canAct) {
         this.nonPlayerActors.forEach((actor) => actor.act());
+
+        if (this.actionUiState === ActionUiState.GameOver) return;
+
         this._cullDeadActors();
         this._tick();
       }

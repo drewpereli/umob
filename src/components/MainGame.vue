@@ -13,7 +13,7 @@ export default defineComponent({
       this.onKeyIsRunning = true;
 
       try {
-        actionHandlers[this.game.actionUiState][key](this.game);
+        actionHandlers[this.game.actionUiState]?.[key]?.(this.game);
       } finally {
         await new Promise((res) => setTimeout(res, 0));
         this.onKeyIsRunning = false;
@@ -29,12 +29,16 @@ export default defineComponent({
   },
   data() {
     return {
-      uiState: ActionUiState.Default,
       onKeyIsRunning: false,
     };
   },
   mounted() {
     (this.$refs.mainGame as HTMLElement).focus();
+  },
+  computed: {
+    gameOver() {
+      return this.game.actionUiState === ActionUiState.GameOver;
+    },
   },
 });
 </script>
@@ -42,11 +46,39 @@ export default defineComponent({
 <template>
   <div @keydown="onKey" tabindex="1" class="main-game" ref="mainGame">
     <GameTiles />
+
+    <div v-if="gameOver" class="game-over-container">
+      <div class="message">You Died</div>
+    </div>
   </div>
 </template>
 
-<style scoped>
-.main-game:focus {
-  outline: none;
-}
+<style scoped lang="stylus">
+.main-game
+  display relative
+  border 1px solid white
+
+  &:focus
+    outline none
+
+  .game-over-container
+    position absolute
+    top 0
+    left 0
+    width 100%
+    height 100%
+    display flex
+    align-items center
+    justify-content center
+
+    .message
+      display flex
+      align-items center
+      justify-content center
+      background-color black
+      padding 2rem 4rem
+      border 1px solid gray
+      font-size 3rem
+      font-weight bold
+      color red
 </style>
