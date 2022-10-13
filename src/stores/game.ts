@@ -1,9 +1,9 @@
 import Actor from '@/entities/actor';
 import { Player } from '@/entities/player';
 import { ActionUiState } from '@/utils/action-handlers';
+import { random } from '@/utils/random';
 import { PermissiveFov } from 'permissive-fov';
 import { defineStore } from 'pinia';
-import random from 'random';
 import { useAnimations } from './animations';
 import { distance, Floor, Tile, useMap } from './map';
 
@@ -96,8 +96,7 @@ export const useGame = defineStore('game', {
         .flat()
         .filter((tile) => tile.terrain instanceof Floor);
 
-      const idx = random.int(0, floorTiles.length - 1);
-      const tile = floorTiles[idx];
+      const tile = random.arrayElement(floorTiles);
 
       const player = new Player(tile);
 
