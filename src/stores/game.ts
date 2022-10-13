@@ -115,13 +115,11 @@ export const useGame = defineStore('game', {
         y: this.player.y + (y ?? 0),
       };
 
-      if (this.actorAt(targetCoords)) return;
-
       const targetTile = this.map.tileAt(targetCoords);
 
       if (!targetTile) return;
 
-      if (!targetTile.canMoveTo) return;
+      if (!this.player.canMoveTo(targetTile)) return;
 
       this.player.move(targetTile);
 

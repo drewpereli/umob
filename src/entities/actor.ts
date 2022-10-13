@@ -5,7 +5,6 @@ import {
 } from '@/stores/animations';
 import { useGame } from '@/stores/game';
 import type { Tile } from '@/stores/map';
-import random from 'random';
 import Gun from './gun';
 
 export default class Actor {
@@ -79,17 +78,30 @@ export default class Actor {
   }
 
   act() {
-    const x = random.int(0, 1) * 2 - 1;
-    const y = random.int(0, 1) * 2 - 1;
-    const coords = { x: this.x + x, y: this.y + y };
-    if (this.game.actorAt(coords)) return;
-    const tile = this.game.map.tileAt(coords);
-    if (!tile) return;
-    if (!tile.canMoveTo) return;
+    if (!this.canAct) return;
+
+    const coordsPathToPlayer = this.game.map.pathBetween(
+      this.coords,
+      this.game.player.coords,
+      this
+    );
+
+    const coordsTowardsPlayer = coordsPathToPlayer[1];
+
+    const tile = this.game.map.tileAt(coordsTowardsPlayer);
+
+    if (!this.canMoveTo(tile)) return;
+
     this.move(tile);
   }
 
   get coords(): Coords {
     return { x: this.x, y: this.y };
+  }
+
+  canMoveTo(tile: Tile) {
+    if (tile.terrain.blocksMovement) return false;
+    if (this.game.actorAt(tile)) return false;
+    return true;
   }
 }

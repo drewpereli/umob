@@ -1,6 +1,8 @@
 import bresenham from '@/utils/bresnham';
 import { generate } from '@/utils/map-generation';
 import { defineStore } from 'pinia';
+import pathfinding from 'pathfinding';
+import type Actor from '@/entities/actor';
 
 export enum Dir {
   Up,
@@ -39,6 +41,27 @@ export const useMap = defineStore('map', {
         return this.tileAt({ x, y });
       };
     },
+    pathBetween() {
+      return (from: Coords, to: Coords, actor: Actor): Coords[] => {
+        const matrix = this.tiles.map((row) => {
+          return row.map((tile) => {
+            if (tile.terrain.blocksMovement) return 1;
+            if (coordsEqual(tile, from)) return 0;
+            if (coordsEqual(tile, to)) return 0;
+            if (actor.game.actorAt(tile)) return 1;
+            return 0;
+          });
+        });
+
+        const grid = new pathfinding.Grid(matrix);
+
+        const finder = new pathfinding.AStarFinder();
+
+        const path = finder.findPath(from.x, from.y, to.x, to.y, grid);
+
+        return path.map(([x, y]) => ({ x, y }));
+      };
+    },
   },
   actions: {
     generate() {
@@ -58,11 +81,7 @@ export class Tile {
   readonly y;
   terrain;
 
-  terrainLastSeenByPlayer?: Terrain;
-
-  get canMoveTo() {
-    return this.terrain.moveTimeMultiplier !== null;
-  }
+  terrainLastSeenByPlayer?: Partial<Terrain>;
 
   get isTransparent() {
     return this.terrain instanceof Floor;
@@ -82,6 +101,10 @@ abstract class Terrain {
   abstract readonly moveTimeMultiplier: number | null;
   readonly color: string = '#ccc';
   readonly penetrationBlock: number = 0;
+
+  get blocksMovement() {
+    return this.moveTimeMultiplier === null;
+  }
 }
 
 export class Floor extends Terrain {
@@ -94,4 +117,8 @@ export class Wall extends Terrain {
   char = '#';
   moveTimeMultiplier = null;
   penetrationBlock = 2;
+}
+
+function coordsEqual(c1: Coords, c2: Coords) {
+  return c1.x === c2.x && c1.y === c2.y;
 }
