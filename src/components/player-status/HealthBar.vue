@@ -1,15 +1,17 @@
 <script lang="ts">
-import { useGame } from '@/stores/game';
+import Actor from '@/entities/actor';
 import { defineComponent } from 'vue';
 
 export default defineComponent({
-  setup() {
-    const game = useGame();
-    return { game };
+  props: {
+    actor: {
+      type: Actor,
+      required: true,
+    },
   },
   computed: {
     innerStyle() {
-      const fraction = this.game.player.health / this.game.player.maxHealth;
+      const fraction = this.actor.health / this.actor.maxHealth;
       const percentage = fraction * 100;
 
       return {

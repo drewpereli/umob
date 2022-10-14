@@ -129,7 +129,11 @@ export default defineComponent({
 </script>
 
 <template>
-  <div class="game-tiles" ref="gameTiles">
+  <div
+    class="game-tiles"
+    ref="gameTiles"
+    :style="{ width: `${canvasLength}px` }"
+  >
     <canvas data-layer="main" :width="canvasLength" :height="canvasLength" />
 
     <canvas

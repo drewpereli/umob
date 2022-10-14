@@ -5,9 +5,10 @@ import { defineComponent } from 'vue';
 import GameTiles from './GameTiles.vue';
 import PlayerStatus from './PlayerStatus.vue';
 import InventoryMenu from './InventoryMenu.vue';
+import EntityDescription from './EntityDescription.vue';
 
 export default defineComponent({
-  components: { GameTiles, PlayerStatus, InventoryMenu },
+  components: { GameTiles, PlayerStatus, InventoryMenu, EntityDescription },
   methods: {
     async onKey({ key }: KeyboardEvent) {
       if (this.onKeyIsRunning) return;
@@ -41,6 +42,16 @@ export default defineComponent({
     showInventoryMenu() {
       return this.game.actionUiState === ActionUiState.Inventory;
     },
+    examinedEntity() {
+      if (this.game.actionUiState !== ActionUiState.Examining) return null;
+      if (!this.game.selectedTile) return null;
+
+      const actor = this.game.actorAt(this.game.selectedTile);
+
+      if (!actor) return null;
+
+      return actor;
+    },
   },
 });
 </script>
@@ -50,6 +61,8 @@ export default defineComponent({
     <PlayerStatus />
 
     <GameTiles />
+
+    <EntityDescription v-if="examinedEntity" :entity="examinedEntity" />
 
     <InventoryMenu v-if="showInventoryMenu" class="inventory-menu" />
   </div>

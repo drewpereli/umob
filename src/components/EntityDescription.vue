@@ -1,26 +1,28 @@
 <script lang="ts">
+import Actor from '@/entities/actor';
 import { defineComponent } from 'vue';
 import HealthBar from './player-status/HealthBar.vue';
-import EquippedWeapon from './player-status/EquippedWeapon.vue';
-import { useGame } from '@/stores/game';
 
 export default defineComponent({
-  components: { HealthBar, EquippedWeapon },
-  setup() {
-    return { game: useGame() };
+  props: {
+    entity: {
+      type: Actor,
+      required: true,
+    },
   },
+  components: { HealthBar },
 });
 </script>
 
 <template>
-  <div class="player-status">
-    <HealthBar :actor="game.player" />
-    <EquippedWeapon />
+  <div class="entity-description">
+    <h2>{{ entity.name }}</h2>
+    <HealthBar :actor="entity" />
   </div>
 </template>
 
 <style scoped lang="stylus">
-.player-status
+.entity-description
   width 300px
   font-family monospace
   padding 1rem

@@ -8,6 +8,7 @@ export enum ActionUiState {
   GameOver = 'game-over',
   Inventory = 'inventory',
   AimingPower = 'aiming-power',
+  Examining = 'examining',
 }
 
 type Game = ReturnType<typeof useGame>;
@@ -35,6 +36,21 @@ export const actionHandlers: Partial<
       game.actionUiState = ActionUiState.Aiming;
     },
     e: (game) => (game.actionUiState = ActionUiState.Inventory),
+    x: (game) => {
+      game.player.selectedPower = game.player.powers[0];
+
+      const playerTile = game.map.tileAt(game.player);
+
+      const target = game.map.adjacentTile(playerTile, Dir.Up);
+
+      if (!target) {
+        return;
+      }
+
+      game.selectedTile = target;
+
+      game.actionUiState = ActionUiState.Examining;
+    },
     1: (game) => {
       game.player.selectedPower = game.player.powers[0];
 
@@ -84,6 +100,16 @@ export const actionHandlers: Partial<
     Enter: (game) => {
       const weapon = game.menu.selectedItem.model as Gun;
       game.player.equippedWeapon = weapon;
+      game.actionUiState = ActionUiState.Default;
+    },
+  },
+  [ActionUiState.Examining]: {
+    ArrowUp: (game) => updateAim(game, Dir.Up),
+    ArrowRight: (game) => updateAim(game, Dir.Right),
+    ArrowDown: (game) => updateAim(game, Dir.Down),
+    ArrowLeft: (game) => updateAim(game, Dir.Left),
+    Escape: (game) => {
+      game.selectedTile = null;
       game.actionUiState = ActionUiState.Default;
     },
   },

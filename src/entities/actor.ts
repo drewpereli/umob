@@ -21,6 +21,8 @@ export default class Actor {
     this.y = y;
   }
 
+  name = 'actor';
+
   x;
   y;
 
