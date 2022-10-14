@@ -115,6 +115,13 @@ export const useGame = defineStore('game', {
         .map((tile) => this.actorAt(tile))
         .filter((t): t is Actor => !!t);
     },
+    coordsVisible() {
+      return (coords: Coords) => {
+        return this.visibleTiles.some(
+          (tile) => tile.x === coords.x && tile.y === coords.y
+        );
+      };
+    },
   },
   actions: {
     initialize() {

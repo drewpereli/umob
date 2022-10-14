@@ -66,8 +66,11 @@ export default class Actor {
 
   receiveFire(damage: number) {
     this.health = Math.max(this.health - damage, 0);
-    const animation = new DamageAnimation(this);
-    this.animationsStore.addAnimation(animation);
+
+    if (this.game.coordsVisible(this)) {
+      const animation = new DamageAnimation(this);
+      this.animationsStore.addAnimation(animation);
+    }
   }
 
   tick() {

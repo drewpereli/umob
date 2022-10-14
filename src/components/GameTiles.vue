@@ -78,19 +78,21 @@ function drawTileVisibilityCanvas({
 function drawTileUiCanvas({
   ctx,
   position,
+  visible,
   tileHasActorAimedAt,
   tileSelected,
   tileIsAimedAt,
 }: {
   ctx: CanvasRenderingContext2D;
   position: { x: number; y: number };
+  visible: boolean;
   tileHasActorAimedAt: boolean;
   tileSelected: boolean;
   tileIsAimedAt: boolean;
 }) {
   let backgroundColor: string | null = null;
 
-  if (tileHasActorAimedAt) {
+  if (tileHasActorAimedAt && visible) {
     backgroundColor = 'rgba(136,0,0,0.5)';
   } else if (tileSelected) {
     backgroundColor = 'rgba(136,136,0,0.75)';
@@ -180,6 +182,7 @@ export default defineComponent({
       this.tiles.forEach((row, y) => {
         row.forEach((tile, x) => {
           const actor = this.game.actorAt(tile);
+          const visible = visibleTileIds.includes(tile.id);
 
           drawTileMainCanvas({
             ctx: this.mainCtx,
@@ -192,7 +195,7 @@ export default defineComponent({
           drawTileVisibilityCanvas({
             ctx: this.visibilityCtx,
             position: { x, y },
-            visible: visibleTileIds.includes(tile.id),
+            visible,
             tile,
           });
 
@@ -205,6 +208,7 @@ export default defineComponent({
           drawTileUiCanvas({
             ctx: this.uiCtx,
             position: { x, y },
+            visible,
             tileIsAimedAt,
             tileHasActorAimedAt,
             tileSelected,
