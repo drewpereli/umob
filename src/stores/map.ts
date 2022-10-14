@@ -76,9 +76,9 @@ export const useMap = defineStore('map', {
     tilesInRadius() {
       return (center: Coords, radius: number) => {
         const rowStart = Math.max(center.y - radius, 0);
-        const rowEnd = center.y + radius;
+        const rowEnd = center.y + radius + 1;
         const colStart = Math.max(center.x - radius, 0);
-        const colEnd = center.x + radius;
+        const colEnd = center.x + radius + 1;
 
         const square = this.tiles
           .slice(rowStart, rowEnd)
