@@ -47,8 +47,6 @@ export default class Actor {
   readonly game = useGame();
   readonly animationsStore = useAnimations();
 
-  animations: GameAnimation[] = [];
-
   mood = Mood.Hostile;
 
   move(tile: Tile) {

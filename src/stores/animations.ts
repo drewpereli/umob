@@ -12,8 +12,6 @@ export abstract class GameAnimation {
   abstract readonly type: string;
 
   isRunning = false;
-
-  abstract beforeDelete?(): void;
 }
 
 export class DamageAnimation extends GameAnimation {
@@ -21,18 +19,10 @@ export class DamageAnimation extends GameAnimation {
     super();
 
     this.actor = actor;
-
-    actor.animations.push(this);
   }
 
   type = 'damage';
   actor;
-
-  beforeDelete() {
-    this.actor.animations = this.actor.animations.filter(
-      (animation) => animation.id !== this.id
-    );
-  }
 }
 
 export class BulletAnimation extends GameAnimation {
@@ -63,10 +53,6 @@ export const useAnimations = defineStore('animations', {
       await new Promise((res) => setTimeout(res, ANIMATION_DURATION));
 
       this.isRunning = false;
-
-      this.animations.forEach((animation) => {
-        animation.beforeDelete?.();
-      });
 
       this.animations = [];
     },
