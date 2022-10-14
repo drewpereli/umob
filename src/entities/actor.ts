@@ -7,6 +7,7 @@ import {
 import { useGame } from '@/stores/game';
 import { distance, type Tile } from '@/stores/map';
 import { debugOptions } from '@/utils/debug-options';
+import { Grenade, type Power } from '@/utils/powers';
 import { random } from '@/utils/random';
 import { Pistol, ShotGun } from './gun';
 
@@ -40,6 +41,9 @@ export default class Actor {
 
   inventory = [new Pistol()];
   equippedWeapon = this.inventory[0];
+
+  powers = [new Grenade()];
+  selectedPower: Power | null = null;
 
   char = 'd';
   readonly color: string = 'white';
@@ -80,6 +84,13 @@ export default class Actor {
 
     this.timeUntilNextAction =
       this.attackTime * this.equippedWeapon.attackTimeMultiplier;
+  }
+
+  useSelectedPower() {
+    if (!this.selectedPower) return;
+
+    this.selectedPower.activate();
+    this.timeUntilNextAction = this.selectedPower.useTime;
   }
 
   receiveFire(damage: number) {

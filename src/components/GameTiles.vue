@@ -148,12 +148,12 @@ async function animateTile({
     const y = position.y * length;
     let isRed = false;
 
-    for (let i = 0; i < 6; i++) {
+    for (let i = 0; i < 4; i++) {
       const color = isRed ? 'white' : 'red';
       isRed = !isRed;
       ctx.fillStyle = color;
       ctx.fillText(actor.char, x + length / 2, y + length / 2);
-      await new Promise((res) => setTimeout(res, 30));
+      await new Promise((res) => setTimeout(res, 20));
     }
   } else if (animation instanceof BulletAnimation) {
     const ctx = ctxs.animationObjects;

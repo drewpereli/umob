@@ -65,8 +65,15 @@ export const useGame = defineStore('game', {
       return this.map.tilesBetween(playerTile, selectedTile).slice(1);
     },
     tilesAimedAt(): Tile[] {
-      if (this.actionUiState !== ActionUiState.Aiming || !this.selectedTile)
-        return [];
+      if (!this.selectedTile) return [];
+
+      if (this.actionUiState === ActionUiState.AimingPower) {
+        const coords = this.player.selectedPower?.tilesAimedAt();
+
+        return coords?.map((coord) => this.map.tileAt(coord)) ?? [];
+      }
+
+      if (this.actionUiState !== ActionUiState.Aiming) return [];
 
       const weapon = this.player.equippedWeapon;
 
@@ -113,6 +120,10 @@ export const useGame = defineStore('game', {
       return tiles;
     },
     actorsAimedAt(): Actor[] {
+      if (this.actionUiState === ActionUiState.AimingPower) {
+        return this.player.selectedPower?.actorsAimedAt() ?? [];
+      }
+
       return this.tilesAimedAt
         .map((tile) => this.actorAt(tile))
         .filter((t): t is Actor => !!t);
@@ -171,6 +182,10 @@ export const useGame = defineStore('game', {
     },
     playerFireWeapon() {
       this.player.fireWeapon(this.actorsAimedAt);
+      this._tickUntilPlayerCanAct();
+    },
+    playerUsePower() {
+      this.player.useSelectedPower();
       this._tickUntilPlayerCanAct();
     },
     onPlayerDie() {
