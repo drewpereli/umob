@@ -8,7 +8,7 @@ import {
   ExplosionAnimation,
 } from '@/stores/animations';
 import type { useCamera } from '@/stores/camera';
-import type { Tile } from '@/stores/map';
+import { distance, type Tile } from '@/stores/map';
 import { polarity, slopeIntercept } from './math';
 
 export function drawTileMainCanvas({
@@ -221,28 +221,55 @@ export async function animateTile({
       ctx.clearRect(px.x, px.y, bulletLength, bulletLength);
     }
   } else if (animation instanceof ExplosionAnimation) {
-    const position = camera.viewCoordsForAbsCoords(animation.at);
-
-    const length = 32;
-    const x = position.x * length + length / 2;
-    const y = position.y * length + length / 2;
-    const radius = animation.radius * length;
-
     const ctx = ctxs.animationObjects;
 
-    const sizes = Array.from({ length: 5 }).map((_, idx) => (idx + 1) / 5);
+    const length = 32;
 
-    for (const size of sizes) {
-      const currRadius = size * radius;
+    const position = camera.viewCoordsForAbsCoords(animation.at);
 
-      ctx.beginPath();
-      ctx.arc(x, y, currRadius, 0, 2 * Math.PI);
-      ctx.fillStyle = 'orange';
-      ctx.fill();
+    const frameCount = 10;
+    const expandingRadii = Array.from({ length: 10 }).map(
+      (_, idx) => ((idx + 1) / frameCount) * animation.radius
+    );
 
-      await new Promise((res) => setTimeout(res, 20));
+    const coordsToFillByFrame: Coords[][] = expandingRadii.map((radius) =>
+      coordsInRadius(position, radius)
+    );
+
+    for (const coordsSet of coordsToFillByFrame) {
+      ctx.fillStyle = 'rgba(255,165,0, 0.3)';
+
+      coordsSet.forEach((coord) => {
+        ctx.fillRect(coord.x * length, coord.y * length, length, length);
+      });
+
+      await new Promise((res) => setTimeout(res, 30));
     }
 
-    ctx.clearRect(x - radius, y - radius, 2 * radius, 2 * radius);
+    ctx.clearRect(
+      (position.x - animation.radius) * length,
+      (position.y - animation.radius) * length,
+      2 * (animation.radius + 1) * length,
+      2 * (animation.radius + 1) * length
+    );
   }
+}
+
+function coordsInRadius(center: Coords, radius: number) {
+  const xStart = center.x - radius;
+  const xEnd = center.x + radius;
+  const yStart = center.y - radius;
+  const yEnd = center.y + radius;
+
+  const coords: Coords[] = [];
+
+  for (let x = xStart; x <= xEnd; x++) {
+    for (let y = yStart; y <= yEnd; y++) {
+      const dist = distance(center, { x, y });
+
+      if (dist <= radius) coords.push({ x, y });
+    }
+  }
+
+  return coords;
 }
