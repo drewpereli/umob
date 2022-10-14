@@ -1,3 +1,4 @@
+import type Gun from '@/entities/gun';
 import type { useGame } from '@/stores/game';
 import { Dir } from '@/stores/map';
 
@@ -5,6 +6,7 @@ export enum ActionUiState {
   Default = 'default',
   Aiming = 'aiming',
   GameOver = 'game-over',
+  Inventory = 'inventory',
 }
 
 type Game = ReturnType<typeof useGame>;
@@ -31,6 +33,7 @@ export const actionHandlers: Partial<
       game.selectedTile = target;
       game.actionUiState = ActionUiState.Aiming;
     },
+    e: (game) => (game.actionUiState = ActionUiState.Inventory),
   },
   [ActionUiState.Aiming]: {
     ArrowUp: (game) => updateAim(game, Dir.Up),
@@ -43,6 +46,16 @@ export const actionHandlers: Partial<
     },
     f: (game) => {
       game.playerFireWeapon();
+    },
+  },
+  [ActionUiState.Inventory]: {
+    Escape: (game) => (game.actionUiState = ActionUiState.Default),
+    ArrowUp: (game) => game.menu.previousItem(),
+    ArrowDown: (game) => game.menu.nextItem(),
+    Enter: (game) => {
+      const weapon = game.menu.selectedItem.model as Gun;
+      game.player.equippedWeapon = weapon;
+      game.actionUiState = ActionUiState.Default;
     },
   },
 };

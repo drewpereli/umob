@@ -4,9 +4,10 @@ import { actionHandlers, ActionUiState } from '@/utils/action-handlers';
 import { defineComponent } from 'vue';
 import GameTiles from './GameTiles.vue';
 import PlayerStatus from './PlayerStatus.vue';
+import InventoryMenu from './InventoryMenu.vue';
 
 export default defineComponent({
-  components: { GameTiles, PlayerStatus },
+  components: { GameTiles, PlayerStatus, InventoryMenu },
   methods: {
     async onKey({ key }: KeyboardEvent) {
       if (this.onKeyIsRunning) return;
@@ -36,6 +37,11 @@ export default defineComponent({
   mounted() {
     (this.$refs.mainGame as HTMLElement).focus();
   },
+  computed: {
+    showInventoryMenu() {
+      return this.game.actionUiState === ActionUiState.Inventory;
+    },
+  },
 });
 </script>
 
@@ -44,6 +50,8 @@ export default defineComponent({
     <PlayerStatus />
 
     <GameTiles />
+
+    <InventoryMenu v-if="showInventoryMenu" class="inventory-menu" />
   </div>
 </template>
 
@@ -54,4 +62,10 @@ export default defineComponent({
 
   &:focus
     outline none
+
+  .inventory-menu
+    position absolute
+    left: 50%;
+    transform: translateX(-50%);
+    top 1rem
 </style>

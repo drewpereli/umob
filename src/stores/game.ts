@@ -15,6 +15,7 @@ import {
   Tile,
   useMap,
 } from './map';
+import { useMenu } from './menu';
 
 export const useGame = defineStore('game', {
   state: () => ({
@@ -25,6 +26,7 @@ export const useGame = defineStore('game', {
     selectedTile: null as null | Tile,
     actionUiState: ActionUiState.Default,
     animations: useAnimations(),
+    menu: useMenu(),
   }),
   getters: {
     player: (state) => state.actors[0],
