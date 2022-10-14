@@ -5,7 +5,7 @@ const activeOptions = {
   smallMap: false,
   randomWallsInEmptyMap: 0,
   docileEnemies: false,
-  extraEnemies: 80,
+  extraEnemies: 20,
   infiniteHealth: true,
 };
 

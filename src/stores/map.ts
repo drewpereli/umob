@@ -120,7 +120,7 @@ export class Tile {
   readonly y;
   terrain;
 
-  terrainLastSeenByPlayer?: Partial<Terrain>;
+  terrainLastSeenByPlayer?: Pick<Terrain, 'char' | 'color'>;
 
   get isTransparent() {
     return this.terrain instanceof Floor;
@@ -131,7 +131,8 @@ export class Tile {
   }
 
   onPlayerSees() {
-    this.terrainLastSeenByPlayer = { ...this.terrain };
+    const { char, color } = this.terrain;
+    this.terrainLastSeenByPlayer = { char, color };
   }
 }
 
@@ -149,7 +150,7 @@ abstract class Terrain {
 export class Floor extends Terrain {
   char = '•';
   moveTimeMultiplier = 1;
-  color = 'gray';
+  color = 'rgba(255,255,255,0.2)';
 }
 
 export class Wall extends Terrain {

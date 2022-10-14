@@ -35,14 +35,14 @@ function drawTileMainCanvas({
 
   if (visible) {
     if (actor) {
-      ctx.fillStyle = 'white';
+      ctx.fillStyle = actor.color;
       ctx.fillText(actor.char, x + length / 2, y + length / 2);
     } else {
-      ctx.fillStyle = 'white';
+      ctx.fillStyle = tile.terrain.color;
       ctx.fillText(tile.terrain.char, x + length / 2, y + length / 2);
     }
   } else if (terrainLastSeen?.char) {
-    ctx.fillStyle = 'white';
+    ctx.fillStyle = terrainLastSeen.color;
     ctx.fillText(terrainLastSeen.char, x + length / 2, y + length / 2);
   }
 }
@@ -63,7 +63,7 @@ function drawTileVisibilityCanvas({
   if (visible) {
     backgroundColor = 'transparent';
   } else if (tile.terrainLastSeenByPlayer) {
-    backgroundColor = 'rgba(0,0,0,0.5)';
+    backgroundColor = 'rgba(0,0,0,0.6)';
   }
 
   ctx.fillStyle = backgroundColor;
@@ -253,7 +253,7 @@ export default defineComponent({
     this.visibilityCtx = visibilityCtx;
     this.uiCtx = uiCtx;
 
-    mainCtx.font = '32px serif';
+    mainCtx.font = '28px Arial';
     mainCtx.textBaseline = 'middle';
     mainCtx.textAlign = 'center';
 
@@ -282,7 +282,6 @@ export default defineComponent({
 
 <style scoped lang="stylus">
 .game-tiles
-  border 1px solid white
   position: relative
 
   canvas
