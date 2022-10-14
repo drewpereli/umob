@@ -13,4 +13,7 @@ export const random = {
   shuffle<T>(arr: T[]): T[] {
     return [...arr].sort(() => (rand.bool() ? -1 : 1));
   },
+  polarity() {
+    return rand.bool() ? 1 : -1;
+  },
 };

@@ -13,7 +13,7 @@ export abstract class GameAnimation {
 
   isRunning = false;
 
-  abstract beforeDelete(): void;
+  abstract beforeDelete?(): void;
 }
 
 export class DamageAnimation extends GameAnimation {
@@ -35,6 +35,22 @@ export class DamageAnimation extends GameAnimation {
   }
 }
 
+export class BulletAnimation extends GameAnimation {
+  constructor(from: Coords, to: Coords, hit: boolean) {
+    super();
+    this.from = from;
+    this.to = to;
+    this.hit = hit;
+  }
+
+  type = 'bullet';
+  from;
+  to;
+  hit;
+
+  beforeDelete = undefined;
+}
+
 export const useAnimations = defineStore('animations', {
   state: () => ({
     animations: [] as GameAnimation[],
@@ -49,7 +65,7 @@ export const useAnimations = defineStore('animations', {
       this.isRunning = false;
 
       this.animations.forEach((animation) => {
-        animation?.beforeDelete();
+        animation.beforeDelete?.();
       });
 
       this.animations = [];

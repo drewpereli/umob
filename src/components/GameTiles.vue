@@ -1,6 +1,7 @@
 <script lang="ts">
 import type Actor from '@/entities/actor';
 import {
+  BulletAnimation,
   DamageAnimation,
   useAnimations,
   type GameAnimation,
@@ -9,7 +10,22 @@ import { useCamera } from '@/stores/camera';
 import { useGame } from '@/stores/game';
 import type { Tile } from '@/stores/map';
 import { ActionUiState } from '@/utils/action-handlers';
+import { random } from '@/utils/random';
+import bresenham from '@/utils/bresnham';
 import { defineComponent } from 'vue';
+
+type Coords = { x: number; y: number };
+
+function slopeIntercept(c1: Coords, c2: Coords): { m: number; b: number } {
+  const m = (c2.y - c1.y) / (c2.x - c1.x);
+  const b = c1.y - m * c1.x;
+
+  return { m, b };
+}
+
+function polarity(from: number, to: number): number {
+  return to > from ? 1 : -1;
+}
 
 function drawTileMainCanvas({
   ctx,
@@ -112,40 +128,124 @@ function drawTileUiCanvas({
 }
 
 async function animateTile({
-  ctx,
+  ctxs,
   animation,
   camera,
 }: {
-  ctx: CanvasRenderingContext2D;
+  ctxs: Record<string, CanvasRenderingContext2D>;
   animation: GameAnimation;
   camera: ReturnType<typeof useCamera>;
 }) {
-  if (!(animation instanceof DamageAnimation)) return;
+  if (animation instanceof DamageAnimation) {
+    const ctx = ctxs.main;
 
-  const actor = animation.actor;
+    const actor = animation.actor;
 
-  const position = camera.viewCoordsForAbsCoords(actor);
+    const position = camera.viewCoordsForAbsCoords(actor);
 
-  const length = 32;
-  const x = position.x * length;
-  const y = position.y * length;
-  let isRed = false;
+    const length = 32;
+    const x = position.x * length;
+    const y = position.y * length;
+    let isRed = false;
 
-  for (let i = 0; i < 6; i++) {
-    const color = isRed ? 'white' : 'red';
-    isRed = !isRed;
-    ctx.fillStyle = color;
-    ctx.fillText(actor.char, x + length / 2, y + length / 2);
-    await new Promise((res) => setTimeout(res, 50));
+    for (let i = 0; i < 6; i++) {
+      const color = isRed ? 'white' : 'red';
+      isRed = !isRed;
+      ctx.fillStyle = color;
+      ctx.fillText(actor.char, x + length / 2, y + length / 2);
+      await new Promise((res) => setTimeout(res, 50));
+    }
+  } else if (animation instanceof BulletAnimation) {
+    const ctx = ctxs.animationObjects;
+
+    const length = 32;
+    const from = camera.viewCoordsForAbsCoords(animation.from);
+
+    const pxFrom = {
+      x: from.x * length + length / 2,
+      y: from.y * length + length / 2,
+    };
+
+    const to = camera.viewCoordsForAbsCoords(animation.to);
+
+    const pxToIfHit = {
+      x: to.x * length + length / 2,
+      y: to.y * length + length / 2,
+    };
+
+    // Add a little variation to where the bullet actually goes.
+    // If the shot was a miss, add more variation
+    let randomOffset: Coords;
+
+    if (animation.hit) {
+      randomOffset = {
+        x: random.int(-10, 10),
+        y: random.int(-10, 10),
+      };
+    } else {
+      randomOffset = {
+        x: random.polarity() * random.int(10, 16),
+        y: random.polarity() * random.int(10, 16),
+      };
+    }
+
+    pxToIfHit.x += randomOffset.x;
+    pxToIfHit.y += randomOffset.y;
+
+    const { m, b } = slopeIntercept(pxFrom, pxToIfHit);
+
+    // If the shot was a miss, calculate a pxTo that's further from the original, so the bullet goes past the target
+    let pxTo;
+
+    if (animation.hit) {
+      pxTo = pxToIfHit;
+    } else {
+      // If the target is directly above/below the shooter
+      if (m === Infinity) {
+        const yPolarity = polarity(pxFrom.y, pxToIfHit.y);
+        pxTo = {
+          x: pxToIfHit.x,
+          y: pxToIfHit.y + 1000 * yPolarity,
+        };
+      } else {
+        const xPolarity = polarity(pxFrom.x, pxToIfHit.x);
+        const newX = pxToIfHit.x + 1000 * xPolarity;
+        pxTo = {
+          x: newX,
+          y: m * newX + b,
+        };
+      }
+    }
+
+    const bulletLength = 5;
+
+    // Subtract half the bullet length from the pixel coordinates, so that the pixels are in the middle
+    pxTo.x -= Math.round(bulletLength / 2);
+    pxTo.y -= Math.round(bulletLength / 2);
+    pxFrom.x -= Math.round(bulletLength / 2);
+    pxFrom.y -= Math.round(bulletLength / 2);
+
+    // Include every 10th pixel in the line
+    const pixelsInLine = bresenham(pxFrom, pxTo).filter(
+      (p, idx) => idx % 10 === 0
+    );
+
+    for (const px of pixelsInLine) {
+      ctx.fillStyle = 'white';
+      ctx.fillRect(px.x, px.y, bulletLength, bulletLength);
+      await new Promise((res) => setTimeout(res, 5));
+      ctx.clearRect(px.x, px.y, bulletLength, bulletLength);
+    }
   }
 }
 
 export default defineComponent({
   data() {
     return {
-      mainCtx: null as unknown as CanvasRenderingContext2D,
-      visibilityCtx: null as unknown as CanvasRenderingContext2D,
-      uiCtx: null as unknown as CanvasRenderingContext2D,
+      ctxs: {} as Record<string, CanvasRenderingContext2D>,
+      // mainCtx: null as unknown as CanvasRenderingContext2D,
+      // visibilityCtx: null as unknown as CanvasRenderingContext2D,
+      // uiCtx: null as unknown as CanvasRenderingContext2D,
     };
   },
   setup() {
@@ -173,9 +273,9 @@ export default defineComponent({
   },
   methods: {
     draw() {
-      this.mainCtx.clearRect(0, 0, this.canvasLength, this.canvasLength);
-      this.visibilityCtx.clearRect(0, 0, this.canvasLength, this.canvasLength);
-      this.uiCtx.clearRect(0, 0, this.canvasLength, this.canvasLength);
+      Object.values(this.ctxs).forEach((ctx) =>
+        ctx.clearRect(0, 0, this.canvasLength, this.canvasLength)
+      );
 
       const visibleTileIds = this.game.visibleTiles.map((tile) => tile.id);
 
@@ -185,7 +285,7 @@ export default defineComponent({
           const visible = visibleTileIds.includes(tile.id);
 
           drawTileMainCanvas({
-            ctx: this.mainCtx,
+            ctx: this.ctxs.main,
             tile,
             actor,
             position: { x, y },
@@ -193,7 +293,7 @@ export default defineComponent({
           });
 
           drawTileVisibilityCanvas({
-            ctx: this.visibilityCtx,
+            ctx: this.ctxs.visibility,
             position: { x, y },
             visible,
             tile,
@@ -206,7 +306,7 @@ export default defineComponent({
           const tileSelected = tile.id === this.game.selectedTile?.id;
 
           drawTileUiCanvas({
-            ctx: this.uiCtx,
+            ctx: this.ctxs.ui,
             position: { x, y },
             visible,
             tileIsAimedAt,
@@ -219,7 +319,7 @@ export default defineComponent({
     animate() {
       this.animations.animations.forEach((animation) => {
         animateTile({
-          ctx: this.mainCtx,
+          ctxs: this.ctxs,
           animation,
           camera: this.camera,
         });
@@ -238,24 +338,21 @@ export default defineComponent({
     },
   },
   mounted() {
-    const mainCanvas = this.$refs.mainCanvas as HTMLCanvasElement;
-    const mainCtx = mainCanvas.getContext('2d') as CanvasRenderingContext2D;
+    const canvasContainer = this.$refs.gameTiles as HTMLElement;
 
-    const visibilityCanvas = this.$refs.visibilityCanvas as HTMLCanvasElement;
-    const visibilityCtx = visibilityCanvas.getContext(
-      '2d'
-    ) as CanvasRenderingContext2D;
+    canvasContainer
+      .querySelectorAll('canvas')
+      .forEach((canvas: HTMLCanvasElement) => {
+        const layer = canvas.dataset.layer as string;
 
-    const uiCanvas = this.$refs.uiCanvas as HTMLCanvasElement;
-    const uiCtx = uiCanvas.getContext('2d') as CanvasRenderingContext2D;
+        const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
 
-    this.mainCtx = mainCtx;
-    this.visibilityCtx = visibilityCtx;
-    this.uiCtx = uiCtx;
+        this.ctxs[layer] = ctx;
+      });
 
-    mainCtx.font = '28px Arial';
-    mainCtx.textBaseline = 'middle';
-    mainCtx.textAlign = 'center';
+    this.ctxs.main.font = '28px Arial';
+    this.ctxs.main.textBaseline = 'middle';
+    this.ctxs.main.textAlign = 'center';
 
     this.draw();
   },
@@ -263,16 +360,22 @@ export default defineComponent({
 </script>
 
 <template>
-  <div class="game-tiles">
-    <canvas ref="mainCanvas" :width="canvasLength" :height="canvasLength" />
+  <div class="game-tiles" ref="gameTiles">
+    <canvas data-layer="main" :width="canvasLength" :height="canvasLength" />
 
     <canvas
-      ref="visibilityCanvas"
+      data-layer="animationObjects"
       :width="canvasLength"
       :height="canvasLength"
     />
 
-    <canvas ref="uiCanvas" :width="canvasLength" :height="canvasLength" />
+    <canvas
+      data-layer="visibility"
+      :width="canvasLength"
+      :height="canvasLength"
+    />
+
+    <canvas data-layer="ui" :width="canvasLength" :height="canvasLength" />
 
     <div v-if="gameOver" class="game-over-container">
       <div class="message">You Died</div>

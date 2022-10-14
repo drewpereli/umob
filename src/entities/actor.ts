@@ -1,4 +1,5 @@
 import {
+  BulletAnimation,
   DamageAnimation,
   useAnimations,
   type GameAnimation,
@@ -62,7 +63,7 @@ export default class Actor {
   fireWeapon(actors: Actor[]) {
     if (!this.canAct) return;
 
-    actors.forEach((actor) => {
+    actors.forEach((actor, idx) => {
       const hitChance =
         this.equippedWeapon.accuracy *
         this.accuracyMultiplier *
@@ -71,6 +72,12 @@ export default class Actor {
       const willHit = random.float(0, 1) < hitChance;
 
       if (willHit) actor.receiveFire(this.equippedWeapon.damage);
+
+      if (idx === 0) {
+        this.game.animations.addAnimation(
+          new BulletAnimation(this, actor, willHit)
+        );
+      }
     });
 
     this.timeUntilNextAction =
