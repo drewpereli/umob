@@ -38,15 +38,17 @@ export class DamageAnimation extends GameAnimation {
 export const useAnimations = defineStore('animations', {
   state: () => ({
     animations: [] as GameAnimation[],
+    isRunning: false,
   }),
   actions: {
     async runAnimations() {
-      this.animations.forEach((animation) => (animation.isRunning = true));
+      this.isRunning = true;
 
       await new Promise((res) => setTimeout(res, ANIMATION_DURATION));
 
+      this.isRunning = false;
+
       this.animations.forEach((animation) => {
-        animation.isRunning = false;
         animation?.beforeDelete();
       });
 

@@ -42,5 +42,13 @@ export const useCamera = defineStore('camera', {
     _idealCameraCenter(): Coords {
       return this.game.selectedTile ?? this.map.tileAt(this.game.player);
     },
+    viewCoordsForAbsCoords() {
+      return (coords: Coords): Coords => {
+        return {
+          x: coords.x - this.cameraCenter.x + this.viewRadius,
+          y: coords.y - this.cameraCenter.y + this.viewRadius,
+        };
+      };
+    },
   },
 });

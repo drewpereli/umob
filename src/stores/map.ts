@@ -16,8 +16,8 @@ export enum Dir {
 export const useMap = defineStore('map', {
   state: () => ({
     tiles: [] as Tile[][],
-    width: debugOptions.smallMap ? 21 : 80,
-    height: debugOptions.smallMap ? 21 : 80,
+    width: debugOptions.smallMap ? 31 : 80,
+    height: debugOptions.smallMap ? 31 : 80,
   }),
   getters: {
     tileAt() {
