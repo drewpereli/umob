@@ -1,7 +1,7 @@
 import type Actor from '@/entities/actor';
 import { defineStore } from 'pinia';
 
-const ANIMATION_DURATION = 400;
+const ANIMATION_DURATION = 100;
 
 export abstract class GameAnimation {
   constructor() {

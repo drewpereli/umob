@@ -153,7 +153,7 @@ async function animateTile({
       isRed = !isRed;
       ctx.fillStyle = color;
       ctx.fillText(actor.char, x + length / 2, y + length / 2);
-      await new Promise((res) => setTimeout(res, 50));
+      await new Promise((res) => setTimeout(res, 30));
     }
   } else if (animation instanceof BulletAnimation) {
     const ctx = ctxs.animationObjects;
