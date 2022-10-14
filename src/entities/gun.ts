@@ -1,4 +1,5 @@
 export default abstract class Gun {
+  abstract name: string;
   abstract damage: number;
   penetration = 0;
   attackTimeMultiplier = 1;
@@ -8,6 +9,7 @@ export default abstract class Gun {
 }
 
 export class ShotGun extends Gun {
+  name = 'shotgun';
   damage = 10;
   spread = 20;
   range = 10;
@@ -15,12 +17,14 @@ export class ShotGun extends Gun {
 }
 
 export class Pistol extends Gun {
+  name = 'pistol';
   damage = 5;
   range = 5;
   attackTimeMultiplier = 4;
 }
 
 export class AssaultRifle extends Gun {
+  name = 'assault rifle';
   damage = 20;
   range = 20;
   penetration = 4;
@@ -28,6 +32,7 @@ export class AssaultRifle extends Gun {
 }
 
 export class SubMachineGun extends Gun {
+  name = 'submachine gun';
   damage = 5;
   range = 10;
   penetration = 0;
