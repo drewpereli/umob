@@ -90,6 +90,17 @@ export const useMap = defineStore('map', {
         return square.filter((tile) => distance(center, tile) <= radius);
       };
     },
+    randomAdjacent() {
+      return (coords: Coords): Coords => {
+        const xOrY = random.bool() ? 'x' : 'y';
+        const plusOrMinus = random.bool() ? -1 : 1;
+
+        return {
+          ...coords,
+          [xOrY]: coords[xOrY] + plusOrMinus,
+        };
+      };
+    },
   },
   actions: {
     generate() {
