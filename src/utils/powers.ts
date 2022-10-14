@@ -1,4 +1,5 @@
 import type Actor from '@/entities/actor';
+import { ExplosionAnimation } from '@/stores/animations';
 import { useGame } from '@/stores/game';
 
 export abstract class Power {
@@ -36,5 +37,9 @@ export class Grenade extends Power {
     this.actorsAimedAt().forEach((actor) => {
       actor.receiveFire(5);
     });
+
+    this.game.animations.addAnimation(
+      new ExplosionAnimation(this.game.selectedTile, 5)
+    );
   }
 }

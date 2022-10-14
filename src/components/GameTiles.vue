@@ -3,6 +3,7 @@ import type Actor from '@/entities/actor';
 import {
   BulletAnimation,
   DamageAnimation,
+  ExplosionAnimation,
   useAnimations,
   type GameAnimation,
 } from '@/stores/animations';
@@ -236,6 +237,30 @@ async function animateTile({
       await new Promise((res) => setTimeout(res, 5));
       ctx.clearRect(px.x, px.y, bulletLength, bulletLength);
     }
+  } else if (animation instanceof ExplosionAnimation) {
+    const position = camera.viewCoordsForAbsCoords(animation.at);
+
+    const length = 32;
+    const x = position.x * length + length / 2;
+    const y = position.y * length + length / 2;
+    const radius = animation.radius * length;
+
+    const ctx = ctxs.animationObjects;
+
+    const sizes = Array.from({ length: 5 }).map((_, idx) => (idx + 1) / 5);
+
+    for (const size of sizes) {
+      const currRadius = size * radius;
+
+      ctx.beginPath();
+      ctx.arc(x, y, currRadius, 0, 2 * Math.PI);
+      ctx.fillStyle = 'orange';
+      ctx.fill();
+
+      await new Promise((res) => setTimeout(res, 20));
+    }
+
+    ctx.clearRect(x - radius, y - radius, 2 * radius, 2 * radius);
   }
 }
 

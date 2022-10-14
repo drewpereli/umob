@@ -41,6 +41,19 @@ export class BulletAnimation extends GameAnimation {
   beforeDelete = undefined;
 }
 
+export class ExplosionAnimation extends GameAnimation {
+  constructor(at: Coords, radius: number) {
+    super();
+    this.at = at;
+    this.radius = radius;
+  }
+
+  type = 'explosion';
+
+  at;
+  radius;
+}
+
 export const useAnimations = defineStore('animations', {
   state: () => ({
     animations: [] as GameAnimation[],
