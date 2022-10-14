@@ -2,6 +2,7 @@ import { default as rand } from 'random';
 
 export const random = {
   int: rand.int,
+  float: rand.float,
   bool: rand.bool,
   arrayElement<T>(arr: T[]): T {
     return arr[rand.int(0, arr.length - 1)];

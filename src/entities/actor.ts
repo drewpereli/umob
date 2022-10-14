@@ -6,6 +6,7 @@ import {
 import { useGame } from '@/stores/game';
 import { distance, type Tile } from '@/stores/map';
 import { debugOptions } from '@/utils/debug-options';
+import { random } from '@/utils/random';
 import { Pistol, ShotGun } from './gun';
 
 enum Mood {
@@ -33,6 +34,9 @@ export default class Actor {
 
   viewRange = 10;
 
+  accuracyMultiplier = 1;
+  evasionMultiplier = 1;
+
   inventory = [new Pistol()];
   equippedWeapon = this.inventory[0];
 
@@ -58,7 +62,16 @@ export default class Actor {
   fireWeapon(actors: Actor[]) {
     if (!this.canAct) return;
 
-    actors.forEach((actor) => actor.receiveFire(this.equippedWeapon.damage));
+    actors.forEach((actor) => {
+      const hitChance =
+        this.equippedWeapon.accuracy *
+        this.accuracyMultiplier *
+        actor.evasionMultiplier;
+
+      const willHit = random.float(0, 1) < hitChance;
+
+      if (willHit) actor.receiveFire(this.equippedWeapon.damage);
+    });
 
     this.timeUntilNextAction =
       this.attackTime * this.equippedWeapon.attackTimeMultiplier;

@@ -4,6 +4,7 @@ export default abstract class Gun {
   attackTimeMultiplier = 1;
   range = Infinity;
   spread: number | null = null;
+  accuracy = 0.5;
 }
 
 export class ShotGun extends Gun {
