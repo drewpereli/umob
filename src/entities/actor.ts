@@ -142,8 +142,32 @@ export default class Actor {
         if (!this.canMoveTo(tile)) return;
 
         this.move(tile);
+      } else {
+        this.wander();
       }
     }
+  }
+
+  wander() {
+    const adjacentCoords = [
+      { x: this.x - 1, y: this.y },
+      { x: this.x + 1, y: this.y },
+      { x: this.x, y: this.y - 1 },
+      { x: this.x, y: this.y + 1 },
+    ];
+
+    const tiles = adjacentCoords
+      .map((coords) => this.game.map.tileAt(coords))
+      .filter((tile) => {
+        if (!tile) return false;
+        if (tile.terrain.blocksMovement) return false;
+        if (this.game.actorAt(tile)) return false;
+        return true;
+      });
+
+    if (tiles.length === 0) return;
+
+    this.move(random.arrayElement(tiles));
   }
 
   get coords(): Coords {

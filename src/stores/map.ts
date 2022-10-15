@@ -22,7 +22,7 @@ export const useMap = defineStore('map', {
   getters: {
     tileAt() {
       return (coords: Coords) => {
-        return this.tiles[coords.y][coords.x];
+        return this.tiles[coords.y]?.[coords.x];
       };
     },
     tilesBetween() {
