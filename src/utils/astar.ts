@@ -21,6 +21,12 @@ function getHeap() {
   });
 }
 
+function manhattan(pos0: Coords, pos1: Coords) {
+  const d1 = Math.abs(pos1.x - pos0.x);
+  const d2 = Math.abs(pos1.y - pos0.y);
+  return d1 + d2;
+}
+
 export const astar = {
   /**
 * Perform an A* Search on a graph given a start and end node.
@@ -39,18 +45,16 @@ export const astar = {
     end: GridNode,
     options?: {
       closest?: boolean;
-      heuristic?: (c1: Coords, c2: Coords) => number;
     }
   ) {
     graph.cleanDirty();
     options = options || {};
-    const heuristic = options.heuristic || astar.heuristics.manhattan;
     const closest = options.closest || false;
 
     const openHeap = getHeap();
     let closestNode = start; // set the start node to be the closest if required
 
-    start.h = heuristic(start, end);
+    start.h = manhattan(start, end);
     graph.markDirty(start);
 
     openHeap.push(start);
@@ -88,7 +92,7 @@ export const astar = {
           // Found an optimal (so far) path to this node.  Take score for node to see how good it is.
           neighbor.visited = true;
           neighbor.parent = currentNode;
-          neighbor.h = neighbor.h || heuristic(neighbor, end);
+          neighbor.h = neighbor.h || manhattan(neighbor, end);
           neighbor.g = gScore;
           neighbor.f = neighbor.g + neighbor.h;
           graph.markDirty(neighbor);
@@ -121,21 +125,6 @@ export const astar = {
 
     // No result was found - empty array signifies failure to find path.
     return [];
-  },
-  // See list of heuristics: http://theory.stanford.edu/~amitp/GameProgramming/Heuristics.html
-  heuristics: {
-    manhattan: function (pos0: Coords, pos1: Coords) {
-      const d1 = Math.abs(pos1.x - pos0.x);
-      const d2 = Math.abs(pos1.y - pos0.y);
-      return d1 + d2;
-    },
-    diagonal: function (pos0: Coords, pos1: Coords) {
-      const D = 1;
-      const D2 = Math.sqrt(2);
-      const d1 = Math.abs(pos1.x - pos0.x);
-      const d2 = Math.abs(pos1.y - pos0.y);
-      return D * (d1 + d2) + (D2 - 2 * D) * Math.min(d1, d2);
-    },
   },
   cleanNode: function (node: GridNode) {
     node.f = 0;
