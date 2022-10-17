@@ -11,6 +11,28 @@ import type { useCamera } from '@/stores/camera';
 import { distance, type Tile } from '@/stores/map';
 import { polarity, slopeIntercept } from './math';
 
+const CELL_LENGTH = 32;
+
+function fillRect(ctx: CanvasRenderingContext2D, pos: Coords, color: string) {
+  ctx.fillStyle = color;
+  ctx.fillRect(
+    pos.x * CELL_LENGTH,
+    pos.y * CELL_LENGTH,
+    CELL_LENGTH,
+    CELL_LENGTH
+  );
+}
+
+function fillText(
+  ctx: CanvasRenderingContext2D,
+  char: string,
+  pos: Coords,
+  color: string
+) {
+  ctx.fillStyle = color;
+  ctx.fillText(char, (pos.x + 0.5) * CELL_LENGTH, (pos.y + 0.5) * CELL_LENGTH);
+}
+
 export function drawTileMainCanvas({
   ctx,
   position,
@@ -24,26 +46,18 @@ export function drawTileMainCanvas({
   actor?: Actor;
   visible: boolean;
 }) {
-  const length = 32;
-  const x = position.x * length;
-  const y = position.y * length;
-
-  ctx.fillStyle = 'black';
-  ctx.fillRect(x, y, length, length);
+  fillRect(ctx, position, 'black');
 
   const terrainLastSeen = tile.terrainLastSeenByPlayer;
 
   if (visible) {
     if (actor) {
-      ctx.fillStyle = actor.color;
-      ctx.fillText(actor.char, x + length / 2, y + length / 2);
+      fillText(ctx, actor.char, position, actor.color);
     } else {
-      ctx.fillStyle = tile.terrain.color;
-      ctx.fillText(tile.terrain.char, x + length / 2, y + length / 2);
+      fillText(ctx, tile.terrain.char, position, tile.terrain.color);
     }
   } else if (terrainLastSeen?.char) {
-    ctx.fillStyle = terrainLastSeen.color;
-    ctx.fillText(terrainLastSeen.char, x + length / 2, y + length / 2);
+    fillText(ctx, terrainLastSeen.char, position, terrainLastSeen.color);
   }
 }
 
@@ -58,21 +72,15 @@ export function drawTileVisibilityCanvas({
   tile: Tile;
   visible: boolean;
 }) {
-  let backgroundColor = 'black';
+  let color = 'black';
 
   if (visible) {
-    backgroundColor = 'transparent';
+    color = 'transparent';
   } else if (tile.terrainLastSeenByPlayer) {
-    backgroundColor = 'rgba(0,0,0,0.6)';
+    color = 'rgba(0,0,0,0.6)';
   }
 
-  ctx.fillStyle = backgroundColor;
-
-  const length = 32;
-  const x = position.x * length;
-  const y = position.y * length;
-
-  ctx.fillRect(x, y, length, length);
+  fillRect(ctx, position, color);
 }
 
 export function drawTileUiCanvas({
@@ -90,25 +98,19 @@ export function drawTileUiCanvas({
   tileSelected: boolean;
   tileIsAimedAt: boolean;
 }) {
-  let backgroundColor: string | null = null;
+  let color: string | null = null;
 
   if (tileHasActorAimedAt && visible) {
-    backgroundColor = 'rgba(136,0,0,0.5)';
+    color = 'rgba(136,0,0,0.5)';
   } else if (tileSelected) {
-    backgroundColor = 'rgba(136,136,0,0.75)';
+    color = 'rgba(136,136,0,0.75)';
   } else if (tileIsAimedAt) {
-    backgroundColor = 'rgba(85,85,0,0.75)';
+    color = 'rgba(85,85,0,0.75)';
   }
 
-  if (!backgroundColor) return;
+  if (!color) return;
 
-  ctx.fillStyle = backgroundColor;
-
-  const length = 32;
-  const x = position.x * length;
-  const y = position.y * length;
-
-  ctx.fillRect(x, y, length, length);
+  fillRect(ctx, position, color);
 }
 
 export async function animateTile({
@@ -127,34 +129,29 @@ export async function animateTile({
 
     const position = camera.viewCoordsForAbsCoords(actor);
 
-    const length = 32;
-    const x = position.x * length;
-    const y = position.y * length;
     let isRed = false;
 
     for (let i = 0; i < 4; i++) {
       const color = isRed ? 'white' : 'red';
       isRed = !isRed;
-      ctx.fillStyle = color;
-      ctx.fillText(actor.char, x + length / 2, y + length / 2);
+      fillText(ctx, actor.char, position, color);
       await new Promise((res) => setTimeout(res, 20));
     }
   } else if (animation instanceof BulletAnimation) {
     const ctx = ctxs.animationObjects;
 
-    const length = 32;
     const from = camera.viewCoordsForAbsCoords(animation.from);
 
     const pxFrom = {
-      x: from.x * length + length / 2,
-      y: from.y * length + length / 2,
+      x: from.x * CELL_LENGTH + CELL_LENGTH / 2,
+      y: from.y * CELL_LENGTH + CELL_LENGTH / 2,
     };
 
     const to = camera.viewCoordsForAbsCoords(animation.to);
 
     const pxToIfHit = {
-      x: to.x * length + length / 2,
-      y: to.y * length + length / 2,
+      x: to.x * CELL_LENGTH + CELL_LENGTH / 2,
+      y: to.y * CELL_LENGTH + CELL_LENGTH / 2,
     };
 
     // Add a little variation to where the bullet actually goes.
@@ -223,8 +220,6 @@ export async function animateTile({
   } else if (animation instanceof ExplosionAnimation) {
     const ctx = ctxs.animationObjects;
 
-    const length = 32;
-
     const position = camera.viewCoordsForAbsCoords(animation.at);
 
     const frameCount = 10;
@@ -240,17 +235,17 @@ export async function animateTile({
       ctx.fillStyle = 'rgba(255,165,0, 0.3)';
 
       coordsSet.forEach((coord) => {
-        ctx.fillRect(coord.x * length, coord.y * length, length, length);
+        fillRect(ctx, coord, 'rgba(255,165,0, 0.3)');
       });
 
       await new Promise((res) => setTimeout(res, 30));
     }
 
     ctx.clearRect(
-      (position.x - animation.radius) * length,
-      (position.y - animation.radius) * length,
-      2 * (animation.radius + 1) * length,
-      2 * (animation.radius + 1) * length
+      (position.x - animation.radius) * CELL_LENGTH,
+      (position.y - animation.radius) * CELL_LENGTH,
+      2 * (animation.radius + 1) * CELL_LENGTH,
+      2 * (animation.radius + 1) * CELL_LENGTH
     );
   }
 }
