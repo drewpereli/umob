@@ -84,6 +84,12 @@ export default class Actor {
       }
     });
 
+    if (actors.length === 0) {
+      this.game.animations.addAnimation(
+        new BulletAnimation(this, this.game.selectedTile as Coords, false)
+      );
+    }
+
     this.timeUntilNextAction =
       this.attackTime * this.equippedWeapon.attackTimeMultiplier;
   }
