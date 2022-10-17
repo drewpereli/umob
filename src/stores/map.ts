@@ -55,7 +55,7 @@ export const useMap = defineStore('map', {
           });
         });
 
-        const graph = new Graph(matrix, { diagonal: false });
+        const graph = new Graph(matrix);
 
         const start = graph.grid[from.y][from.x];
         const end = graph.grid[to.y][to.x];

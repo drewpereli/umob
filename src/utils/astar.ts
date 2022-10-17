@@ -139,13 +139,9 @@ export const astar = {
 /**
  * A graph memory structure
  * @param {Array} gridIn 2D array of input weights
- * @param {Object} [options]
- * @param {bool} [options.diagonal] Specifies whether diagonal moves are allowed
  */
 export class Graph {
-  constructor(gridIn: number[][], options: { diagonal?: boolean }) {
-    options = options || {};
-    this.diagonal = !!options.diagonal;
+  constructor(gridIn: number[][]) {
     for (let y = 0; y < gridIn.length; y++) {
       this.grid[y] = [];
 
@@ -160,7 +156,6 @@ export class Graph {
 
   grid: GridNode[][] = [];
   nodes: GridNode[] = [];
-  diagonal: boolean;
 
   dirtyNodes: GridNode[] = [];
 
@@ -206,28 +201,6 @@ export class Graph {
     // North
     if (grid[y] && grid[y][x + 1]) {
       ret.push(grid[y][x + 1]);
-    }
-
-    if (this.diagonal) {
-      // Southwest
-      if (grid[y - 1] && grid[y - 1][x - 1]) {
-        ret.push(grid[y - 1][x - 1]);
-      }
-
-      // Southeast
-      if (grid[y + 1] && grid[y + 1][x - 1]) {
-        ret.push(grid[y + 1][x - 1]);
-      }
-
-      // Northwest
-      if (grid[y - 1] && grid[y - 1][x + 1]) {
-        ret.push(grid[y - 1][x + 1]);
-      }
-
-      // Northeast
-      if (grid[y + 1] && grid[y + 1][x + 1]) {
-        ret.push(grid[y + 1][x + 1]);
-      }
     }
 
     return ret;
