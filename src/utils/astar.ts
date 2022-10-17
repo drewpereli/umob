@@ -28,31 +28,9 @@ function manhattan(pos0: Coords, pos1: Coords) {
 }
 
 export const astar = {
-  /**
-* Perform an A* Search on a graph given a start and end node.
-* @param {Graph} graph
-* @param {GridNode} start
-* @param {GridNode} end
-* @param {Object} [options]
-* @param {bool} [options.closest] Specifies whether to return the
-           path to the closest node if the target is unreachable.
-* @param {Function} [options.heuristic] Heuristic function (see
-*          astar.heuristics).
-*/
-  search: function (
-    graph: Graph,
-    start: GridNode,
-    end: GridNode,
-    options?: {
-      closest?: boolean;
-    }
-  ) {
+  search: function (graph: Graph, start: GridNode, end: GridNode) {
     graph.cleanDirty();
-    options = options || {};
-    const closest = options.closest || false;
-
     const openHeap = getHeap();
-    let closestNode = start; // set the start node to be the closest if required
 
     start.h = manhattan(start, end);
     graph.markDirty(start);
@@ -96,17 +74,6 @@ export const astar = {
           neighbor.g = gScore;
           neighbor.f = neighbor.g + neighbor.h;
           graph.markDirty(neighbor);
-          if (closest) {
-            // If the neighbour is closer than the current closestNode or if it's equally close but has
-            // a cheaper path than the current closest node then it becomes the closest node
-            if (
-              neighbor.h < (closestNode.h as number) ||
-              (neighbor.h === closestNode.h &&
-                neighbor.g < (closestNode.g as number))
-            ) {
-              closestNode = neighbor;
-            }
-          }
 
           if (!beenVisited) {
             // Pushing to heap will put it in proper place based on the 'f' value.
@@ -117,10 +84,6 @@ export const astar = {
           }
         }
       }
-    }
-
-    if (closest) {
-      return pathTo(closestNode);
     }
 
     // No result was found - empty array signifies failure to find path.
@@ -237,10 +200,6 @@ class GridNode {
   closed?: boolean;
   visited?: boolean;
   parent: GridNode | null = null;
-
-  toString() {
-    return '[' + this.x + ' ' + this.y + ']';
-  }
 
   getCost(fromNeighbor: GridNode) {
     // Take diagonal weight into consideration.
