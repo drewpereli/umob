@@ -147,7 +147,7 @@ export const useGame = defineStore('game', {
       const fov = new PermissiveFov(
         this.map.width,
         this.map.height,
-        (x: number, y: number) => this.map.tileAt({ x, y }).isTransparent
+        (x: number, y: number) => !this.map.tileAt({ x, y }).blocksView
       );
 
       this.fovUtil = fov;

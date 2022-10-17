@@ -126,8 +126,8 @@ export class Tile {
 
   terrainLastSeenByPlayer?: Pick<Terrain, 'char' | 'color'>;
 
-  get isTransparent() {
-    return this.terrain instanceof Floor;
+  get blocksView() {
+    return this.terrain.blocksView;
   }
 
   get id() {
@@ -145,6 +145,7 @@ abstract class Terrain {
   abstract readonly moveTimeMultiplier: number | null;
   readonly color: string = '#ccc';
   readonly penetrationBlock: number = 0;
+  readonly blocksView: boolean = false;
 
   get blocksMovement() {
     return this.moveTimeMultiplier === null;
@@ -161,6 +162,13 @@ export class Wall extends Terrain {
   char = '#';
   moveTimeMultiplier = null;
   penetrationBlock = 2;
+  blocksView = true;
+}
+
+export class HalfWall extends Terrain {
+  char = '▄';
+  moveTimeMultiplier = 2;
+  color = '#aaa';
 }
 
 export function coordsEqual(c1: Coords, c2: Coords) {

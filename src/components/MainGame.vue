@@ -60,7 +60,11 @@ export default defineComponent({
 
 <template>
   <div @keydown="onKey" tabindex="1" class="main-game" ref="mainGame">
-    <PlayerStatus />
+    <div>
+      <PlayerStatus />
+
+      <div>Curr time: {{ game.currTime }}</div>
+    </div>
 
     <GameTiles />
 
