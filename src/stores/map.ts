@@ -60,11 +60,7 @@ export const useMap = defineStore('map', {
         const start = graph.grid[from.y][from.x];
         const end = graph.grid[to.y][to.x];
 
-        const path = astar.search(graph, start, end);
-
-        const coords = path.map((n) => ({ x: n.y, y: n.x }));
-
-        return coords;
+        return astar.search(graph, start, end);
       };
     },
     randomFloorTile() {
