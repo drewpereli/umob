@@ -48,11 +48,16 @@ export const useMap = defineStore('map', {
         const matrix = this.tiles.map((row) => {
           return row.map((tile) => {
             if (tile.terrain.blocksMovement) return 0;
-            if (coordsEqual(tile, from)) return 1;
-            if (coordsEqual(tile, to)) return 1;
-            if (actor.game.actorAt(tile)) return 0;
             return 1;
           });
+        });
+
+        actor.game.actors.forEach((actor) => {
+          if (coordsEqual(actor, to)) {
+            matrix[actor.y][actor.x] = 1;
+          } else {
+            matrix[actor.y][actor.x] = 0;
+          }
         });
 
         const graph = new Graph(matrix);
