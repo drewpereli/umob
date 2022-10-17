@@ -7,7 +7,6 @@ import {
   drawTileMainCanvas,
   drawTileVisibilityCanvas,
   drawTileUiCanvas,
-  animateTile,
 } from '@/utils/canvas';
 import { defineComponent } from 'vue';
 
@@ -85,15 +84,6 @@ export default defineComponent({
         });
       });
     },
-    animate() {
-      this.animations.animations.forEach((animation) => {
-        animateTile({
-          ctxs: this.ctxs,
-          animation,
-          camera: this.camera,
-        });
-      });
-    },
   },
   watch: {
     tiles() {
@@ -101,9 +91,6 @@ export default defineComponent({
     },
     'game.visibleTiles'() {
       this.draw();
-    },
-    'animations.isRunning'() {
-      this.animate();
     },
   },
   mounted() {
@@ -122,6 +109,8 @@ export default defineComponent({
     this.ctxs.main.font = '28px Arial';
     this.ctxs.main.textBaseline = 'middle';
     this.ctxs.main.textAlign = 'center';
+
+    this.animations.setContexts(this.ctxs);
 
     this.draw();
   },
