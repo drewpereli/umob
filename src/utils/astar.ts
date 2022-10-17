@@ -9,10 +9,10 @@ function pathTo(node: GridNode) {
   let curr = node;
   const path = [];
   while (curr.parent) {
-    path.unshift(curr);
+    path.push(curr);
     curr = curr.parent;
   }
-  return path;
+  return path.reverse();
 }
 
 function getHeap() {
