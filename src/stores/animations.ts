@@ -37,6 +37,8 @@ export abstract class GameAnimation {
   isRunning = false;
   camera = useCamera();
 
+  blocking = true; // Whether we wait for the animation to finish before resuming the game, taking use input, etc
+
   abstract run(ctxs: Record<string, CanvasRenderingContext2D>): Promise<void>;
 }
 
@@ -80,6 +82,8 @@ export class BulletAnimation extends GameAnimation {
   from;
   to;
   hit;
+
+  blocking = false;
 
   async run(ctxs: Record<string, CanvasRenderingContext2D>) {
     const ctx = ctxs.animationObjects;
@@ -219,11 +223,17 @@ export const useAnimations = defineStore('animations', {
     async runAnimations() {
       this.isRunning = true;
 
-      await Promise.all(
-        this.animations.map((animation) =>
-          animation.run(this.ctxs as Record<string, CanvasRenderingContext2D>)
-        )
-      );
+      const blockingAnimationPromises: Promise<void>[] = [];
+
+      this.animations.forEach((animation) => {
+        const runPromise = animation.run(
+          this.ctxs as Record<string, CanvasRenderingContext2D>
+        );
+
+        if (animation.blocking) blockingAnimationPromises.push(runPromise);
+      });
+
+      await Promise.all(blockingAnimationPromises);
 
       this.animations = [];
 
