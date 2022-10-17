@@ -1,4 +1,5 @@
 import Actor from '@/entities/actor';
+import type { Damageable } from '@/entities/damageable';
 import { Player } from '@/entities/player';
 import { ActionUiState } from '@/utils/action-handlers';
 import { debugOptions } from '@/utils/debug-options';
@@ -120,22 +121,20 @@ export const useGame = defineStore('game', {
 
       return tiles;
     },
-    entitiesAimedAt(): (Actor | Tile)[] {
+    damageablesAimedAt(): (Damageable & Coords)[] {
       if (this.actionUiState === ActionUiState.AimingPower) {
         return this.player.selectedPower?.actorsAimedAt() ?? [];
       }
 
-      return this.tilesAimedAt
-        .map((tile) => {
-          const actor = this.actorAt(tile);
+      return this.tilesAimedAt.flatMap((tile): (Damageable & Coords)[] => {
+        const actor = this.actorAt(tile);
 
-          if (actor) return actor;
+        if (actor) return [actor];
 
-          if (tile.terrain instanceof Wall) return tile;
+        if (tile.terrain instanceof Wall) return [tile];
 
-          return false;
-        })
-        .filter((t): t is Actor | Tile => !!t);
+        return [];
+      });
     },
     coordsVisible() {
       return (coords: Coords) => {
@@ -190,7 +189,7 @@ export const useGame = defineStore('game', {
       this._tickUntilPlayerCanAct();
     },
     playerFireWeapon() {
-      this.player.fireWeapon(this.entitiesAimedAt);
+      this.player.fireWeapon(this.damageablesAimedAt);
       this._tickUntilPlayerCanAct();
     },
     playerUsePower() {

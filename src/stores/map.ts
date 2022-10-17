@@ -5,6 +5,7 @@ import type Actor from '@/entities/actor';
 import { debugOptions } from '@/utils/debug-options';
 import { random } from '@/utils/random';
 import { astar, Graph } from '@/utils/astar';
+import type { Damageable } from '@/entities/damageable';
 
 export enum Dir {
   Up,
@@ -113,7 +114,7 @@ export const useMap = defineStore('map', {
   },
 });
 
-export class Tile {
+export class Tile implements Damageable {
   constructor({ x, y, terrain }: Coords & { terrain?: Terrain }) {
     this.x = x;
     this.y = y;
@@ -139,12 +140,18 @@ export class Tile {
     this.terrainLastSeenByPlayer = { char, color };
   }
 
-  terrainReceiveFire(damage: number) {
-    this.terrain.receiveFire(damage);
+  receiveDamage(damage: number) {
+    if (!this.isCurrentlyDamageable) return;
+
+    (this.terrain as Wall).receiveDamage(damage);
 
     if (this.terrain.health <= 0) {
       this.terrain = this.terrain.terrainOnDie as Terrain;
     }
+  }
+
+  get isCurrentlyDamageable() {
+    return this.terrain instanceof Wall;
   }
 }
 
@@ -152,21 +159,14 @@ abstract class Terrain {
   abstract readonly char: string;
   abstract readonly moveTimeMultiplier: number | null;
   readonly color: string = '#ccc';
-  readonly penetrationBlock: number = 0;
   readonly blocksView: boolean = false;
   readonly terrainOnDie?: Terrain;
+  readonly penetrationBlock: number = 0;
   health = 100;
 
   get blocksMovement() {
     return this.moveTimeMultiplier === null;
   }
-
-  get canReceiveFire() {
-    return !!this.penetrationBlock;
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  receiveFire(_damage: number) {}
 }
 
 export class Floor extends Terrain {
@@ -175,16 +175,18 @@ export class Floor extends Terrain {
   color = 'rgba(255,255,255,0.2)';
 }
 
-export class Wall extends Terrain {
+export class Wall extends Terrain implements Damageable {
   char = '#';
   moveTimeMultiplier = null;
   penetrationBlock = 2;
   blocksView = true;
   terrainOnDie = new HalfWall();
 
-  receiveFire(damage: number) {
+  receiveDamage(damage: number) {
     this.health -= damage;
   }
+
+  isCurrentlyDamageable = true;
 }
 
 export class HalfWall extends Terrain {

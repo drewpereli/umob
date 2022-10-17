@@ -44,7 +44,7 @@ export class Grenade extends Power {
     if (!this.game.selectedTile) return;
 
     this.actorsAimedAt().forEach((actor) => {
-      actor.receiveFire(5);
+      actor.receiveDamage(5);
     });
 
     this.game.animations.addAnimation(

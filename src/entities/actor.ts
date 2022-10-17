@@ -9,13 +9,14 @@ import { distance, Wall, type Tile } from '@/stores/map';
 import { debugOptions } from '@/utils/debug-options';
 import { Grenade, type Power } from '@/utils/powers';
 import { random } from '@/utils/random';
+import type { Damageable } from './damageable';
 import { Pistol, ShotGun } from './gun';
 
 enum Mood {
   Hostile = 'hostile',
 }
 
-export default class Actor {
+export default class Actor implements Damageable {
   constructor({ x, y }: { x: number; y: number }) {
     this.x = x;
     this.y = y;
@@ -64,12 +65,12 @@ export default class Actor {
       this.moveTime * (tile.terrain.moveTimeMultiplier as number);
   }
 
-  fireWeapon(entities: (Actor | Tile)[]) {
+  fireWeapon(entities: (Damageable & Coords)[]) {
     if (!this.canAct) return;
 
     entities.forEach((entity, idx) => {
       const hitChance =
-        entity instanceof Actor
+        entity.evasionMultiplier !== undefined
           ? this.equippedWeapon.accuracy *
             this.accuracyMultiplier *
             entity.evasionMultiplier
@@ -78,11 +79,7 @@ export default class Actor {
       const willHit = random.float(0, 1) < hitChance;
 
       if (willHit) {
-        if (entity instanceof Actor) {
-          entity.receiveFire(this.equippedWeapon.damage);
-        } else {
-          entity.terrainReceiveFire(this.equippedWeapon.damage);
-        }
+        entity.receiveDamage(this.equippedWeapon.damage);
       }
 
       if (idx === 0) {
@@ -109,7 +106,7 @@ export default class Actor {
     this.timeUntilNextAction = this.selectedPower.useTime;
   }
 
-  receiveFire(damage: number) {
+  receiveDamage(damage: number) {
     this.health = Math.max(this.health - damage, 0);
 
     if (this.game.coordsVisible(this)) {
@@ -130,6 +127,10 @@ export default class Actor {
 
   get isDead() {
     return this.health <= 0;
+  }
+
+  get isCurrentlyDamageable() {
+    return this.health > 0;
   }
 
   act() {

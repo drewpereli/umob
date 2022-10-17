@@ -12,13 +12,13 @@ export class Player extends Actor {
     new SubMachineGun(),
     new AssaultRifle(),
   ];
-  equippedWeapon = this.inventory[0];
+  equippedWeapon = this.inventory[1];
 
   health = debugOptions.infiniteHealth ? Infinity : 100;
   maxHealth = debugOptions.infiniteHealth ? Infinity : 100;
 
-  receiveFire(damage: number) {
-    super.receiveFire(damage);
+  receiveDamage(damage: number) {
+    super.receiveDamage(damage);
 
     if (this.health <= 0) {
       this.game.onPlayerDie();
