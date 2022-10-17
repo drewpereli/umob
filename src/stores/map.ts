@@ -1,10 +1,10 @@
 import bresenham from '@/utils/bresnham';
 import { generate } from '@/utils/map-generation';
 import { defineStore } from 'pinia';
-import pathfinding from 'pathfinding';
 import type Actor from '@/entities/actor';
 import { debugOptions } from '@/utils/debug-options';
 import { random } from '@/utils/random';
+import { astar, Graph } from '@/utils/astar';
 
 export enum Dir {
   Up,
@@ -47,21 +47,24 @@ export const useMap = defineStore('map', {
       return (from: Coords, to: Coords, actor: Actor): Coords[] => {
         const matrix = this.tiles.map((row) => {
           return row.map((tile) => {
-            if (tile.terrain.blocksMovement) return 1;
-            if (coordsEqual(tile, from)) return 0;
-            if (coordsEqual(tile, to)) return 0;
-            if (actor.game.actorAt(tile)) return 1;
-            return 0;
+            if (tile.terrain.blocksMovement) return 0;
+            if (coordsEqual(tile, from)) return 1;
+            if (coordsEqual(tile, to)) return 1;
+            if (actor.game.actorAt(tile)) return 0;
+            return 1;
           });
         });
 
-        const grid = new pathfinding.Grid(matrix);
+        const graph = new Graph(matrix, { diagonal: false });
 
-        const finder = new pathfinding.AStarFinder();
+        const start = graph.grid[from.y][from.x];
+        const end = graph.grid[to.y][to.x];
 
-        const path = finder.findPath(from.x, from.y, to.x, to.y, grid);
+        const path = astar.search(graph, start, end);
 
-        return path.map(([x, y]) => ({ x, y }));
+        const coords = path.map((n) => ({ x: n.y, y: n.x }));
+
+        return coords;
       };
     },
     randomFloorTile() {

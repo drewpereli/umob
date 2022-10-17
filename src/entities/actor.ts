@@ -133,7 +133,7 @@ export default class Actor {
           this
         );
 
-        const coordsTowardsPlayer = coordsPathToPlayer[1];
+        const coordsTowardsPlayer = coordsPathToPlayer[0];
 
         if (!coordsTowardsPlayer) return;
 
