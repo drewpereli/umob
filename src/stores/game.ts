@@ -14,6 +14,7 @@ import {
   Floor,
   Tile,
   useMap,
+  Wall,
 } from './map';
 import { useMenu } from './menu';
 
@@ -119,14 +120,22 @@ export const useGame = defineStore('game', {
 
       return tiles;
     },
-    actorsAimedAt(): Actor[] {
+    entitiesAimedAt(): (Actor | Tile)[] {
       if (this.actionUiState === ActionUiState.AimingPower) {
         return this.player.selectedPower?.actorsAimedAt() ?? [];
       }
 
       return this.tilesAimedAt
-        .map((tile) => this.actorAt(tile))
-        .filter((t): t is Actor => !!t);
+        .map((tile) => {
+          const actor = this.actorAt(tile);
+
+          if (actor) return actor;
+
+          if (tile.terrain instanceof Wall) return tile;
+
+          return false;
+        })
+        .filter((t): t is Actor | Tile => !!t);
     },
     coordsVisible() {
       return (coords: Coords) => {
@@ -181,7 +190,7 @@ export const useGame = defineStore('game', {
       this._tickUntilPlayerCanAct();
     },
     playerFireWeapon() {
-      this.player.fireWeapon(this.actorsAimedAt);
+      this.player.fireWeapon(this.entitiesAimedAt);
       this._tickUntilPlayerCanAct();
     },
     playerUsePower() {

@@ -5,7 +5,7 @@ import {
   type GameAnimation,
 } from '@/stores/animations';
 import { useGame } from '@/stores/game';
-import { distance, type Tile } from '@/stores/map';
+import { distance, Wall, type Tile } from '@/stores/map';
 import { debugOptions } from '@/utils/debug-options';
 import { Grenade, type Power } from '@/utils/powers';
 import { random } from '@/utils/random';
@@ -64,27 +64,35 @@ export default class Actor {
       this.moveTime * (tile.terrain.moveTimeMultiplier as number);
   }
 
-  fireWeapon(actors: Actor[]) {
+  fireWeapon(entities: (Actor | Tile)[]) {
     if (!this.canAct) return;
 
-    actors.forEach((actor, idx) => {
+    entities.forEach((entity, idx) => {
       const hitChance =
-        this.equippedWeapon.accuracy *
-        this.accuracyMultiplier *
-        actor.evasionMultiplier;
+        entity instanceof Actor
+          ? this.equippedWeapon.accuracy *
+            this.accuracyMultiplier *
+            entity.evasionMultiplier
+          : 1;
 
       const willHit = random.float(0, 1) < hitChance;
 
-      if (willHit) actor.receiveFire(this.equippedWeapon.damage);
+      if (willHit) {
+        if (entity instanceof Actor) {
+          entity.receiveFire(this.equippedWeapon.damage);
+        } else {
+          entity.terrainReceiveFire(this.equippedWeapon.damage);
+        }
+      }
 
       if (idx === 0) {
         this.game.animations.addAnimation(
-          new BulletAnimation(this, actor, willHit)
+          new BulletAnimation(this, entity, willHit)
         );
       }
     });
 
-    if (actors.length === 0) {
+    if (entities.length === 0) {
       this.game.animations.addAnimation(
         new BulletAnimation(this, this.game.selectedTile as Coords, false)
       );

@@ -138,6 +138,14 @@ export class Tile {
     const { char, color } = this.terrain;
     this.terrainLastSeenByPlayer = { char, color };
   }
+
+  terrainReceiveFire(damage: number) {
+    this.terrain.receiveFire(damage);
+
+    if (this.terrain.health <= 0) {
+      this.terrain = this.terrain.terrainOnDie as Terrain;
+    }
+  }
 }
 
 abstract class Terrain {
@@ -146,10 +154,19 @@ abstract class Terrain {
   readonly color: string = '#ccc';
   readonly penetrationBlock: number = 0;
   readonly blocksView: boolean = false;
+  readonly terrainOnDie?: Terrain;
+  health = 100;
 
   get blocksMovement() {
     return this.moveTimeMultiplier === null;
   }
+
+  get canReceiveFire() {
+    return !!this.penetrationBlock;
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  receiveFire(_damage: number) {}
 }
 
 export class Floor extends Terrain {
@@ -163,6 +180,11 @@ export class Wall extends Terrain {
   moveTimeMultiplier = null;
   penetrationBlock = 2;
   blocksView = true;
+  terrainOnDie = new HalfWall();
+
+  receiveFire(damage: number) {
+    this.health -= damage;
+  }
 }
 
 export class HalfWall extends Terrain {
