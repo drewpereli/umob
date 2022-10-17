@@ -213,9 +213,12 @@ export const useAnimations = defineStore('animations', {
   state: () => ({
     animations: [] as GameAnimation[],
     ctxs: null as null | Record<string, CanvasRenderingContext2D>,
+    isRunning: false,
   }),
   actions: {
     async runAnimations() {
+      this.isRunning = true;
+
       await Promise.all(
         this.animations.map((animation) =>
           animation.run(this.ctxs as Record<string, CanvasRenderingContext2D>)
@@ -223,6 +226,8 @@ export const useAnimations = defineStore('animations', {
       );
 
       this.animations = [];
+
+      this.isRunning = false;
     },
     addAnimation(animation: GameAnimation) {
       this.animations.push(animation);

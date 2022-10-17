@@ -6,12 +6,14 @@ import GameTiles from './GameTiles.vue';
 import PlayerStatus from './PlayerStatus.vue';
 import InventoryMenu from './InventoryMenu.vue';
 import EntityDescription from './EntityDescription.vue';
+import { useAnimations } from '@/stores/animations';
 
 export default defineComponent({
   components: { GameTiles, PlayerStatus, InventoryMenu, EntityDescription },
   methods: {
     async onKey({ key }: KeyboardEvent) {
       if (this.onKeyIsRunning) return;
+      if (useAnimations().isRunning) return;
 
       this.onKeyIsRunning = true;
 
