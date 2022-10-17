@@ -1,11 +1,11 @@
 const debugMode = true;
 
 const activeOptions = {
-  emptyMap: true,
-  smallMap: true,
+  emptyMap: false,
+  smallMap: false,
   randomWallsInEmptyMap: 0,
   docileEnemies: false,
-  extraEnemies: 10,
+  extraEnemies: 40,
   infiniteHealth: true,
 };
 
