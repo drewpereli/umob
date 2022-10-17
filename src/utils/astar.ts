@@ -62,8 +62,7 @@ export const astar = {
 
         // The g score is the shortest distance from start to current node.
         // We need to check if the path we have arrived at this neighbor is the shortest one we have seen yet.
-        const gScore =
-          (currentNode.g as number) + neighbor.getCost(currentNode);
+        const gScore = (currentNode.g as number) + neighbor.getCost();
         const beenVisited = neighbor.visited;
 
         if (!beenVisited || gScore < (neighbor.g as number)) {
@@ -147,40 +146,26 @@ export class Graph {
     const grid = this.grid;
 
     // West
-    if (grid[y - 1] && grid[y - 1][x]) {
+    if (grid[y - 1]?.[x]) {
       ret.push(grid[y - 1][x]);
     }
 
     // East
-    if (grid[y + 1] && grid[y + 1][x]) {
+    if (grid[y + 1]?.[x]) {
       ret.push(grid[y + 1][x]);
     }
 
     // South
-    if (grid[y] && grid[y][x - 1]) {
+    if (grid[y]?.[x - 1]) {
       ret.push(grid[y][x - 1]);
     }
 
     // North
-    if (grid[y] && grid[y][x + 1]) {
+    if (grid[y]?.[x + 1]) {
       ret.push(grid[y][x + 1]);
     }
 
     return ret;
-  }
-
-  toString() {
-    const graphString = [];
-    const nodes = this.grid;
-    for (let x = 0; x < nodes.length; x++) {
-      const rowDebug = [];
-      const row = nodes[x];
-      for (let y = 0; y < row.length; y++) {
-        rowDebug.push(row[y].weight);
-      }
-      graphString.push(rowDebug.join(' '));
-    }
-    return graphString.join('\n');
   }
 }
 
@@ -201,11 +186,7 @@ class GridNode {
   visited?: boolean;
   parent: GridNode | null = null;
 
-  getCost(fromNeighbor: GridNode) {
-    // Take diagonal weight into consideration.
-    if (fromNeighbor && fromNeighbor.x != this.x && fromNeighbor.y != this.y) {
-      return this.weight * 1.41421;
-    }
+  getCost() {
     return this.weight;
   }
 
