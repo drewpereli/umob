@@ -48,7 +48,7 @@ export class Grenade extends Power {
     });
 
     this.game.animations.addAnimation(
-      new ExplosionAnimation(this.centerOfExplosion(), 5)
+      new ExplosionAnimation(this.centerOfExplosion(), this.radius)
     );
   }
 

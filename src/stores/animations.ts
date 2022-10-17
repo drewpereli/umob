@@ -1,11 +1,12 @@
 import type Actor from '@/entities/actor';
 import bresenham from '@/utils/bresnham';
-import { CELL_LENGTH, fillRect, fillText } from '@/utils/canvas';
+import { CELL_LENGTH, clearRect, fillRect, fillText } from '@/utils/canvas';
 import { polarity, slopeIntercept } from '@/utils/math';
 import { random } from '@/utils/random';
 import { defineStore } from 'pinia';
 import { useCamera } from './camera';
 import { distance } from './map';
+import chroma from 'chroma-js';
 
 function coordsInRadius(center: Coords, radius: number) {
   const xStart = center.x - radius;
@@ -59,13 +60,10 @@ export class DamageAnimation extends GameAnimation {
 
     const position = this.camera.viewCoordsForAbsCoords(actor);
 
-    let isRed = false;
-
     for (let i = 0; i < 4; i++) {
-      const color = isRed ? 'white' : 'red';
-      isRed = !isRed;
+      const color = i % 2 === 1 ? this.actor.color : 'red';
       fillText(ctx, actor.char, position, color);
-      await new Promise((res) => setTimeout(res, 20));
+      await new Promise((res) => setTimeout(res, 50));
     }
   }
 }
@@ -156,7 +154,7 @@ export class BulletAnimation extends GameAnimation {
 
     // Include every 10th pixel in the line
     const pixelsInLine = bresenham(pxFrom, pxTo).filter(
-      (p, idx) => idx % 10 === 0
+      (p, idx) => idx % 20 === 0
     );
 
     for (const px of pixelsInLine) {
@@ -186,30 +184,29 @@ export class ExplosionAnimation extends GameAnimation {
     const position = this.camera.viewCoordsForAbsCoords(this.at);
 
     const frameCount = 10;
-    const expandingRadii = Array.from({ length: 10 }).map(
-      (_, idx) => ((idx + 1) / frameCount) * this.radius
-    );
 
-    const coordsToFillByFrame: Coords[][] = expandingRadii.map((radius) =>
-      coordsInRadius(position, radius)
-    );
+    const frameOpacities = Array.from({ length: 10 }).map((_, idx) => {
+      const frameFraction = idx / (frameCount - 1);
 
-    for (const coordsSet of coordsToFillByFrame) {
-      ctx.fillStyle = 'rgba(255,165,0, 0.3)';
+      return 1 - frameFraction;
+    });
 
-      coordsSet.forEach((coord) => {
-        fillRect(ctx, coord, 'rgba(255,165,0, 0.3)');
+    const coordsSet = coordsInRadius(position, this.radius);
+
+    const colorScale = chroma.scale(['red', 'orange']);
+
+    for (const opacity of frameOpacities) {
+      coordsSet.forEach((coords) => {
+        const actualColor = colorScale(random.float()).alpha(opacity).css();
+        fillRect(ctx, coords, actualColor);
       });
 
-      await new Promise((res) => setTimeout(res, 30));
-    }
+      await new Promise((res) => setTimeout(res, 20));
 
-    ctx.clearRect(
-      (position.x - this.radius) * CELL_LENGTH,
-      (position.y - this.radius) * CELL_LENGTH,
-      2 * (this.radius + 1) * CELL_LENGTH,
-      2 * (this.radius + 1) * CELL_LENGTH
-    );
+      coordsSet.forEach((coords) => {
+        clearRect(ctx, coords);
+      });
+    }
   }
 }
 

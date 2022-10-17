@@ -17,6 +17,15 @@ export function fillRect(
   );
 }
 
+export function clearRect(ctx: CanvasRenderingContext2D, pos: Coords) {
+  ctx.clearRect(
+    pos.x * CELL_LENGTH,
+    pos.y * CELL_LENGTH,
+    CELL_LENGTH,
+    CELL_LENGTH
+  );
+}
+
 export function fillText(
   ctx: CanvasRenderingContext2D,
   char: string,
