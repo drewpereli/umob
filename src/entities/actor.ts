@@ -7,7 +7,13 @@ import {
 import { useGame } from '@/stores/game';
 import type { Tile } from '@/stores/map';
 import { debugOptions } from '@/utils/debug-options';
-import { Cover, Dir, DIRS, distance } from '@/utils/map';
+import {
+  Cover,
+  coverMultiplierBetween,
+  Dir,
+  DIRS,
+  distance,
+} from '@/utils/map';
 import { Grenade, type Power } from '@/utils/powers';
 import { random } from '@/utils/random';
 import type { Damageable } from './damageable';
@@ -72,12 +78,7 @@ export default class Actor implements Damageable {
     if (!this.canAct) return;
 
     entities.forEach((entity, idx) => {
-      const hitChance =
-        entity.evasionMultiplier !== undefined
-          ? this.equippedWeapon.accuracy *
-            this.accuracyMultiplier *
-            entity.evasionMultiplier
-          : 1;
+      const hitChance = this.hitChanceForDamageable(entity);
 
       const willHit = random.float(0, 1) < hitChance;
 
@@ -232,5 +233,26 @@ export default class Actor implements Damageable {
 
   coverInDirection(dir: Dir) {
     return this.game.map.adjacentTile(this, dir)?.cover ?? Cover.None;
+  }
+
+  // // The chance that a shot fired from this actor at "damageable" will hit
+  // // Returns a number between 0 and 1 inclusive
+  hitChanceForDamageable(damageable: Damageable & Coords) {
+    if (damageable.evasionMultiplier === undefined) {
+      return 1;
+    }
+
+    const actor: Actor = damageable as Actor;
+
+    const baselineAccuracy =
+      this.accuracyMultiplier *
+      this.equippedWeapon.accuracy *
+      actor.evasionMultiplier;
+
+    return baselineAccuracy * actor.coverMultiplierWhenShotFrom(this);
+  }
+
+  coverMultiplierWhenShotFrom(from: Coords) {
+    return coverMultiplierBetween(this, from, this.covers);
   }
 }
