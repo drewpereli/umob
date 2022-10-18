@@ -16,6 +16,8 @@ export abstract class Terrain {
   get blocksMovement() {
     return this.moveTimeMultiplier === null;
   }
+
+  affectActorStandingOn?(actor: Actor): void;
 }
 
 export class Floor extends Terrain {
@@ -53,4 +55,8 @@ export class Lava extends Terrain {
   type = 'lava';
   char = '~';
   moveTimeMultiplier = 2;
+
+  affectActorStandingOn(actor: Actor) {
+    actor.receiveDamage(20);
+  }
 }

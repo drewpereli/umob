@@ -240,6 +240,11 @@ export const useGame = defineStore('game', {
       while (!this.player.canAct) {
         this.nonPlayerActors.forEach((actor) => actor.act());
 
+        this.actors.forEach((actor) => {
+          const tile = this.map.tileAt(actor);
+          tile.terrain.affectActorStandingOn?.(actor);
+        });
+
         if (this.actionUiState === ActionUiState.GameOver) return;
 
         this._cullDeadActors();
