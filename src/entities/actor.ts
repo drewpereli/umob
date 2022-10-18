@@ -13,6 +13,7 @@ import {
   coverMultiplierBetween,
   Dir,
   DIRS,
+  dirsBetween,
   distance,
 } from '@/utils/map';
 import { Grenade, type Power } from '@/utils/powers';
@@ -172,10 +173,20 @@ export default class Actor implements Damageable {
 
         if (!this.canMoveTo(tile)) return;
 
-        this.move(tile);
+        this.moveOrTurn(tile);
       } else {
         this.wander();
       }
+    }
+  }
+
+  moveOrTurn(tile: Tile) {
+    const dirs = dirsBetween(this, tile);
+
+    if (dirs.includes(this.facing)) {
+      this.move(tile);
+    } else {
+      this.turn(dirs[0]);
     }
   }
 
@@ -198,7 +209,7 @@ export default class Actor implements Damageable {
 
     if (tiles.length === 0) return;
 
-    this.move(random.arrayElement(tiles));
+    this.moveOrTurn(random.arrayElement(tiles));
   }
 
   get coords(): Coords {
