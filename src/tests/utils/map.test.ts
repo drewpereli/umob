@@ -1,5 +1,11 @@
 import type { Covers } from '@/entities/actor';
-import { Cover, coverMultiplierBetween, Dir, dirsBetween } from '@/utils/map';
+import {
+  Cover,
+  coverMultiplierBetween,
+  Dir,
+  dirsBetween,
+  coordsInViewCone,
+} from '@/utils/map';
 import { describe, expect, test } from 'vitest';
 
 describe('dirsBetween', () => {
@@ -43,6 +49,27 @@ describe('coverMultiplierBetween', () => {
     'coverMultiplierBetween(%o, %o, covers) -> %f',
     (target, source, expected) => {
       const actual = coverMultiplierBetween(target, source, covers);
+
+      expect(actual).toBe(expected);
+    }
+  );
+});
+
+describe('coordsInViewCone', () => {
+  const examples: [Coords, Coords, number, Dir, boolean][] = [
+    [{ x: 0, y: 0 }, { x: 10, y: 0 }, 90, Dir.Right, true],
+    [{ x: 0, y: 0 }, { x: 10, y: 10 }, 90, Dir.Right, true],
+    [{ x: 0, y: 0 }, { x: 10, y: 11 }, 90, Dir.Right, false],
+    [{ x: 5, y: 0 }, { x: 5, y: 10 }, 90, Dir.Down, true],
+    [{ x: 5, y: 0 }, { x: 5, y: 10 }, 90, Dir.Right, false],
+    [{ x: 5, y: 5 }, { x: 5, y: 6 }, 90, Dir.Down, true],
+    [{ x: 5, y: 5 }, { x: 5, y: 6 }, 90, Dir.Up, false],
+  ];
+
+  test.each(examples)(
+    'coordsInViewCone(%o, %o, %i, "%s") -> %j',
+    (source, target, viewAngle, sourceFacing, expected) => {
+      const actual = coordsInViewCone(source, target, viewAngle, sourceFacing);
 
       expect(actual).toBe(expected);
     }

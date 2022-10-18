@@ -1,5 +1,5 @@
 import type { Covers } from '@/entities/actor';
-import { angle } from './math';
+import { angle, angularDistance } from './math';
 
 export enum Dir {
   Up = 'up',
@@ -71,4 +71,28 @@ export function coverMultiplierBetween(
   const multipliers = covers.map((cover) => coverEvasionMultipliers[cover]);
 
   return Math.min(...multipliers);
+}
+
+// This DOES NOT compute the actors fov
+// It just checks if the coords are within the actor's view cone, ignoring view range, walls, etc
+export function coordsInViewCone(
+  source: Coords,
+  target: Coords,
+  viewAngle: number,
+  sourceFacing: Dir
+) {
+  const dirAngleOffset = {
+    [Dir.Up]: -90,
+    [Dir.Right]: 0,
+    [Dir.Down]: 90,
+    [Dir.Left]: 180,
+  };
+
+  const angleCurrentlyFacing = dirAngleOffset[sourceFacing];
+
+  const targetAngle = angle(source, target);
+
+  const distance = angularDistance(angleCurrentlyFacing, targetAngle);
+
+  return distance <= viewAngle / 2;
 }
