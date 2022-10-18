@@ -1,18 +1,18 @@
 import { debugOptions } from '@/utils/debug-options';
 import Actor from './actor';
-import { AssaultRifle, Pistol, ShotGun, SubMachineGun } from './gun';
+import { AssaultRifle, Pistol, RailGun, SubMachineGun } from './gun';
 
 export class Player extends Actor {
   defaultChar = '@';
   color = 'yellow';
 
   inventory = [
-    new ShotGun(),
+    new RailGun(),
     new Pistol(),
     new SubMachineGun(),
     new AssaultRifle(),
   ];
-  equippedWeapon = this.inventory[1];
+  equippedWeapon = this.inventory[0];
 
   health = debugOptions.infiniteHealth ? Infinity : 100;
   maxHealth = debugOptions.infiniteHealth ? Infinity : 100;

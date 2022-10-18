@@ -110,6 +110,16 @@ export default class Actor implements Damageable {
       const willHit = random.float(0, 1) < hitChance;
 
       if (willHit) {
+        if (this.equippedWeapon.knockBack && entity instanceof Actor) {
+          const dirs = dirsBetween(this, entity);
+          const dir = random.arrayElement(dirs);
+          entity.receiveKnockBack(
+            this.equippedWeapon.damage,
+            this.equippedWeapon.knockBack,
+            dir
+          );
+        }
+
         entity.receiveDamage(this.equippedWeapon.damage);
       }
 
@@ -293,5 +303,44 @@ export default class Actor implements Damageable {
 
   coverMultiplierWhenShotFrom(from: Coords) {
     return coverMultiplierBetween(this, from, this.covers);
+  }
+
+  receiveKnockBack(damage: number, amount: number, dir: Dir) {
+    let toCoords: Coords = this;
+    let additionalActorDamaged: Actor | null = null;
+    let hitWall = false;
+
+    for (let i = 0; i < amount; i++) {
+      const next = this.game.map.adjacentTile(toCoords, dir);
+
+      if (!next) {
+        break;
+      }
+
+      const actor = this.game.actorAt(next);
+
+      if (actor) {
+        additionalActorDamaged = actor;
+        break;
+      }
+
+      if (next.terrain.blocksMovement) {
+        hitWall = true;
+        break;
+      }
+
+      toCoords = next;
+    }
+
+    if (additionalActorDamaged) {
+      additionalActorDamaged.receiveDamage(damage * 0.25);
+    }
+
+    if (hitWall) {
+      this.receiveDamage(damage * 0.25);
+    }
+
+    this.x = toCoords.x;
+    this.y = toCoords.y;
   }
 }

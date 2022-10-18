@@ -6,6 +6,7 @@ export default abstract class Gun {
   range = Infinity;
   spread: number | null = null;
   accuracy = 0.5;
+  knockBack = 0;
 }
 
 export class ShotGun extends Gun {
@@ -37,4 +38,11 @@ export class SubMachineGun extends Gun {
   range = 10;
   penetration = 0;
   attackTimeMultiplier = 1;
+}
+
+export class RailGun extends Gun {
+  name = 'rail gun';
+  damage = 5;
+  range = 10;
+  knockBack = 5;
 }

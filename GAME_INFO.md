@@ -1,5 +1,12 @@
 # UMOB
 
+## Guns and Gun Effects
+
+### Knock-back
+Some guns have "knock-back". If you shoot an enemy with a gun with knock-back, they will be knocked back in the direction of the shot. 
+If there is another actor behind the actor that was shot, that actor will take 1/4 of the gun's damage.
+If there is a wall behind the actor that was shot, the actor that was shot will take an additional 1/4 of the gun's damage.
+
 ## Cover system
 If you're behind cover, and an enemy tries to shoot you from the direction of that cover, the hit chance is reduced.
 Some terrain (like walls) give you "full" cover, while others (like half walls) give you "half" cover. Full cover reduced hit chance by 50%, while 
