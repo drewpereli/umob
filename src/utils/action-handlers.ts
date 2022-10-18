@@ -26,13 +26,13 @@ export const actionHandlers: Partial<
     a: (game) => {
       const playerTile = game.map.tileAt(game.player);
 
-      const target = game.map.adjacentTile(playerTile, Dir.Up);
+      const target = game.map.adjacentTile(playerTile, game.player.facing);
 
       if (!target) {
         return;
       }
 
-      game.selectedTile = target;
+      game.setSelectedTile(target);
       game.actionUiState = ActionUiState.Aiming;
     },
     e: (game) => (game.actionUiState = ActionUiState.Inventory),
@@ -41,13 +41,13 @@ export const actionHandlers: Partial<
 
       const playerTile = game.map.tileAt(game.player);
 
-      const target = game.map.adjacentTile(playerTile, Dir.Up);
+      const target = game.map.adjacentTile(playerTile, game.player.facing);
 
       if (!target) {
         return;
       }
 
-      game.selectedTile = target;
+      game.setSelectedTile(target);
 
       game.actionUiState = ActionUiState.Examining;
     },
@@ -56,13 +56,13 @@ export const actionHandlers: Partial<
 
       const playerTile = game.map.tileAt(game.player);
 
-      const target = game.map.adjacentTile(playerTile, Dir.Up);
+      const target = game.map.adjacentTile(playerTile, game.player.facing);
 
       if (!target) {
         return;
       }
 
-      game.selectedTile = target;
+      game.setSelectedTile(target);
 
       game.actionUiState = ActionUiState.AimingPower;
     },
@@ -77,7 +77,7 @@ export const actionHandlers: Partial<
     ArrowDown: (game) => updateAim(game, Dir.Down),
     ArrowLeft: (game) => updateAim(game, Dir.Left),
     Escape: (game) => {
-      game.selectedTile = null;
+      game.setSelectedTile(null);
       game.actionUiState = ActionUiState.Default;
     },
     f: (game) => {
@@ -90,7 +90,7 @@ export const actionHandlers: Partial<
     ArrowDown: (game) => updateAim(game, Dir.Down),
     ArrowLeft: (game) => updateAim(game, Dir.Left),
     Escape: (game) => {
-      game.selectedTile = null;
+      game.setSelectedTile(null);
       game.actionUiState = ActionUiState.Default;
     },
     f: (game) => {
@@ -113,7 +113,7 @@ export const actionHandlers: Partial<
     ArrowDown: (game) => updateAim(game, Dir.Down),
     ArrowLeft: (game) => updateAim(game, Dir.Left),
     Escape: (game) => {
-      game.selectedTile = null;
+      game.setSelectedTile(null);
       game.actionUiState = ActionUiState.Default;
     },
   },
@@ -130,7 +130,7 @@ function updateAim(game: Game, dir: Dir) {
     return;
   }
 
-  game.selectedTile = target;
+  game.setSelectedTile(target);
 }
 
 function defaultArrowKey(game: Game, dir: Dir) {
