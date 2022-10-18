@@ -69,7 +69,7 @@ export const actionHandlers: Partial<
     '.': (game) => {
       game.playerWait();
     },
-    d: (game) => (game.directionViewMode = !game.directionViewMode),
+    d: (game) => game.toggleDirectionViewMode(),
   },
   [ActionUiState.Aiming]: {
     ArrowUp: (game) => updateAim(game, Dir.Up),
