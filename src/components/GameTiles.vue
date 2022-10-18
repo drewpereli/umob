@@ -92,6 +92,9 @@ export default defineComponent({
     'game.visibleTiles'() {
       this.draw();
     },
+    'game.directionViewMode'() {
+      this.draw();
+    },
   },
   mounted() {
     const canvasContainer = this.$refs.gameTiles as HTMLElement;

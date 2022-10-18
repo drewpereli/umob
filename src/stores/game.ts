@@ -22,6 +22,7 @@ export const useGame = defineStore('game', {
     actionUiState: ActionUiState.Default,
     animations: useAnimations(),
     menu: useMenu(),
+    directionViewMode: false, // Actors chars will be replaced with arrows showing where they're facing
   }),
   getters: {
     player: (state) => state.actors[0],

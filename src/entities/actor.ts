@@ -27,6 +27,13 @@ enum Mood {
 
 export type Covers = Record<Dir, Cover>;
 
+const dirChars: Record<Dir, string> = {
+  [Dir.Up]: '↑',
+  [Dir.Right]: '→',
+  [Dir.Down]: '↓',
+  [Dir.Left]: '←',
+};
+
 export default class Actor implements Damageable {
   constructor({ x, y }: { x: number; y: number }) {
     this.x = x;
@@ -63,7 +70,14 @@ export default class Actor implements Damageable {
   powers = [new Grenade()];
   selectedPower: Power | null = null;
 
-  char = 'd';
+  defaultChar = 'd';
+
+  get char() {
+    return this.game.directionViewMode
+      ? dirChars[this.facing]
+      : this.defaultChar;
+  }
+
   readonly color: string = 'white';
 
   readonly game = useGame();

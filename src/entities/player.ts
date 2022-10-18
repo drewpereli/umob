@@ -3,7 +3,7 @@ import Actor from './actor';
 import { AssaultRifle, Pistol, ShotGun, SubMachineGun } from './gun';
 
 export class Player extends Actor {
-  char = '@';
+  defaultChar = '@';
   color = 'yellow';
 
   inventory = [
