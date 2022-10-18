@@ -10,7 +10,7 @@ import { defineStore } from 'pinia';
 import { useAnimations } from './animations';
 import { Tile, useMap, Wall } from './map';
 import { useMenu } from './menu';
-import { distance, coordsEqual } from '@/utils/map';
+import { distance, coordsEqual, coordsInViewCone, Dir } from '@/utils/map';
 
 export const useGame = defineStore('game', {
   state: () => ({
@@ -22,6 +22,7 @@ export const useGame = defineStore('game', {
     actionUiState: ActionUiState.Default,
     animations: useAnimations(),
     menu: useMenu(),
+    directionViewMode: false, // Actors chars will be replaced with arrows showing where they're facing
   }),
   getters: {
     player: (state) => state.actors[0],
@@ -42,6 +43,18 @@ export const useGame = defineStore('game', {
         this.player.viewRange,
         (x: number, y: number) => {
           const tile = this.map.tileAt({ x, y });
+
+          if (
+            !coordsInViewCone(
+              this.player,
+              tile,
+              this.player.viewAngle,
+              this.player.facing
+            ) &&
+            !coordsEqual(tile, this.player)
+          )
+            return;
+
           visibleTiles.push(tile);
         }
       );
@@ -179,6 +192,10 @@ export const useGame = defineStore('game', {
 
       this.player.move(targetTile);
 
+      this._tickUntilPlayerCanAct();
+    },
+    turnPlayer(dir: Dir) {
+      this.player.turn(dir);
       this._tickUntilPlayerCanAct();
     },
     playerFireWeapon() {

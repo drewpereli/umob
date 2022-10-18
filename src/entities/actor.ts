@@ -8,10 +8,12 @@ import { useGame } from '@/stores/game';
 import type { Tile } from '@/stores/map';
 import { debugOptions } from '@/utils/debug-options';
 import {
+  coordsInViewCone,
   Cover,
   coverMultiplierBetween,
   Dir,
   DIRS,
+  dirsBetween,
   distance,
 } from '@/utils/map';
 import { Grenade, type Power } from '@/utils/powers';
@@ -24,6 +26,13 @@ enum Mood {
 }
 
 export type Covers = Record<Dir, Cover>;
+
+const dirChars: Record<Dir, string> = {
+  [Dir.Up]: '↑',
+  [Dir.Right]: '→',
+  [Dir.Down]: '↓',
+  [Dir.Left]: '←',
+};
 
 export default class Actor implements Damageable {
   constructor({ x, y }: { x: number; y: number }) {
@@ -40,6 +49,7 @@ export default class Actor implements Damageable {
   maxHealth = 100;
 
   moveTime = 2;
+  turnTime = 1;
   attackTime = 2;
 
   timeUntilNextAction = 0;
@@ -51,13 +61,23 @@ export default class Actor implements Damageable {
   accuracyMultiplier = 1;
   evasionMultiplier = 1;
 
+  facing: Dir = random.arrayElement([Dir.Up, Dir.Right, Dir.Down, Dir.Left]);
+  viewAngle: number = 90;
+
   inventory = [new Pistol()];
   equippedWeapon = this.inventory[0];
 
   powers = [new Grenade()];
   selectedPower: Power | null = null;
 
-  char = 'd';
+  defaultChar = 'd';
+
+  get char() {
+    return this.game.directionViewMode
+      ? dirChars[this.facing]
+      : this.defaultChar;
+  }
+
   readonly color: string = 'white';
 
   readonly game = useGame();
@@ -72,6 +92,13 @@ export default class Actor implements Damageable {
     this.y = tile.y;
     this.timeUntilNextAction =
       this.moveTime * (tile.terrain.moveTimeMultiplier as number);
+  }
+
+  turn(dir: Dir) {
+    if (!this.canAct || dir === this.facing) return;
+
+    this.facing = dir;
+    this.timeUntilNextAction = this.turnTime;
   }
 
   fireWeapon(entities: (Damageable & Coords)[]) {
@@ -160,10 +187,20 @@ export default class Actor implements Damageable {
 
         if (!this.canMoveTo(tile)) return;
 
-        this.move(tile);
+        this.moveOrTurn(tile);
       } else {
         this.wander();
       }
+    }
+  }
+
+  moveOrTurn(tile: Tile) {
+    const dirs = dirsBetween(this, tile);
+
+    if (dirs.includes(this.facing)) {
+      this.move(tile);
+    } else {
+      this.turn(dirs[0]);
     }
   }
 
@@ -186,7 +223,7 @@ export default class Actor implements Damageable {
 
     if (tiles.length === 0) return;
 
-    this.move(random.arrayElement(tiles));
+    this.moveOrTurn(random.arrayElement(tiles));
   }
 
   get coords(): Coords {
@@ -214,6 +251,8 @@ export default class Actor implements Damageable {
 
   get canSeePlayer() {
     if (distance(this, this.game.player) > this.viewRange) return false;
+    if (!coordsInViewCone(this, this.game.player, this.viewAngle, this.facing))
+      return false;
 
     return true;
   }

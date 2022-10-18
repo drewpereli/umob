@@ -1,5 +1,5 @@
 import type { Covers } from '@/entities/actor';
-import { angle } from './math';
+import { angle, angularDistance } from './math';
 
 export enum Dir {
   Up = 'up',
@@ -33,23 +33,24 @@ export function distance(c1: Coords, c2: Coords) {
 // Returns the direction(s) between "from" and "to"
 // This is usually just one direction, but if "from" and "to" are at exactly a 45 degree angle, it will return 2 directions
 // e.g. if "to" is exactly north-east of "from", it will return [Dir.Up, Dir.Right]
+// It's kind of confusing because the y-axis is inverted (0 is at the top)
 export function dirsBetween(from: Coords, to: Coords): [Dir] | [Dir, Dir] {
   const angleBetween = angle(from, to);
 
   switch (angleBetween) {
     case 45:
-      return [Dir.Up, Dir.Right];
-    case 135:
-      return [Dir.Left, Dir.Up];
-    case -45:
       return [Dir.Right, Dir.Down];
-    case -135:
+    case 135:
       return [Dir.Down, Dir.Left];
+    case -45:
+      return [Dir.Up, Dir.Right];
+    case -135:
+      return [Dir.Left, Dir.Up];
   }
 
   if (isBetween(angleBetween, -45, 45)) return [Dir.Right];
-  if (isBetween(angleBetween, 45, 135)) return [Dir.Up];
-  if (isBetween(angleBetween, -135, -45)) return [Dir.Down];
+  if (isBetween(angleBetween, 45, 135)) return [Dir.Down];
+  if (isBetween(angleBetween, -135, -45)) return [Dir.Up];
   return [Dir.Left];
 }
 
@@ -70,4 +71,28 @@ export function coverMultiplierBetween(
   const multipliers = covers.map((cover) => coverEvasionMultipliers[cover]);
 
   return Math.min(...multipliers);
+}
+
+// This DOES NOT compute the actors fov
+// It just checks if the coords are within the actor's view cone, ignoring view range, walls, etc
+export function coordsInViewCone(
+  source: Coords,
+  target: Coords,
+  viewAngle: number,
+  sourceFacing: Dir
+) {
+  const dirAngleOffset = {
+    [Dir.Up]: -90,
+    [Dir.Right]: 0,
+    [Dir.Down]: 90,
+    [Dir.Left]: 180,
+  };
+
+  const angleCurrentlyFacing = dirAngleOffset[sourceFacing];
+
+  const targetAngle = angle(source, target);
+
+  const distance = angularDistance(angleCurrentlyFacing, targetAngle);
+
+  return distance <= viewAngle / 2;
 }
