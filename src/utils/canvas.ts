@@ -3,7 +3,7 @@ import type { TerrainData, Tile } from '@/stores/map';
 import { scale } from 'chroma-js';
 import { random } from './random';
 
-export const CELL_LENGTH = 32;
+export const CELL_LENGTH = 28;
 
 export function fillRect(
   ctx: CanvasRenderingContext2D,

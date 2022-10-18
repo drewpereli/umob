@@ -4,6 +4,7 @@ import {
   drawTileMainCanvas,
   drawTileVisibilityCanvas,
   drawTileUiCanvas,
+  CELL_LENGTH,
 } from '@/utils/canvas';
 
 export class View {
@@ -18,7 +19,7 @@ export class View {
   }
 
   get canvasLength() {
-    return 32 * (2 * this.camera.viewRadius + 1);
+    return CELL_LENGTH * (2 * this.camera.viewRadius + 1);
   }
 
   get tiles() {
@@ -70,7 +71,7 @@ export class View {
   }
 
   setContexts(contexts: Record<string, CanvasRenderingContext2D>) {
-    contexts.main.font = '28px Arial';
+    contexts.main.font = `${CELL_LENGTH * (28 / 32)}px Arial`;
     contexts.main.textBaseline = 'middle';
     contexts.main.textAlign = 'center';
 
