@@ -192,6 +192,17 @@ export const useGame = defineStore('game', {
     onPlayerDie() {
       this.actionUiState = ActionUiState.GameOver;
     },
+    async playerWait() {
+      this.nonPlayerActors.forEach((actor) => actor.act());
+
+      this._cullDeadActors();
+      this._tick();
+
+      if (this.animations.animations.length) {
+        await new Promise((res) => setTimeout(res, 0));
+        await this.animations.runAnimations();
+      }
+    },
     async _tickUntilPlayerCanAct() {
       if (this.animations.animations.length) {
         await new Promise((res) => setTimeout(res, 0));

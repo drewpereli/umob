@@ -66,6 +66,9 @@ export const actionHandlers: Partial<
 
       game.actionUiState = ActionUiState.AimingPower;
     },
+    '.': (game) => {
+      game.playerWait();
+    },
   },
   [ActionUiState.Aiming]: {
     ArrowUp: (game) => updateAim(game, Dir.Up),
