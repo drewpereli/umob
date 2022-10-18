@@ -3,9 +3,10 @@ import { defineComponent } from 'vue';
 import HealthBar from './player-status/HealthBar.vue';
 import EquippedWeapon from './player-status/EquippedWeapon.vue';
 import { useGame } from '@/stores/game';
+import CoverIndicators from './CoverIndicators.vue';
 
 export default defineComponent({
-  components: { HealthBar, EquippedWeapon },
+  components: { HealthBar, EquippedWeapon, CoverIndicators },
   setup() {
     return { game: useGame() };
   },
@@ -16,6 +17,7 @@ export default defineComponent({
   <div class="player-status">
     <HealthBar :actor="game.player" />
     <EquippedWeapon />
+    <CoverIndicators :covers="game.player.covers" />
   </div>
 </template>
 
@@ -26,7 +28,7 @@ export default defineComponent({
   padding 1rem
   border-radius 4px
   border 1px solid gray
-  div
+  & > *
     margin-top 0.5rem
     &:first-child
       margin-top 0

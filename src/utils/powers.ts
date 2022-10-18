@@ -1,8 +1,8 @@
 import type Actor from '@/entities/actor';
 import { ExplosionAnimation } from '@/stores/animations';
 import { useGame } from '@/stores/game';
-import { distance } from '@/stores/map';
 import bresenham from './bresnham';
+import { distance } from './map';
 
 export abstract class Power {
   useTime = 5;

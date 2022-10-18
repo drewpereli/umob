@@ -1,6 +1,6 @@
 import type Gun from '@/entities/gun';
 import type { useGame } from '@/stores/game';
-import { Dir } from '@/stores/map';
+import { Dir } from './map';
 
 export enum ActionUiState {
   Default = 'default',
