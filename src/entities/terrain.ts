@@ -1,7 +1,9 @@
 import { Cover } from '@/utils/map';
+import type Actor from './actor';
 import type { Damageable } from './damageable';
 
 export abstract class Terrain {
+  abstract readonly type: string;
   abstract readonly char: string;
   abstract readonly moveTimeMultiplier: number | null;
   readonly color: string = '#ccc';
@@ -17,12 +19,14 @@ export abstract class Terrain {
 }
 
 export class Floor extends Terrain {
+  type = 'floor';
   char = '•';
   moveTimeMultiplier = 1;
   color = 'rgba(255,255,255,0.2)';
 }
 
 export class Wall extends Terrain implements Damageable {
+  type = 'wall';
   char = '#';
   moveTimeMultiplier = null;
   penetrationBlock = 2;
@@ -38,6 +42,7 @@ export class Wall extends Terrain implements Damageable {
 }
 
 export class HalfWall extends Terrain {
+  type = 'half-wall';
   char = '▄';
   moveTimeMultiplier = 2;
   color = '#aaa';
@@ -45,6 +50,7 @@ export class HalfWall extends Terrain {
 }
 
 export class Lava extends Terrain {
+  type = 'lava';
   char = '~';
   moveTimeMultiplier = 2;
 }

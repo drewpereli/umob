@@ -109,6 +109,8 @@ export const useMap = defineStore('map', {
   },
 });
 
+export type TerrainData = Pick<Terrain, 'type' | 'char' | 'color'>;
+
 export class Tile implements Damageable {
   constructor({ x, y, terrain }: Coords & { terrain?: Terrain }) {
     this.x = x;
@@ -120,7 +122,7 @@ export class Tile implements Damageable {
   readonly y;
   terrain;
 
-  terrainLastSeenByPlayer?: Pick<Terrain, 'char' | 'color'>;
+  terrainLastSeenByPlayer?: TerrainData;
 
   get blocksView() {
     return this.terrain.blocksView;
@@ -131,8 +133,8 @@ export class Tile implements Damageable {
   }
 
   onPlayerSees() {
-    const { char, color } = this.terrain;
-    this.terrainLastSeenByPlayer = { char, color };
+    const { type, char, color } = this.terrain;
+    this.terrainLastSeenByPlayer = { type, char, color };
   }
 
   receiveDamage(damage: number) {
