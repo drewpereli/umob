@@ -43,7 +43,8 @@ export const useMap = defineStore('map', {
       return (from: Coords, to: Coords, actor: Actor): Coords[] => {
         const matrix = this.tiles.map((row) => {
           return row.map((tile) => {
-            if (tile.terrain.blocksMovement) return 0;
+            if (tile.terrain.blocksMovement || tile.terrain.type === 'lava')
+              return 0;
             return 1;
           });
         });
