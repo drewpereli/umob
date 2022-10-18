@@ -7,8 +7,9 @@ const activeOptions = {
   randomHalfWallsInEmptyMap: 10,
   randomLavaInEmptyMap: 10,
   docileEnemies: false,
-  extraEnemies: 0,
-  infiniteHealth: true,
+  extraEnemies: 1,
+  infiniteHealth: 0,
+  fullViewAngle: true,
 };
 
 export const debugOptions = debugMode
