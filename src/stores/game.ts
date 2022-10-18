@@ -8,9 +8,10 @@ import { random } from '@/utils/random';
 import { PermissiveFov } from 'permissive-fov';
 import { defineStore } from 'pinia';
 import { useAnimations } from './animations';
-import { Tile, useMap, Wall } from './map';
+import { Tile, useMap } from './map';
 import { useMenu } from './menu';
 import { distance, coordsEqual, coordsInViewCone, Dir } from '@/utils/map';
+import { Wall } from '@/entities/terrain';
 
 export const useGame = defineStore('game', {
   state: () => ({
@@ -206,6 +207,16 @@ export const useGame = defineStore('game', {
       this.player.useSelectedPower();
       this._tickUntilPlayerCanAct();
     },
+    setSelectedTile(tile: Tile | null) {
+      if (tile === null) {
+        this.selectedTile = null;
+        return;
+      }
+
+      if (!this.coordsVisible(tile)) return;
+
+      this.selectedTile = tile;
+    },
     onPlayerDie() {
       this.actionUiState = ActionUiState.GameOver;
     },
@@ -228,6 +239,11 @@ export const useGame = defineStore('game', {
 
       while (!this.player.canAct) {
         this.nonPlayerActors.forEach((actor) => actor.act());
+
+        this.actors.forEach((actor) => {
+          const tile = this.map.tileAt(actor);
+          tile.terrain.affectActorStandingOn?.(actor);
+        });
 
         if (this.actionUiState === ActionUiState.GameOver) return;
 

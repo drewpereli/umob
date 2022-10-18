@@ -17,6 +17,8 @@ export class Player extends Actor {
   health = debugOptions.infiniteHealth ? Infinity : 100;
   maxHealth = debugOptions.infiniteHealth ? Infinity : 100;
 
+  viewAngle = debugOptions.fullViewAngle ? 360 : 90;
+
   receiveDamage(damage: number) {
     super.receiveDamage(damage);
 

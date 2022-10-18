@@ -7,6 +7,7 @@ import { random } from '@/utils/random';
 import { astar, Graph } from '@/utils/astar';
 import type { Damageable } from '@/entities/damageable';
 import { distance, coordsEqual, Dir, Cover } from '@/utils/map';
+import { Floor, Terrain, Wall } from '@/entities/terrain';
 
 export const useMap = defineStore('map', {
   state: () => ({
@@ -42,7 +43,8 @@ export const useMap = defineStore('map', {
       return (from: Coords, to: Coords, actor: Actor): Coords[] => {
         const matrix = this.tiles.map((row) => {
           return row.map((tile) => {
-            if (tile.terrain.blocksMovement) return 0;
+            if (tile.terrain.blocksMovement || tile.terrain.type === 'lava')
+              return 0;
             return 1;
           });
         });
@@ -108,6 +110,8 @@ export const useMap = defineStore('map', {
   },
 });
 
+export type TerrainData = Pick<Terrain, 'type' | 'char' | 'color'>;
+
 export class Tile implements Damageable {
   constructor({ x, y, terrain }: Coords & { terrain?: Terrain }) {
     this.x = x;
@@ -119,7 +123,7 @@ export class Tile implements Damageable {
   readonly y;
   terrain;
 
-  terrainLastSeenByPlayer?: Pick<Terrain, 'char' | 'color'>;
+  terrainLastSeenByPlayer?: TerrainData;
 
   get blocksView() {
     return this.terrain.blocksView;
@@ -130,8 +134,8 @@ export class Tile implements Damageable {
   }
 
   onPlayerSees() {
-    const { char, color } = this.terrain;
-    this.terrainLastSeenByPlayer = { char, color };
+    const { type, char, color } = this.terrain;
+    this.terrainLastSeenByPlayer = { type, char, color };
   }
 
   receiveDamage(damage: number) {
@@ -151,47 +155,4 @@ export class Tile implements Damageable {
   get cover() {
     return this.terrain.cover;
   }
-}
-
-abstract class Terrain {
-  abstract readonly char: string;
-  abstract readonly moveTimeMultiplier: number | null;
-  readonly color: string = '#ccc';
-  readonly blocksView: boolean = false;
-  readonly terrainOnDie?: Terrain;
-  readonly penetrationBlock: number = 0;
-  readonly cover: Cover = Cover.None;
-  health = 100;
-
-  get blocksMovement() {
-    return this.moveTimeMultiplier === null;
-  }
-}
-
-export class Floor extends Terrain {
-  char = '•';
-  moveTimeMultiplier = 1;
-  color = 'rgba(255,255,255,0.2)';
-}
-
-export class Wall extends Terrain implements Damageable {
-  char = '#';
-  moveTimeMultiplier = null;
-  penetrationBlock = 2;
-  blocksView = true;
-  terrainOnDie = new HalfWall();
-  cover = Cover.Full;
-
-  receiveDamage(damage: number) {
-    this.health -= damage;
-  }
-
-  isCurrentlyDamageable = true;
-}
-
-export class HalfWall extends Terrain {
-  char = '▄';
-  moveTimeMultiplier = 2;
-  color = '#aaa';
-  cover = Cover.Half;
 }
