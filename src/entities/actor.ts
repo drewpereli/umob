@@ -5,9 +5,9 @@ import {
   type GameAnimation,
 } from '@/stores/animations';
 import { useGame } from '@/stores/game';
-import { Cover, Wall, type Tile } from '@/stores/map';
+import type { Tile } from '@/stores/map';
 import { debugOptions } from '@/utils/debug-options';
-import { Dir, DIRS, distance } from '@/utils/map';
+import { Cover, Dir, DIRS, distance } from '@/utils/map';
 import { Grenade, type Power } from '@/utils/powers';
 import { random } from '@/utils/random';
 import type { Damageable } from './damageable';
@@ -16,6 +16,8 @@ import { Pistol, ShotGun } from './gun';
 enum Mood {
   Hostile = 'hostile',
 }
+
+export type Covers = Record<Dir, Cover>;
 
 export default class Actor implements Damageable {
   constructor({ x, y }: { x: number; y: number }) {

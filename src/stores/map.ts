@@ -6,13 +6,7 @@ import { debugOptions } from '@/utils/debug-options';
 import { random } from '@/utils/random';
 import { astar, Graph } from '@/utils/astar';
 import type { Damageable } from '@/entities/damageable';
-import { distance, coordsEqual, Dir } from '@/utils/map';
-
-export enum Cover {
-  None = 'none',
-  Half = 'half',
-  Full = 'full',
-}
+import { distance, coordsEqual, Dir, Cover } from '@/utils/map';
 
 export const useMap = defineStore('map', {
   state: () => ({

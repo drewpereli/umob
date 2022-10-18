@@ -1,3 +1,4 @@
+import type { Covers } from '@/entities/actor';
 import { angle } from './math';
 
 export enum Dir {
@@ -8,6 +9,18 @@ export enum Dir {
 }
 
 export const DIRS = [Dir.Up, Dir.Right, Dir.Down, Dir.Left];
+
+export enum Cover {
+  None = 'none',
+  Half = 'half',
+  Full = 'full',
+}
+
+const coverEvasionMultipliers: Record<Cover, number> = {
+  [Cover.None]: 1,
+  [Cover.Half]: 0.75,
+  [Cover.Full]: 0.5,
+};
 
 export function coordsEqual(c1: Coords, c2: Coords) {
   return c1.x === c2.x && c1.y === c2.y;
@@ -43,4 +56,18 @@ export function dirsBetween(from: Coords, to: Coords): [Dir] | [Dir, Dir] {
 // num is within [min, max)
 function isBetween(num: number, min: number, max: number) {
   return num >= min && num < max;
+}
+
+export function coverMultiplierBetween(
+  target: Coords,
+  source: Coords,
+  targetCovers: Covers
+) {
+  const directions = dirsBetween(target, source);
+
+  const covers = directions.map((dir) => targetCovers[dir]);
+
+  const multipliers = covers.map((cover) => coverEvasionMultipliers[cover]);
+
+  return Math.min(...multipliers);
 }
