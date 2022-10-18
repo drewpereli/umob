@@ -7,6 +7,7 @@ import { random } from '@/utils/random';
 import { astar, Graph } from '@/utils/astar';
 import type { Damageable } from '@/entities/damageable';
 import { distance, coordsEqual, Dir, Cover } from '@/utils/map';
+import { Floor, Terrain, Wall } from '@/entities/terrain';
 
 export const useMap = defineStore('map', {
   state: () => ({
@@ -151,47 +152,4 @@ export class Tile implements Damageable {
   get cover() {
     return this.terrain.cover;
   }
-}
-
-abstract class Terrain {
-  abstract readonly char: string;
-  abstract readonly moveTimeMultiplier: number | null;
-  readonly color: string = '#ccc';
-  readonly blocksView: boolean = false;
-  readonly terrainOnDie?: Terrain;
-  readonly penetrationBlock: number = 0;
-  readonly cover: Cover = Cover.None;
-  health = 100;
-
-  get blocksMovement() {
-    return this.moveTimeMultiplier === null;
-  }
-}
-
-export class Floor extends Terrain {
-  char = '•';
-  moveTimeMultiplier = 1;
-  color = 'rgba(255,255,255,0.2)';
-}
-
-export class Wall extends Terrain implements Damageable {
-  char = '#';
-  moveTimeMultiplier = null;
-  penetrationBlock = 2;
-  blocksView = true;
-  terrainOnDie = new HalfWall();
-  cover = Cover.Full;
-
-  receiveDamage(damage: number) {
-    this.health -= damage;
-  }
-
-  isCurrentlyDamageable = true;
-}
-
-export class HalfWall extends Terrain {
-  char = '▄';
-  moveTimeMultiplier = 2;
-  color = '#aaa';
-  cover = Cover.Half;
 }

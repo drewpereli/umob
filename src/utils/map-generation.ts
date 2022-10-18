@@ -1,4 +1,5 @@
-import { Floor, HalfWall, Tile, Wall } from '@/stores/map';
+import { Floor, Wall, HalfWall } from '@/entities/terrain';
+import { Tile } from '@/stores/map';
 import { debugOptions } from './debug-options';
 import { random } from './random';
 
