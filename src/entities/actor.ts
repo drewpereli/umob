@@ -8,6 +8,7 @@ import { useGame } from '@/stores/game';
 import type { Tile } from '@/stores/map';
 import { debugOptions } from '@/utils/debug-options';
 import {
+  coordsInViewCone,
   Cover,
   coverMultiplierBetween,
   Dir,
@@ -225,6 +226,8 @@ export default class Actor implements Damageable {
 
   get canSeePlayer() {
     if (distance(this, this.game.player) > this.viewRange) return false;
+    if (!coordsInViewCone(this, this.game.player, this.viewAngle, this.facing))
+      return false;
 
     return true;
   }
