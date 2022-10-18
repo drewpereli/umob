@@ -1,4 +1,4 @@
-import { Floor, Wall, HalfWall } from '@/entities/terrain';
+import { Floor, Wall, HalfWall, Lava } from '@/entities/terrain';
 import { Tile } from '@/stores/map';
 import { debugOptions } from './debug-options';
 import { random } from './random';
@@ -33,6 +33,19 @@ export function generate(width: number, height: number): Map {
       );
 
       randOpen.forEach((tile) => (tile.terrain = new HalfWall()));
+    }
+
+    if (debugOptions.randomLavaInEmptyMap) {
+      const openTiles = map.flatMap((row) => {
+        return row.filter((tile) => tile.terrain instanceof Floor);
+      });
+
+      const randOpen = random.arrayElements(
+        openTiles,
+        debugOptions.randomHalfWallsInEmptyMap
+      );
+
+      randOpen.forEach((tile) => (tile.terrain = new Lava()));
     }
 
     return map;

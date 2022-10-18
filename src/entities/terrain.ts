@@ -43,3 +43,8 @@ export class HalfWall extends Terrain {
   color = '#aaa';
   cover = Cover.Half;
 }
+
+export class Lava extends Terrain {
+  char = '~';
+  moveTimeMultiplier = 2;
+}
