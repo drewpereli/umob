@@ -42,7 +42,7 @@ export function generate(width: number, height: number): Map {
 
       const randOpen = random.arrayElements(
         openTiles,
-        debugOptions.randomHalfWallsInEmptyMap
+        debugOptions.randomLavaInEmptyMap
       );
 
       randOpen.forEach((tile) => (tile.terrain = new Lava()));
