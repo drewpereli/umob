@@ -12,6 +12,7 @@ export function polarity(from: number, to: number): number {
   return to > from ? 1 : -1;
 }
 
+// Returns between -180 and 180
 export function angle(c1: Coords, c2: Coords) {
   return Math.atan2(c2.y - c1.y, c2.x - c1.x) * (180 / Math.PI);
 }
