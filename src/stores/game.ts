@@ -8,8 +8,9 @@ import { random } from '@/utils/random';
 import { PermissiveFov } from 'permissive-fov';
 import { defineStore } from 'pinia';
 import { useAnimations } from './animations';
-import { coordsEqual, distance, Floor, Tile, useMap, Wall } from './map';
+import { Tile, useMap, Wall } from './map';
 import { useMenu } from './menu';
+import { distance, coordsEqual } from '@/utils/map';
 
 export const useGame = defineStore('game', {
   state: () => ({

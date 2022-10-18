@@ -1,6 +1,7 @@
 <script lang="ts">
 import { defineComponent, type PropType } from 'vue';
-import type { Dir, Cover } from '@/stores/map';
+import type { Cover } from '@/stores/map';
+import type { Dir } from '@/utils/map';
 
 interface IndicatorData {
   dir: Dir;

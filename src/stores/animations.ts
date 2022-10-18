@@ -5,8 +5,8 @@ import { polarity, slopeIntercept } from '@/utils/math';
 import { random } from '@/utils/random';
 import { defineStore } from 'pinia';
 import { useCamera } from './camera';
-import { distance } from './map';
 import chroma from 'chroma-js';
+import { distance } from '@/utils/map';
 
 function coordsInRadius(center: Coords, radius: number) {
   const xStart = center.x - radius;
