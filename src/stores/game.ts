@@ -3,20 +3,12 @@ import type { Damageable } from '@/entities/damageable';
 import { Player } from '@/entities/player';
 import { ActionUiState } from '@/utils/action-handlers';
 import { debugOptions } from '@/utils/debug-options';
+import { angle, angularDistance } from '@/utils/math';
 import { random } from '@/utils/random';
 import { PermissiveFov } from 'permissive-fov';
 import { defineStore } from 'pinia';
 import { useAnimations } from './animations';
-import {
-  angle,
-  angularDistance,
-  coordsEqual,
-  distance,
-  Floor,
-  Tile,
-  useMap,
-  Wall,
-} from './map';
+import { coordsEqual, distance, Floor, Tile, useMap, Wall } from './map';
 import { useMenu } from './menu';
 
 export const useGame = defineStore('game', {
