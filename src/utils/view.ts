@@ -75,6 +75,10 @@ export class View {
     contexts.main.textBaseline = 'middle';
     contexts.main.textAlign = 'center';
 
+    contexts.animationObjects.font = `${CELL_LENGTH * (28 / 32)}px Arial`;
+    contexts.animationObjects.textBaseline = 'middle';
+    contexts.animationObjects.textAlign = 'center';
+
     this.ctxs = contexts;
   }
 }

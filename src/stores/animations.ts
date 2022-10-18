@@ -210,6 +210,64 @@ export class ExplosionAnimation extends GameAnimation {
   }
 }
 
+export class KnockBackAnimation extends GameAnimation {
+  constructor(
+    private actor: Actor,
+    private from: Coords,
+    private to: Coords,
+    private hitSomething: boolean
+  ) {
+    super();
+  }
+
+  type = 'knock-back';
+
+  async run(ctxs: Record<string, CanvasRenderingContext2D>) {
+    const ctx = ctxs.animationObjects;
+
+    const from = this.camera.viewCoordsForAbsCoords(this.from);
+    const to = this.camera.viewCoordsForAbsCoords(this.to);
+
+    const fromPx = {
+      x: from.x * CELL_LENGTH + CELL_LENGTH / 2,
+      y: from.y * CELL_LENGTH + CELL_LENGTH / 2,
+    };
+
+    const toPx = {
+      x: to.x * CELL_LENGTH + CELL_LENGTH / 2,
+      y: to.y * CELL_LENGTH + CELL_LENGTH / 2,
+    };
+
+    const frames = 10;
+
+    const coordsByFrames = Array.from({ length: frames }).map((_, idx) => {
+      const fraction = (idx + 1) / frames;
+
+      const xDiff = toPx.x - fromPx.x;
+      const yDiff = toPx.y - fromPx.y;
+
+      const x = Math.round(fromPx.x + xDiff * fraction);
+      const y = Math.round(fromPx.y + yDiff * fraction);
+
+      return { x, y };
+    });
+
+    clearRect(ctx, from);
+
+    for (const coords of coordsByFrames) {
+      ctx.fillStyle = this.actor.color;
+      ctx.fillText(this.actor.char, coords.x, coords.y);
+      await new Promise((res) => setTimeout(res, 10));
+      ctx.clearRect(
+        coords.x - CELL_LENGTH / 2,
+        coords.y - CELL_LENGTH / 2,
+        CELL_LENGTH,
+        CELL_LENGTH
+      );
+    }
+  }
+}
+
 export const useAnimations = defineStore('animations', {
   state: () => ({
     animations: [] as GameAnimation[],

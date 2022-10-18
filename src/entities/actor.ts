@@ -1,8 +1,8 @@
 import {
   BulletAnimation,
   DamageAnimation,
+  KnockBackAnimation,
   useAnimations,
-  type GameAnimation,
 } from '@/stores/animations';
 import { useGame } from '@/stores/game';
 import type { Tile } from '@/stores/map';
@@ -339,6 +339,15 @@ export default class Actor implements Damageable {
     if (hitWall) {
       this.receiveDamage(damage * 0.25);
     }
+
+    this.game.animations.addAnimation(
+      new KnockBackAnimation(
+        this,
+        this.coords,
+        toCoords,
+        !!(hitWall || additionalActorDamaged)
+      )
+    );
 
     this.x = toCoords.x;
     this.y = toCoords.y;
