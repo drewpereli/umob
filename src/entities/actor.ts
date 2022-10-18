@@ -5,7 +5,7 @@ import {
   type GameAnimation,
 } from '@/stores/animations';
 import { useGame } from '@/stores/game';
-import { distance, Wall, type Tile } from '@/stores/map';
+import { Cover, Dir, DIRS, distance, Wall, type Tile } from '@/stores/map';
 import { debugOptions } from '@/utils/debug-options';
 import { Grenade, type Power } from '@/utils/powers';
 import { random } from '@/utils/random';
@@ -218,5 +218,16 @@ export default class Actor implements Damageable {
     if (tile.terrain.blocksMovement) return false;
     if (this.game.actorAt(tile)) return false;
     return true;
+  }
+
+  get covers(): Record<Dir, Cover> {
+    return DIRS.reduce((acc, dir) => {
+      acc[dir] = this.coverInDirection(dir);
+      return acc;
+    }, {} as Record<Dir, Cover>);
+  }
+
+  coverInDirection(dir: Dir) {
+    return this.game.map.adjacentTile(this, dir)?.cover ?? Cover.None;
   }
 }

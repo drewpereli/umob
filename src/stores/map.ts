@@ -8,11 +8,19 @@ import { astar, Graph } from '@/utils/astar';
 import type { Damageable } from '@/entities/damageable';
 
 export enum Dir {
-  Up,
-  Right,
-  Down,
-  Left,
+  Up = 'up',
+  Right = 'right',
+  Down = 'down',
+  Left = 'left',
 }
+
+export enum Cover {
+  None = 'none',
+  Half = 'half',
+  Full = 'full',
+}
+
+export const DIRS = [Dir.Up, Dir.Right, Dir.Down, Dir.Left];
 
 export const useMap = defineStore('map', {
   state: () => ({
@@ -34,12 +42,12 @@ export const useMap = defineStore('map', {
       };
     },
     adjacentTile() {
-      return (tile: Tile, dir: Dir): Tile | undefined => {
+      return (coords: Coords, dir: Dir): Tile | undefined => {
         const xDiff = dir === Dir.Left ? -1 : dir === Dir.Right ? 1 : 0;
         const yDiff = dir === Dir.Up ? -1 : dir === Dir.Down ? 1 : 0;
 
-        const x = tile.x + xDiff;
-        const y = tile.y + yDiff;
+        const x = coords.x + xDiff;
+        const y = coords.y + yDiff;
 
         return this.tileAt({ x, y });
       };
@@ -153,6 +161,10 @@ export class Tile implements Damageable {
   get isCurrentlyDamageable() {
     return this.terrain instanceof Wall;
   }
+
+  get cover() {
+    return this.terrain.cover;
+  }
 }
 
 abstract class Terrain {
@@ -162,6 +174,7 @@ abstract class Terrain {
   readonly blocksView: boolean = false;
   readonly terrainOnDie?: Terrain;
   readonly penetrationBlock: number = 0;
+  readonly cover: Cover = Cover.None;
   health = 100;
 
   get blocksMovement() {
@@ -181,6 +194,7 @@ export class Wall extends Terrain implements Damageable {
   penetrationBlock = 2;
   blocksView = true;
   terrainOnDie = new HalfWall();
+  cover = Cover.Full;
 
   receiveDamage(damage: number) {
     this.health -= damage;
@@ -193,6 +207,7 @@ export class HalfWall extends Terrain {
   char = '▄';
   moveTimeMultiplier = 2;
   color = '#aaa';
+  cover = Cover.Half;
 }
 
 export function coordsEqual(c1: Coords, c2: Coords) {
