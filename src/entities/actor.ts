@@ -40,6 +40,7 @@ export default class Actor implements Damageable {
   maxHealth = 100;
 
   moveTime = 2;
+  turnTime = 1;
   attackTime = 2;
 
   timeUntilNextAction = 0;
@@ -50,6 +51,9 @@ export default class Actor implements Damageable {
 
   accuracyMultiplier = 1;
   evasionMultiplier = 1;
+
+  facing: Dir = random.arrayElement([Dir.Up, Dir.Right, Dir.Down, Dir.Left]);
+  viewAngle: number = 90;
 
   inventory = [new Pistol()];
   equippedWeapon = this.inventory[0];
@@ -72,6 +76,13 @@ export default class Actor implements Damageable {
     this.y = tile.y;
     this.timeUntilNextAction =
       this.moveTime * (tile.terrain.moveTimeMultiplier as number);
+  }
+
+  turn(dir: Dir) {
+    if (!this.canAct || dir === this.facing) return;
+
+    this.facing = dir;
+    this.timeUntilNextAction = this.turnTime;
   }
 
   fireWeapon(entities: (Damageable & Coords)[]) {

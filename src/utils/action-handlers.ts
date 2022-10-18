@@ -19,10 +19,10 @@ export const actionHandlers: Partial<
   Record<ActionUiState, Record<string, KeyHandler>>
 > = {
   [ActionUiState.Default]: {
-    ArrowUp: (game) => game.movePlayer({ y: -1 }),
-    ArrowRight: (game) => game.movePlayer({ x: 1 }),
-    ArrowDown: (game) => game.movePlayer({ y: 1 }),
-    ArrowLeft: (game) => game.movePlayer({ x: -1 }),
+    ArrowUp: (game) => defaultArrowKey(game, Dir.Up),
+    ArrowRight: (game) => defaultArrowKey(game, Dir.Right),
+    ArrowDown: (game) => defaultArrowKey(game, Dir.Down),
+    ArrowLeft: (game) => defaultArrowKey(game, Dir.Left),
     a: (game) => {
       const playerTile = game.map.tileAt(game.player);
 
@@ -130,4 +130,21 @@ function updateAim(game: Game, dir: Dir) {
   }
 
   game.selectedTile = target;
+}
+
+function defaultArrowKey(game: Game, dir: Dir) {
+  if (game.player.facing === dir) {
+    const dirCoordOffset = {
+      [Dir.Up]: { y: -1 },
+      [Dir.Right]: { x: 1 },
+      [Dir.Down]: { y: 1 },
+      [Dir.Left]: { x: -1 },
+    };
+
+    const offset = dirCoordOffset[dir];
+
+    game.movePlayer(offset);
+  } else {
+    game.turnPlayer(dir);
+  }
 }
