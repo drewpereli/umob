@@ -101,10 +101,15 @@ export default abstract class Actor implements Damageable {
     this.y = coords.y;
   }
 
+  updateFacing(dir: Dir) {
+    this.facing = dir;
+  }
+
   turn(dir: Dir) {
     if (!this.canAct || dir === this.facing) return;
 
-    this.facing = dir;
+    this.updateFacing(dir);
+
     this.timeUntilNextAction = this.turnTime;
   }
 

@@ -1,4 +1,5 @@
 import { debugOptions } from '@/utils/debug-options';
+import type { Dir } from '@/utils/map';
 import { NonPlayerActor } from './non-player-actor';
 
 enum Mood {
@@ -6,6 +7,11 @@ enum Mood {
 }
 
 export class Enemy extends NonPlayerActor {
+  constructor(coords: Coords) {
+    super(coords);
+    this.updateLastSawPlayerIfCanSee();
+  }
+
   mood = Mood.Hostile;
 
   lastSawPlayerAt: Coords | null = null;
@@ -16,10 +22,14 @@ export class Enemy extends NonPlayerActor {
     if (this.mood === Mood.Hostile) {
       if (this.canAttackPlayer) return this.fireWeapon([this.game.player]);
 
-      if (this.canSeePlayer) {
+      if (this.canSeePlayer || this.lastSawPlayerAt) {
+        const targetCoords = this.canSeePlayer
+          ? this.game.player.coords
+          : (this.lastSawPlayerAt as Coords);
+
         const coordsPathToPlayer = this.game.map.pathBetween(
           this.coords,
-          this.game.player.coords,
+          targetCoords,
           this
         );
 
@@ -40,7 +50,15 @@ export class Enemy extends NonPlayerActor {
 
   updatePosition(coords: Coords) {
     super.updatePosition(coords);
+    this.updateLastSawPlayerIfCanSee();
+  }
 
+  updateFacing(dir: Dir) {
+    super.updateFacing(dir);
+    this.updateLastSawPlayerIfCanSee();
+  }
+
+  updateLastSawPlayerIfCanSee() {
     if (this.canSeePlayer) {
       this.lastSawPlayerAt = this.game.player.coords;
     }

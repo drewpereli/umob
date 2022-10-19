@@ -197,6 +197,12 @@ export const useGame = defineStore('game', {
 
       this.player.move(targetTile);
 
+      this.nonPlayerActors.forEach((actor) => {
+        if (actor instanceof Enemy && actor.canSeePlayer) {
+          actor.lastSawPlayerAt = targetTile;
+        }
+      });
+
       this.view.draw();
 
       this._tickUntilPlayerCanAct();
