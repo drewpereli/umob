@@ -1,5 +1,6 @@
 import { debugOptions } from '@/utils/debug-options';
 import type { Dir } from '@/utils/map';
+import { random } from '@/utils/random';
 import { NonPlayerActor } from './non-player-actor';
 
 enum Mood {
@@ -25,7 +26,7 @@ export class Enemy extends NonPlayerActor {
       if (this.canSeePlayer || this.lastSawPlayerAt) {
         this._moveTowardsPlayerOrLastSeen();
       } else {
-        this.wander();
+        this._wander();
       }
     }
   }
@@ -56,6 +57,28 @@ export class Enemy extends NonPlayerActor {
     if (!this.canMoveTo(tile)) return;
 
     this.moveOrTurn(tile);
+  }
+
+  _wander() {
+    const adjacentCoords = [
+      { x: this.x - 1, y: this.y },
+      { x: this.x + 1, y: this.y },
+      { x: this.x, y: this.y - 1 },
+      { x: this.x, y: this.y + 1 },
+    ];
+
+    const tiles = adjacentCoords
+      .map((coords) => this.game.map.tileAt(coords))
+      .filter((tile) => {
+        if (!tile) return false;
+        if (tile.terrain.blocksMovement) return false;
+        if (this.game.actorAt(tile)) return false;
+        return true;
+      });
+
+    if (tiles.length === 0) return;
+
+    this.moveOrTurn(random.arrayElement(tiles));
   }
 
   updatePosition(coords: Coords) {
