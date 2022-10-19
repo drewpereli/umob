@@ -5,6 +5,9 @@ import {
   Dir,
   dirsBetween,
   coordsInViewCone,
+  FlankingDir,
+  rotateDir,
+  flankingDirBetween,
 } from '@/utils/map';
 import { describe, expect, test } from 'vitest';
 
@@ -70,6 +73,48 @@ describe('coordsInViewCone', () => {
     'coordsInViewCone(%o, %o, %i, "%s") -> %j',
     (source, target, viewAngle, sourceFacing, expected) => {
       const actual = coordsInViewCone(source, target, viewAngle, sourceFacing);
+
+      expect(actual).toBe(expected);
+    }
+  );
+});
+
+describe('rotateDir', () => {
+  const examples: [
+    ...Parameters<typeof rotateDir>,
+    ReturnType<typeof rotateDir>
+  ][] = [
+    [Dir.Up, 1, Dir.Right],
+    [Dir.Down, 1, Dir.Left],
+    [Dir.Down, 3, Dir.Right],
+    [Dir.Down, -1, Dir.Right],
+    [Dir.Up, 7, Dir.Left],
+    [Dir.Up, -7, Dir.Right],
+  ];
+
+  test.each(examples)('rotateDir("%s", %i) -> "%s"', (dir, steps, expected) => {
+    const actual = rotateDir(dir, steps);
+
+    expect(actual).toBe(expected);
+  });
+});
+
+describe('flankingDirBetween', () => {
+  const examples: [Coords, Coords, Dir, FlankingDir][] = [
+    [{ x: 0, y: 0 }, { x: 1, y: 0 }, Dir.Left, FlankingDir.Front],
+    [{ x: 0, y: 0 }, { x: 1, y: 0 }, Dir.Up, FlankingDir.Side],
+    [{ x: 0, y: 0 }, { x: 1, y: 0 }, Dir.Down, FlankingDir.Side],
+    [{ x: 0, y: 0 }, { x: 1, y: 0 }, Dir.Right, FlankingDir.Back],
+    [{ x: 0, y: 0 }, { x: 1, y: 1 }, Dir.Right, FlankingDir.Back],
+    [{ x: 0, y: 0 }, { x: 1, y: 1 }, Dir.Down, FlankingDir.Back],
+    [{ x: 0, y: 0 }, { x: 1, y: 1 }, Dir.Up, FlankingDir.Side],
+    [{ x: 0, y: 0 }, { x: 1, y: 1 }, Dir.Left, FlankingDir.Side],
+  ];
+
+  test.only.each(examples)(
+    'flankingDirBetween(%o, %o, "%s") -> "%s"',
+    (source, target, targetFacing, expected) => {
+      const actual = flankingDirBetween(source, target, targetFacing);
 
       expect(actual).toBe(expected);
     }

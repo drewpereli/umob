@@ -7,6 +7,7 @@ export default abstract class Gun {
   spread: number | null = null;
   accuracy = 0.5;
   knockBack = 0;
+  flankingBonus = 0.5;
 }
 
 export class ShotGun extends Gun {

@@ -16,6 +16,12 @@ export enum Cover {
   Full = 'full',
 }
 
+export enum FlankingDir {
+  Front = 'front',
+  Side = 'side',
+  Back = 'back',
+}
+
 const coverEvasionMultipliers: Record<Cover, number> = {
   [Cover.None]: 1,
   [Cover.Half]: 0.75,
@@ -95,4 +101,34 @@ export function coordsInViewCone(
   const distance = angularDistance(angleCurrentlyFacing, targetAngle);
 
   return distance <= viewAngle / 2;
+}
+
+// Rotates "dir" "steps" number of 90-degree steps clockwise
+// Set "steps" to negative to rotate counter-clockwise
+export function rotateDir(dir: Dir, steps: number): Dir {
+  const actualSteps = Math.floor(steps % 4);
+  const clockwiseSteps = actualSteps < 0 ? actualSteps + 4 : actualSteps;
+
+  const dirIdx = DIRS.indexOf(dir);
+  const newIdx = (dirIdx + clockwiseSteps) % 4;
+
+  return DIRS[newIdx];
+}
+
+export function flankingDirBetween(
+  source: Coords,
+  target: Coords,
+  targetFacing: Dir
+): FlankingDir {
+  const dirs = dirsBetween(source, target);
+
+  if (dirs.includes(targetFacing)) return FlankingDir.Back;
+
+  if (
+    dirs.includes(rotateDir(targetFacing, 1)) ||
+    dirs.includes(rotateDir(targetFacing, -1))
+  )
+    return FlankingDir.Side;
+
+  return FlankingDir.Front;
 }

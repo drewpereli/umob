@@ -8,8 +8,8 @@ export class Player extends Actor {
   color = 'yellow';
 
   inventory = [
-    new RailGun(),
     new Pistol(),
+    new RailGun(),
     new SubMachineGun(),
     new AssaultRifle(),
   ];

@@ -15,6 +15,8 @@ import {
   DIRS,
   dirsBetween,
   distance,
+  FlankingDir,
+  flankingDirBetween,
 } from '@/utils/map';
 import { Grenade, type Power } from '@/utils/powers';
 import { random } from '@/utils/random';
@@ -32,6 +34,12 @@ const dirChars: Record<Dir, string> = {
   [Dir.Right]: '→',
   [Dir.Down]: '↓',
   [Dir.Left]: '←',
+};
+
+const flankingDirBonusMultipliers: Record<FlankingDir, number> = {
+  [FlankingDir.Front]: 0,
+  [FlankingDir.Side]: 1,
+  [FlankingDir.Back]: 2,
 };
 
 export default class Actor implements Damageable {
@@ -109,6 +117,8 @@ export default class Actor implements Damageable {
 
       const willHit = random.float(0, 1) < hitChance;
 
+      let damage = this.equippedWeapon.damage;
+
       if (willHit) {
         if (this.equippedWeapon.knockBack && entity instanceof Actor) {
           const dirs = dirsBetween(this, entity);
@@ -120,7 +130,15 @@ export default class Actor implements Damageable {
           );
         }
 
-        entity.receiveDamage(this.equippedWeapon.damage);
+        if (entity instanceof Actor && this.equippedWeapon.flankingBonus) {
+          const flankingDir = flankingDirBetween(this, entity, entity.facing);
+          const bonusMultiplier = flankingDirBonusMultipliers[flankingDir];
+
+          damage +=
+            damage * this.equippedWeapon.flankingBonus * bonusMultiplier;
+        }
+
+        entity.receiveDamage(damage);
       }
 
       if (idx === 0) {
