@@ -96,10 +96,15 @@ export default class Actor implements Damageable {
   move(tile: Tile) {
     if (!this.canAct) return;
 
-    this.x = tile.x;
-    this.y = tile.y;
+    this.updatePosition(tile);
+
     this.timeUntilNextAction =
       this.moveTime * (tile.terrain.moveTimeMultiplier as number);
+  }
+
+  updatePosition(coords: Coords) {
+    this.x = coords.x;
+    this.y = coords.y;
   }
 
   turn(dir: Dir) {
@@ -373,7 +378,6 @@ export default class Actor implements Damageable {
       )
     );
 
-    this.x = toCoords.x;
-    this.y = toCoords.y;
+    this.updatePosition(toCoords);
   }
 }

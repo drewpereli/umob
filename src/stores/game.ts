@@ -1,4 +1,4 @@
-import Actor from '@/entities/actor';
+import type Actor from '@/entities/actor';
 import type { Damageable } from '@/entities/damageable';
 import { Player } from '@/entities/player';
 import { ActionUiState } from '@/utils/action-handlers';
@@ -12,6 +12,7 @@ import { useMenu } from './menu';
 import { distance, coordsEqual, coordsInViewCone, Dir } from '@/utils/map';
 import { Wall } from '@/entities/terrain';
 import { View } from '@/utils/view';
+import { Enemy } from '@/entities/enemy';
 
 export const useGame = defineStore('game', {
   state: () => ({
@@ -176,7 +177,7 @@ export const useGame = defineStore('game', {
 
           while (this.actorAt(tile)) tile = this.map.randomFloorTile();
 
-          this.actors.push(new Actor(tile));
+          this.actors.push(new Enemy(tile));
         });
       }
     },
