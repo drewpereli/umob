@@ -1,12 +1,12 @@
 <script lang="ts">
-import Actor from '@/entities/actor';
+import Creature from '@/entities/creature';
 import { defineComponent } from 'vue';
 import HealthBar from './player-status/HealthBar.vue';
 
 export default defineComponent({
   props: {
     entity: {
-      type: Actor,
+      type: Creature,
       required: true,
     },
   },

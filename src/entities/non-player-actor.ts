@@ -1,6 +1,6 @@
-import Actor from './actor';
+import Creature from './creature';
 
-export abstract class NonPlayerActor extends Actor {
+export abstract class NonPlayerActor extends Creature {
   abstract _act(): void;
 
   actIfPossible() {

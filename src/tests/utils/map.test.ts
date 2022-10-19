@@ -1,4 +1,4 @@
-import type { Covers } from '@/entities/actor';
+import type { Covers } from '@/entities/creature';
 import {
   Cover,
   coverMultiplierBetween,

@@ -1,4 +1,4 @@
-import type Actor from '@/entities/actor';
+import type Creature from '@/entities/creature';
 import { ExplosionAnimation } from '@/stores/animations';
 import { useGame } from '@/stores/game';
 import bresenham from './bresnham';
@@ -14,7 +14,7 @@ export abstract class Power {
     return [];
   }
 
-  actorsAimedAt(): Actor[] {
+  actorsAimedAt(): Creature[] {
     return [];
   }
 

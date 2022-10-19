@@ -2,7 +2,7 @@ import { describe, expect, test, beforeEach } from 'vitest';
 import { setActivePinia, createPinia } from 'pinia';
 import { useGame } from '@/stores/game';
 import { Tile, useMap } from '@/stores/map';
-import Actor from '@/entities/actor';
+import Creature from '@/entities/creature';
 import Gun from '@/entities/gun';
 import { Floor, Wall, HalfWall } from '@/entities/terrain';
 
@@ -19,7 +19,7 @@ describe('Actor', () => {
 
     const tile = map.tileAt(coords);
 
-    const actor = new Actor(tile);
+    const actor = new Creature(tile);
     actor.accuracyMultiplier = 1;
     actor.evasionMultiplier = 1;
     actor.equippedWeapon = new TestGun();

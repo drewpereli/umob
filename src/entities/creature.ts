@@ -38,7 +38,7 @@ const flankingDirBonusMultipliers: Record<FlankingDir, number> = {
   [FlankingDir.Back]: 2,
 };
 
-export default abstract class Actor implements Damageable {
+export default abstract class Creature implements Damageable {
   constructor({ x, y }: Coords) {
     this.x = x;
     this.y = y;
@@ -124,7 +124,7 @@ export default abstract class Actor implements Damageable {
       let damage = this.equippedWeapon.damage;
 
       if (willHit) {
-        if (this.equippedWeapon.knockBack && entity instanceof Actor) {
+        if (this.equippedWeapon.knockBack && entity instanceof Creature) {
           const dirs = dirsBetween(this, entity);
           const dir = random.arrayElement(dirs);
           entity.receiveKnockBack(
@@ -134,7 +134,7 @@ export default abstract class Actor implements Damageable {
           );
         }
 
-        if (entity instanceof Actor && this.equippedWeapon.flankingBonus) {
+        if (entity instanceof Creature && this.equippedWeapon.flankingBonus) {
           const flankingDir = flankingDirBetween(this, entity, entity.facing);
           const bonusMultiplier = flankingDirBonusMultipliers[flankingDir];
 
@@ -267,7 +267,7 @@ export default abstract class Actor implements Damageable {
       return 1;
     }
 
-    const actor: Actor = damageable as Actor;
+    const actor: Creature = damageable as Creature;
 
     const baselineAccuracy =
       this.accuracyMultiplier *
@@ -283,7 +283,7 @@ export default abstract class Actor implements Damageable {
 
   receiveKnockBack(damage: number, amount: number, dir: Dir) {
     let toCoords: Coords = this;
-    let additionalActorDamaged: Actor | null = null;
+    let additionalActorDamaged: Creature | null = null;
     let hitWall = false;
 
     for (let i = 0; i < amount; i++) {

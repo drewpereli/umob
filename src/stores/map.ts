@@ -1,7 +1,7 @@
 import bresenham from '@/utils/bresnham';
 import { generate } from '@/utils/map-generation';
 import { defineStore } from 'pinia';
-import type Actor from '@/entities/actor';
+import type Creature from '@/entities/creature';
 import { debugOptions } from '@/utils/debug-options';
 import { random } from '@/utils/random';
 import { astar, Graph } from '@/utils/astar';
@@ -40,7 +40,7 @@ export const useMap = defineStore('map', {
       };
     },
     pathBetween() {
-      return (from: Coords, to: Coords, actor: Actor): Coords[] => {
+      return (from: Coords, to: Coords, actor: Creature): Coords[] => {
         const matrix = this.tiles.map((row) => {
           return row.map((tile) => {
             if (tile.terrain.blocksMovement || tile.terrain.type === 'lava')

@@ -1,9 +1,9 @@
 import { debugOptions } from '@/utils/debug-options';
-import Actor from './actor';
+import Creature from './creature';
 import type { Damageable } from './damageable';
 import { AssaultRifle, Pistol, RailGun, SubMachineGun } from './gun';
 
-export class Player extends Actor {
+export class Player extends Creature {
   defaultChar = '@';
   color = 'yellow';
 

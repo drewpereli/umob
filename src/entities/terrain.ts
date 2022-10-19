@@ -1,5 +1,5 @@
 import { Cover } from '@/utils/map';
-import type Actor from './actor';
+import type Creature from './creature';
 import type { Damageable } from './damageable';
 
 export abstract class Terrain {
@@ -17,7 +17,7 @@ export abstract class Terrain {
     return this.moveTimeMultiplier === null;
   }
 
-  affectActorStandingOn?(actor: Actor): void;
+  affectActorStandingOn?(actor: Creature): void;
 }
 
 export class Floor extends Terrain {
@@ -56,7 +56,7 @@ export class Lava extends Terrain {
   char = '~';
   moveTimeMultiplier = 2;
 
-  affectActorStandingOn(actor: Actor) {
+  affectActorStandingOn(actor: Creature) {
     actor.receiveDamage(20);
   }
 }

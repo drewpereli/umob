@@ -1,4 +1,4 @@
-import type Actor from '@/entities/actor';
+import type Creature from '@/entities/creature';
 import bresenham from '@/utils/bresnham';
 import { CELL_LENGTH, clearRect, fillRect, fillText } from '@/utils/canvas';
 import { polarity, slopeIntercept } from '@/utils/math';
@@ -44,7 +44,7 @@ export abstract class GameAnimation {
 }
 
 export class DamageAnimation extends GameAnimation {
-  constructor(actor: Actor) {
+  constructor(actor: Creature) {
     super();
 
     this.actor = actor;
@@ -212,7 +212,7 @@ export class ExplosionAnimation extends GameAnimation {
 
 export class KnockBackAnimation extends GameAnimation {
   constructor(
-    private actor: Actor,
+    private actor: Creature,
     private from: Coords,
     private to: Coords,
     private hitSomething: boolean

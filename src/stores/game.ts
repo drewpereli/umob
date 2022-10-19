@@ -1,4 +1,4 @@
-import type Actor from '@/entities/actor';
+import type Creature from '@/entities/creature';
 import type { Damageable } from '@/entities/damageable';
 import { Player } from '@/entities/player';
 import { ActionUiState } from '@/utils/action-handlers';

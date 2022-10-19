@@ -1,11 +1,11 @@
 <script lang="ts">
-import Actor from '@/entities/actor';
+import Creature from '@/entities/creature';
 import { defineComponent } from 'vue';
 
 export default defineComponent({
   props: {
     actor: {
-      type: Actor,
+      type: Creature,
       required: true,
     },
   },

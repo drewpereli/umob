@@ -1,4 +1,4 @@
-import type Actor from '@/entities/actor';
+import type Creature from '@/entities/creature';
 import type { TerrainData, Tile } from '@/stores/map';
 import { scale } from 'chroma-js';
 import { random } from './random';
@@ -48,7 +48,7 @@ export function drawTileMainCanvas({
   ctx: CanvasRenderingContext2D;
   position: Coords;
   tile: Tile;
-  actor?: Actor;
+  actor?: Creature;
   visible: boolean;
 }) {
   fillRect(ctx, position, 'black');
