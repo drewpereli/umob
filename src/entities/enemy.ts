@@ -10,10 +10,8 @@ export class Enemy extends NonPlayerActor {
 
   lastSawPlayerAt: Coords | null = null;
 
-  act() {
+  _act() {
     if (debugOptions.docileEnemies) return;
-
-    if (!this.canAct) return;
 
     if (this.mood === Mood.Hostile) {
       if (this.canAttackPlayer) return this.fireWeapon([this.game.player]);

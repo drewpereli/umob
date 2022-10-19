@@ -233,7 +233,7 @@ export const useGame = defineStore('game', {
       this.view.draw();
     },
     async playerWait() {
-      this.nonPlayerActors.forEach((actor) => actor.act());
+      this.nonPlayerActors.forEach((actor) => actor.actIfPossible());
 
       this._cullDeadActors();
       this._tick();
@@ -252,7 +252,7 @@ export const useGame = defineStore('game', {
       }
 
       while (!this.player.canAct) {
-        this.nonPlayerActors.forEach((actor) => actor.act());
+        this.nonPlayerActors.forEach((actor) => actor.actIfPossible());
 
         this.actors.forEach((actor) => {
           const tile = this.map.tileAt(actor);
