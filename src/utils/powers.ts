@@ -24,7 +24,7 @@ export abstract class Power {
   // Return true if activation successful
   abstract activate(): boolean | undefined;
 
-  closestToSelectedWithinRange(): Coords {
+  closestValidToSelected(): Coords | undefined {
     if (!this.game.selectedTile)
       throw new Error('Cannot get center without selected tile');
 
@@ -58,13 +58,11 @@ export class Grenade extends Power {
   radius = 3;
 
   tilesAimedAt() {
-    if (!this.game.selectedTile)
-      throw new Error('Cannot get tiles aimed at without selected tile');
+    const closest = this.closestValidToSelected();
 
-    return this.game.map.tilesInRadius(
-      this.closestToSelectedWithinRange(),
-      this.radius
-    );
+    if (!closest) return [];
+
+    return this.game.map.tilesInRadius(closest, this.radius);
   }
 
   actorsAimedAt() {
@@ -76,14 +74,15 @@ export class Grenade extends Power {
   }
 
   activate() {
-    if (!this.game.selectedTile) return;
+    const closest = this.closestValidToSelected();
+    if (!closest) return;
 
     this.actorsAimedAt().forEach((actor) => {
       actor.receiveDamage(5);
     });
 
     this.game.animations.addAnimation(
-      new ExplosionAnimation(this.closestToSelectedWithinRange(), this.radius)
+      new ExplosionAnimation(closest, this.radius)
     );
 
     return true;
@@ -94,26 +93,52 @@ export class CreateBlackHole extends Power {
   range = 8;
 
   tilesAimedAt() {
-    return this.game.selectedTile
-      ? [this.game.selectedTile, this.closestToSelectedWithinRange()]
-      : [];
+    const coords: Coords[] = [];
+
+    if (this.game.selectedTile) coords.push(this.game.selectedTile);
+
+    const closest = this.closestValidToSelected();
+
+    if (closest) coords.push(closest);
+
+    return coords;
   }
 
   activate() {
-    if (!this.game.selectedTile) return;
+    const closest = this.closestValidToSelected();
 
-    this.game.addMapEntity(new BlackHole(this.closestToSelectedWithinRange()));
+    if (!closest) return;
+
+    this.game.addMapEntity(new BlackHole(closest));
 
     return true;
+  }
+
+  // Don't allow creating a black hole on a tile with an entity that blocks movement (i.e. creature, wall, etc)
+  // If the closest selected has such an entity, find the next closest that doesn't have one
+  closestValidToSelected() {
+    const closest = super.closestValidToSelected();
+
+    if (!closest) return;
+
+    const line = bresenham(this.game.player, closest);
+
+    return line.reverse().find((coords) => {
+      const entities = this.game.entitiesAt(coords);
+
+      const nonBlocking = !entities.some((entity) => entity.blocksMovement);
+
+      return nonBlocking;
+    });
   }
 }
 
 export class BlackHole extends Actor {
   canAct = true;
 
-  blocksMovement = false;
+  blocksMovement = true;
 
-  ticksBeforeDeath = 50;
+  ticksBeforeDeath = 10;
 
   range = 5;
 
