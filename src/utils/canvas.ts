@@ -43,13 +43,13 @@ export function drawTileMainCanvas({
   ctx,
   position,
   tile,
-  entity: actor,
+  entities,
   visible,
 }: {
   ctx: CanvasRenderingContext2D;
   position: Coords;
   tile: Tile;
-  entity?: MapEntity;
+  entities: MapEntity[];
   visible: boolean;
 }) {
   fillRect(ctx, position, 'black');
@@ -59,9 +59,7 @@ export function drawTileMainCanvas({
   if (visible) {
     drawTerrain(ctx, tile.terrain, position);
 
-    if (actor) {
-      fillText(ctx, actor.char, position, actor.color);
-    }
+    entities.forEach((e) => drawEntity(ctx, position, e));
   } else if (terrainLastSeen) {
     drawTerrain(ctx, terrainLastSeen, position);
   }
@@ -96,6 +94,14 @@ function drawTerrain(
   }
 }
 
+function drawEntity(
+  ctx: CanvasRenderingContext2D,
+  position: Coords,
+  entity: MapEntity
+) {
+  fillText(ctx, entity.char, position, entity.color);
+}
+
 export function drawTileVisibilityCanvas({
   ctx,
   position,
@@ -122,20 +128,20 @@ export function drawTileUiCanvas({
   ctx,
   position,
   visible,
-  tileHasActorAimedAt,
-  tileSelected,
   tileIsAimedAt,
+  tileSelected,
+  tileHasDamageableAimedAt,
 }: {
   ctx: CanvasRenderingContext2D;
   position: Coords;
   visible: boolean;
-  tileHasActorAimedAt: boolean;
-  tileSelected: boolean;
   tileIsAimedAt: boolean;
+  tileSelected: boolean;
+  tileHasDamageableAimedAt: boolean;
 }) {
   let color: string | null = null;
 
-  if (tileHasActorAimedAt && visible) {
+  if (tileHasDamageableAimedAt && visible) {
     color = 'rgba(136,0,0,0.5)';
   } else if (tileSelected) {
     color = 'rgba(136,136,0,0.75)';

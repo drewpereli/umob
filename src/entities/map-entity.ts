@@ -7,7 +7,6 @@ export default abstract class MapEntity {
 
   x;
   y;
-  penetrationBlock = 0; // If and how much this block weapon fire
 
   abstract blocksMovement: boolean;
   abstract char: string; // The character to display for this entity

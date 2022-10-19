@@ -49,9 +49,16 @@ export const useGame = defineStore('game', {
         (entity): entity is Creature => entity instanceof Creature
       );
     },
-    entityAt() {
-      return (coords: Coords) => {
-        return this.mapEntities.find((entity) => coordsEqual(coords, entity));
+    entitiesAt() {
+      return (coords: Coords): MapEntity[] => {
+        return this.mapEntities.filter((entity) => coordsEqual(coords, entity));
+      };
+    },
+    damageablesAt() {
+      return (coords: Coords): (MapEntity & Damageable)[] => {
+        return this.entitiesAt(coords).filter(
+          (e): e is MapEntity & Damageable => isDamageable(e)
+        );
       };
     },
     creatureAt() {
@@ -139,13 +146,13 @@ export const useGame = defineStore('game', {
 
         tiles.push(tile);
 
-        const actor = this.entityAt(tile);
+        const damageables = this.damageablesAt(tile);
 
         penetrationRemaining -= tile.terrain.penetrationBlock;
 
-        if (actor) {
-          penetrationRemaining -= actor.penetrationBlock;
-        }
+        damageables.forEach((d) => {
+          penetrationRemaining -= d.penetrationBlock;
+        });
 
         if (penetrationRemaining < 0) break;
       }
@@ -158,9 +165,9 @@ export const useGame = defineStore('game', {
       }
 
       return this.tilesAimedAt.flatMap((tile): (Damageable & Coords)[] => {
-        const entity = this.entityAt(tile);
+        const damageables = this.damageablesAt(tile);
 
-        if (entity && isDamageable(entity)) return [entity];
+        if (damageables.length) return damageables;
 
         if (tile.terrain instanceof Wall) return [tile];
 
@@ -177,7 +184,7 @@ export const useGame = defineStore('game', {
     creatureCanOccupy() {
       return (tile: Tile) => {
         if (tile.terrain.blocksMovement) return false;
-        if (this.entityAt(tile)?.blocksMovement) return false;
+        if (this.entitiesAt(tile).some((e) => e.blocksMovement)) return false;
         return true;
       };
     },
@@ -205,7 +212,8 @@ export const useGame = defineStore('game', {
         Array.from({ length: debugOptions.extraEnemies }).forEach(() => {
           let tile = this.map.randomFloorTile();
 
-          while (this.entityAt(tile)) tile = this.map.randomFloorTile();
+          while (!this.creatureCanOccupy(tile))
+            tile = this.map.randomFloorTile();
 
           const enemy = new Enemy(tile);
           this.mapEntities.push(enemy);

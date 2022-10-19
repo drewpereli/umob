@@ -9,6 +9,7 @@ import {
   fillText,
 } from '@/utils/canvas';
 import { debugOptions } from './debug-options';
+import { coordsEqual } from './map';
 
 export class View {
   ctxs: Record<string, CanvasRenderingContext2D> = {};
@@ -38,13 +39,13 @@ export class View {
 
     this.tiles.forEach((row, y) => {
       row.forEach((tile, x) => {
-        const actor = this.game.entityAt(tile);
+        const entities = this.game.entitiesAt(tile);
         const visible = visibleTileIds.includes(tile.id);
 
         drawTileMainCanvas({
           ctx: this.ctxs.main,
           tile,
-          entity: actor,
+          entities,
           position: { x, y },
           visible: visibleTileIds.includes(tile.id),
         });
@@ -58,7 +59,9 @@ export class View {
 
         const aimedTileIds = this.game.tilesAimedAt.map((t) => t.id);
         const tileIsAimedAt = aimedTileIds.includes(tile.id);
-        const tileHasActorAimedAt = tileIsAimedAt && !!this.game.entityAt(tile);
+        const tileHasDamageableAimedAt = this.game.damageablesAimedAt.some(
+          (d) => coordsEqual(d, tile)
+        );
         const tileSelected = tile.id === this.game.selectedTile?.id;
 
         drawTileUiCanvas({
@@ -66,7 +69,7 @@ export class View {
           position: { x, y },
           visible,
           tileIsAimedAt,
-          tileHasActorAimedAt,
+          tileHasDamageableAimedAt,
           tileSelected,
         });
       });

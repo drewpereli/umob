@@ -125,6 +125,8 @@ export class Tile implements Damageable {
 
   terrainLastSeenByPlayer?: TerrainData;
 
+  penetrationBlock = 0;
+
   readonly IMPLEMENTS_DAMAGEABLE = true;
 
   get blocksView() {
