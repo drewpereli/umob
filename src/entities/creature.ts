@@ -22,6 +22,7 @@ import { Grenade, type Power } from '@/utils/powers';
 import { random } from '@/utils/random';
 import type { Damageable } from './damageable';
 import { Pistol, ShotGun } from './gun';
+import MapEntity from './map-entity';
 
 export type Covers = Record<Dir, Cover>;
 
@@ -38,16 +39,10 @@ const flankingDirBonusMultipliers: Record<FlankingDir, number> = {
   [FlankingDir.Back]: 2,
 };
 
-export default abstract class Creature implements Damageable {
-  constructor({ x, y }: Coords) {
-    this.x = x;
-    this.y = y;
-  }
-
+export default abstract class Creature extends MapEntity implements Damageable {
   name = 'actor';
 
-  x;
-  y;
+  attackable = true;
 
   health = 100;
   maxHealth = 100;
@@ -204,10 +199,6 @@ export default abstract class Creature implements Damageable {
     } else {
       this.turn(dirs[0]);
     }
-  }
-
-  get coords(): Coords {
-    return { x: this.x, y: this.y };
   }
 
   get canAttackPlayer() {
