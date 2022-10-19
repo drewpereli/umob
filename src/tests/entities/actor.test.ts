@@ -1,9 +1,10 @@
 import { describe, expect, test, beforeEach } from 'vitest';
 import { setActivePinia, createPinia } from 'pinia';
 import { useGame } from '@/stores/game';
-import { Floor, HalfWall, Tile, useMap, Wall } from '@/stores/map';
+import { Tile, useMap } from '@/stores/map';
 import Actor from '@/entities/actor';
 import Gun from '@/entities/gun';
+import { Floor, Wall, HalfWall } from '@/entities/terrain';
 
 class TestGun extends Gun {
   name = 'test gun';
