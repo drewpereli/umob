@@ -39,7 +39,7 @@ const flankingDirBonusMultipliers: Record<FlankingDir, number> = {
 };
 
 export default abstract class Actor implements Damageable {
-  constructor({ x, y }: { x: number; y: number }) {
+  constructor({ x, y }: Coords) {
     this.x = x;
     this.y = y;
   }

@@ -197,7 +197,7 @@ function generateLevel(
   const allRooms: Room[] = [];
 
   // list with all doors to return
-  const allDoors: { x: number; y: number }[] = [];
+  const allDoors: Coords[] = [];
 
   // grow recursively from the seed room until we have enough
   function growMap(lastRoom: Room) {
