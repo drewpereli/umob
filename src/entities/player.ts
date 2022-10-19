@@ -1,5 +1,6 @@
 import { debugOptions } from '@/utils/debug-options';
 import Actor from './actor';
+import type { Damageable } from './damageable';
 import { AssaultRifle, Pistol, RailGun, SubMachineGun } from './gun';
 
 export class Player extends Actor {
@@ -25,5 +26,11 @@ export class Player extends Actor {
     if (this.health <= 0) {
       this.game.onPlayerDie();
     }
+  }
+
+  hitChanceForDamageable(damageable: Damageable & Coords) {
+    if (debugOptions.infiniteAccuracy) return 1;
+
+    return super.hitChanceForDamageable(damageable);
   }
 }
