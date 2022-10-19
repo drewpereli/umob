@@ -251,9 +251,10 @@ export const useGame = defineStore('game', {
       this._tickUntilPlayerCanAct();
     },
     playerUsePower() {
-      this.player.useSelectedPower();
-      this.view.draw();
-      this._tickUntilPlayerCanAct();
+      if (this.player.useSelectedPower()) {
+        this.view.draw();
+        this._tickUntilPlayerCanAct();
+      }
     },
     async setSelectedTile(tile: Tile | null) {
       if (tile && !this.coordsVisible(tile)) return;
@@ -313,6 +314,9 @@ export const useGame = defineStore('game', {
       this.mapEntities = this.mapEntities.filter(
         (entity) => !entity.shouldRemoveFromGame
       );
+    },
+    addMapEntity(entity: MapEntity) {
+      this.mapEntities.push(entity);
     },
   },
 });

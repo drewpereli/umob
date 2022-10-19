@@ -9,8 +9,6 @@ export default abstract class MapEntity {
   y;
 
   abstract blocksMovement: boolean;
-  abstract char: string; // The character to display for this entity
-  abstract color: string;
 
   get coords(): Coords {
     return { x: this.x, y: this.y };

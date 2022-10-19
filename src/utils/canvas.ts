@@ -1,7 +1,8 @@
-import type Creature from '@/entities/creature';
+import Creature from '@/entities/creature';
 import type MapEntity from '@/entities/map-entity';
 import type { TerrainData, Tile } from '@/stores/map';
 import { scale } from 'chroma-js';
+import { BlackHole } from './powers';
 import { random } from './random';
 
 export const CELL_LENGTH = 28;
@@ -99,7 +100,20 @@ function drawEntity(
   position: Coords,
   entity: MapEntity
 ) {
-  fillText(ctx, entity.char, position, entity.color);
+  if (entity instanceof Creature) {
+    return fillText(ctx, entity.char, position, entity.color);
+  }
+
+  if (entity instanceof BlackHole) {
+    const pxCoords = positionToPx(position, 'center');
+
+    const radius = CELL_LENGTH / 2 - 2;
+
+    ctx.fillStyle = '#37334d';
+    ctx.beginPath();
+    ctx.arc(pxCoords.x, pxCoords.y, radius, 0, 2 * Math.PI);
+    ctx.fill();
+  }
 }
 
 export function drawTileVisibilityCanvas({
@@ -152,4 +166,15 @@ export function drawTileUiCanvas({
   if (!color) return;
 
   fillRect(ctx, position, color);
+}
+
+function positionToPx(coords: Coords, positionInCell?: 'center'): Coords {
+  return {
+    x:
+      coords.x * CELL_LENGTH +
+      (positionInCell === 'center' ? CELL_LENGTH / 2 : 0),
+    y:
+      coords.y * CELL_LENGTH +
+      (positionInCell === 'center' ? CELL_LENGTH / 2 : 0),
+  };
 }
