@@ -38,4 +38,10 @@ export class Player extends Creature {
   _act() {
     throw new Error('_act should not be called on Player');
   }
+
+  wait() {
+    if (!this.canAct) return;
+
+    this.timeUntilNextAction = 1;
+  }
 }

@@ -257,17 +257,8 @@ export const useGame = defineStore('game', {
       this.view.draw();
     },
     async playerWait() {
-      this.nonPlayerActors.forEach((actor) => actor.actIfPossible());
-
-      this._cullDeadActors();
-      this._tick();
-
-      if (this.animations.animations.length) {
-        await new Promise((res) => setTimeout(res, 0));
-        await this.animations.runAnimations();
-      }
-
-      this.view.draw();
+      this.player.wait();
+      this._tickUntilPlayerCanAct();
     },
     async _tickUntilPlayerCanAct() {
       if (this.animations.animations.length) {
@@ -276,17 +267,7 @@ export const useGame = defineStore('game', {
       }
 
       while (!this.player.canAct) {
-        this.nonPlayerActors.forEach((actor) => actor.actIfPossible());
-
-        this.creatures.forEach((actor) => {
-          const tile = this.map.tileAt(actor);
-          tile.terrain.affectActorStandingOn?.(actor);
-        });
-
-        if (this.actionUiState === ActionUiState.GameOver) return;
-
-        this._cullDeadActors();
-        this._tick();
+        this._processOneTick();
       }
 
       this.view.draw();
@@ -296,11 +277,24 @@ export const useGame = defineStore('game', {
         await this.animations.runAnimations();
       }
     },
-    _tick() {
+    _processOneTick() {
+      this.nonPlayerActors.forEach((actor) => actor.actIfPossible());
+
+      this.creatures.forEach((actor) => {
+        const tile = this.map.tileAt(actor);
+        tile.terrain.affectActorStandingOn?.(actor);
+      });
+
+      if (this.actionUiState === ActionUiState.GameOver) return;
+
+      this._cullEntities();
+      this._tickDownTime();
+    },
+    _tickDownTime() {
       this.allActors.forEach((actor) => actor.tick());
       this.currTime++;
     },
-    _cullDeadActors() {
+    _cullEntities() {
       this.mapEntities = this.mapEntities.filter(
         (entity) => !entity.shouldRemoveFromGame
       );
