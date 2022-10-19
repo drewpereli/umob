@@ -60,6 +60,8 @@ export default abstract class Creature extends MapEntity implements Damageable {
   accuracyMultiplier = 1;
   evasionMultiplier = 1;
 
+  blocksMovement = true;
+
   facing: Dir = random.arrayElement([Dir.Up, Dir.Right, Dir.Down, Dir.Left]);
   viewAngle: number = 90;
 

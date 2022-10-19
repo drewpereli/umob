@@ -10,6 +10,7 @@ export default abstract class MapEntity {
   penetrationBlock = 0; // If and how much this block weapon fire
   attackable = false; // Whether the player can attack this
 
+  abstract blocksMovement: boolean;
   abstract char: string; // The character to display for this entity
   abstract color: string;
 
