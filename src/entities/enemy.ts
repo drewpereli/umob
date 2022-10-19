@@ -1,13 +1,13 @@
 import { debugOptions } from '@/utils/debug-options';
 import { coordsEqual, rotateDir, type Dir } from '@/utils/map';
 import { random } from '@/utils/random';
-import { NonPlayerActor } from './non-player-actor';
+import { Actor } from './actor';
 
 enum Mood {
   Hostile = 'hostile',
 }
 
-export class Enemy extends NonPlayerActor {
+export class Enemy extends Actor {
   constructor(coords: Coords) {
     super(coords);
     this.updateLastSawPlayerIfCanSee();

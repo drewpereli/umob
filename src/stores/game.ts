@@ -13,11 +13,11 @@ import { distance, coordsEqual, coordsInViewCone, Dir } from '@/utils/map';
 import { Wall } from '@/entities/terrain';
 import { View } from '@/utils/view';
 import { Enemy } from '@/entities/enemy';
-import type { NonPlayerActor } from '@/entities/non-player-actor';
+import type { Actor } from '@/entities/actor';
 
 export const useGame = defineStore('game', {
   state: () => ({
-    actors: [] as (Player | NonPlayerActor)[],
+    actors: [] as (Player | Actor)[],
     currTime: 0,
     map: useMap(),
     fovUtil: null as unknown as PermissiveFov,
@@ -30,8 +30,7 @@ export const useGame = defineStore('game', {
   }),
   getters: {
     player: (state) => state.actors[0],
-    nonPlayerActors: (state): NonPlayerActor[] =>
-      state.actors.slice(1) as NonPlayerActor[],
+    nonPlayerActors: (state): Actor[] => state.actors.slice(1) as Actor[],
     actorAt() {
       return (coords: Coords) => {
         return this.actors.find(
