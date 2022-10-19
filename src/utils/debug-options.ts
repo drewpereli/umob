@@ -1,18 +1,18 @@
 const debugMode = true;
 
 const activeOptions = {
-  emptyMap: true,
-  smallMap: true,
+  emptyMap: false,
+  smallMap: false,
   randomWallsInEmptyMap: 0,
   randomHalfWallsInEmptyMap: 0,
   randomLavaInEmptyMap: 0,
   docileEnemies: false,
-  wanderingEnemies: true,
-  extraEnemies: 10,
-  infiniteHealth: true,
-  infiniteAccuracy: true,
+  wanderingEnemies: false,
+  extraEnemies: 0,
+  infiniteHealth: false,
+  infiniteAccuracy: false,
   fullViewAngle: false,
-  showPlayerLastSeen: true,
+  showPlayerLastSeen: false,
 };
 
 export const debugOptions = debugMode
