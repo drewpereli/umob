@@ -1,60 +1,40 @@
 <script lang="ts">
+import type Gun from '@/entities/gun';
 import { useGame } from '@/stores/game';
+import type { MenuItem } from '@/stores/menu';
 import { defineComponent } from 'vue';
+import UiMenu from './UiMenu.vue';
+import WeaponStats from './WeaponStats.vue';
 
 export default defineComponent({
   setup() {
     const game = useGame();
     const menu = game.menu;
-
     menu.items = game.player.inventory.map((item) => {
-      return { label: item.name, model: item };
+      return { label: item.name, model: item, description: item.description };
     });
-
     return { menu };
   },
+  components: { UiMenu, WeaponStats },
 });
 </script>
 
 <template>
-  <div class="inventory-menu">
-    <div class="header-container">
-      <h2>Inventory</h2>
-    </div>
+  <UiMenu
+    title="Inventory"
+    :items="menu.items"
+    :selectedItemIdx="menu.selectedItemIdx"
+  >
+    <template
+      #selected-item-description="selectedItemSlotProps: {
+        selectedItem: MenuItem<Gun>,
+      }"
+    >
+      <WeaponStats :weapon="selectedItemSlotProps.selectedItem.model" />
 
-    <div class="items">
-      <div
-        v-for="(item, idx) in menu.items"
-        :key="idx"
-        class="item"
-        :class="{ selected: idx === menu.selectedItemIdx }"
-      >
-        {{ item.label }}
+      <div>
+        {{ selectedItemSlotProps.selectedItem.model.description }}
       </div>
-    </div>
-  </div>
+    </template>
+  </UiMenu>
 </template>
-
-<style scoped lang="stylus">
-.inventory-menu
-  background-color black
-  width 50vw
-  border 1px solid gray
-  border-radius 4px
-
-  .header-container
-    padding 0.25rem 0.5rem
-    border-bottom 1px solid gray
-
-  .items
-    .item
-      padding 0.25rem 0.5rem
-      margin-top 1rem
-
-      &:first-child
-        margin-top 0rem
-
-      &.selected
-        background-color yellow
-        color black
-</style>

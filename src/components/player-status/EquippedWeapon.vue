@@ -1,6 +1,7 @@
 <script lang="ts">
 import { useGame } from '@/stores/game';
 import { defineComponent } from 'vue';
+import WeaponStats from '../WeaponStats.vue';
 
 export default defineComponent({
   setup() {
@@ -11,19 +12,14 @@ export default defineComponent({
       return this.game.player.equippedWeapon;
     },
   },
+  components: { WeaponStats },
 });
 </script>
 
 <template>
   <div class="equipped-weapon">
     <h4>Equipped Weapon</h4>
-    <div v-if="weapon" class="weapon">
-      <div>{{ weapon.name }}</div>
-      <div>Damage: {{ weapon.damage }}</div>
-      <div>Range: {{ weapon.range }}</div>
-      <div>Attack Time Multiplier: {{ weapon.attackTimeMultiplier }}</div>
-      <div v-if="weapon.spread">Spread: {{ weapon.spread }}</div>
-    </div>
+    <WeaponStats v-if="weapon" :weapon="weapon" />
     <div v-else>No weapon equipped</div>
   </div>
 </template>

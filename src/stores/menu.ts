@@ -1,8 +1,9 @@
 import { defineStore } from 'pinia';
 
-export interface MenuItem {
-  model: unknown;
+export interface MenuItem<T = unknown> {
+  model: T;
   label: string;
+  description?: string;
 }
 
 export const useMenu = defineStore('menu', {
