@@ -174,6 +174,13 @@ export const useGame = defineStore('game', {
         );
       };
     },
+    creatureCanOccupy() {
+      return (tile: Tile) => {
+        if (tile.terrain.blocksMovement) return false;
+        if (this.entityAt(tile)?.blocksMovement) return false;
+        return true;
+      };
+    },
   },
   actions: {
     initialize() {
@@ -215,7 +222,7 @@ export const useGame = defineStore('game', {
 
       if (!targetTile) return;
 
-      if (!this.player.canMoveTo(targetTile)) return;
+      if (!this.creatureCanOccupy(targetTile)) return;
 
       this.player.move(targetTile);
 

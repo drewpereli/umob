@@ -62,7 +62,7 @@ export class Enemy extends Creature {
 
     const tile = this.game.map.tileAt(coordsTowardsTarget);
 
-    if (!this.canMoveTo(tile)) return;
+    if (!this.game.creatureCanOccupy(tile)) return;
 
     this.moveOrTurn(tile);
   }
@@ -78,7 +78,7 @@ export class Enemy extends Creature {
     const tiles = adjacentCoords
       .map((coords) => this.game.map.tileAt(coords))
       .filter((tile) => {
-        return tile && this.canMoveTo(tile);
+        return tile && this.game.creatureCanOccupy(tile);
       });
 
     if (tiles.length === 0) return;

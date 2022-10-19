@@ -234,12 +234,6 @@ export default abstract class Creature extends Actor implements Damageable {
     return true;
   }
 
-  canMoveTo(tile: Tile) {
-    if (tile.terrain.blocksMovement) return false;
-    if (this.game.entityAt(tile)?.blocksMovement) return false;
-    return true;
-  }
-
   get covers(): Record<Dir, Cover> {
     return DIRS.reduce((acc, dir) => {
       acc[dir] = this.coverInDirection(dir);
