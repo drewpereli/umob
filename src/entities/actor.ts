@@ -279,8 +279,14 @@ export default class Actor implements Damageable {
 
   get canSeePlayer() {
     if (distance(this, this.game.player) > this.viewRange) return false;
+
     if (!coordsInViewCone(this, this.game.player, this.viewAngle, this.facing))
       return false;
+
+    // See if view is blocked by a wall
+    const tilesBetween = this.game.map.tilesBetween(this, this.game.player);
+
+    if (tilesBetween.some((tile) => tile.blocksView)) return false;
 
     return true;
   }
