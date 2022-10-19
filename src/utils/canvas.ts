@@ -3,7 +3,7 @@ import type { TerrainData, Tile } from '@/stores/map';
 import { scale } from 'chroma-js';
 import { random } from './random';
 
-export const CELL_LENGTH = 32;
+export const CELL_LENGTH = 28;
 
 export function fillRect(
   ctx: CanvasRenderingContext2D,
@@ -46,7 +46,7 @@ export function drawTileMainCanvas({
   visible,
 }: {
   ctx: CanvasRenderingContext2D;
-  position: { x: number; y: number };
+  position: Coords;
   tile: Tile;
   actor?: Actor;
   visible: boolean;
@@ -102,7 +102,7 @@ export function drawTileVisibilityCanvas({
   visible,
 }: {
   ctx: CanvasRenderingContext2D;
-  position: { x: number; y: number };
+  position: Coords;
   tile: Tile;
   visible: boolean;
 }) {
@@ -126,7 +126,7 @@ export function drawTileUiCanvas({
   tileIsAimedAt,
 }: {
   ctx: CanvasRenderingContext2D;
-  position: { x: number; y: number };
+  position: Coords;
   visible: boolean;
   tileHasActorAimedAt: boolean;
   tileSelected: boolean;

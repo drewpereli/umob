@@ -1,10 +1,9 @@
-import Actor from '@/entities/actor';
+import type Actor from '@/entities/actor';
 import type { Damageable } from '@/entities/damageable';
 import { Player } from '@/entities/player';
 import { ActionUiState } from '@/utils/action-handlers';
 import { debugOptions } from '@/utils/debug-options';
 import { angle, angularDistance } from '@/utils/math';
-import { random } from '@/utils/random';
 import { PermissiveFov } from 'permissive-fov';
 import { defineStore } from 'pinia';
 import { useAnimations } from './animations';
@@ -12,10 +11,13 @@ import { Tile, useMap } from './map';
 import { useMenu } from './menu';
 import { distance, coordsEqual, coordsInViewCone, Dir } from '@/utils/map';
 import { Wall } from '@/entities/terrain';
+import { View } from '@/utils/view';
+import { Enemy } from '@/entities/enemy';
+import type { NonPlayerActor } from '@/entities/non-player-actor';
 
 export const useGame = defineStore('game', {
   state: () => ({
-    actors: [] as Actor[],
+    actors: [] as (Player | NonPlayerActor)[],
     currTime: 0,
     map: useMap(),
     fovUtil: null as unknown as PermissiveFov,
@@ -24,10 +26,12 @@ export const useGame = defineStore('game', {
     animations: useAnimations(),
     menu: useMenu(),
     directionViewMode: false, // Actors chars will be replaced with arrows showing where they're facing
+    view: new View(),
   }),
   getters: {
     player: (state) => state.actors[0],
-    nonPlayerActors: (state) => state.actors.slice(1),
+    nonPlayerActors: (state): NonPlayerActor[] =>
+      state.actors.slice(1) as NonPlayerActor[],
     actorAt() {
       return (coords: Coords) => {
         return this.actors.find(
@@ -175,7 +179,7 @@ export const useGame = defineStore('game', {
 
           while (this.actorAt(tile)) tile = this.map.randomFloorTile();
 
-          this.actors.push(new Actor(tile));
+          this.actors.push(new Enemy(tile));
         });
       }
     },
@@ -193,35 +197,49 @@ export const useGame = defineStore('game', {
 
       this.player.move(targetTile);
 
+      this.nonPlayerActors.forEach((actor) => {
+        if (actor instanceof Enemy && actor.canSeePlayer) {
+          actor.lastSawPlayerAt = targetTile;
+        }
+      });
+
+      this.view.draw();
+
       this._tickUntilPlayerCanAct();
     },
     turnPlayer(dir: Dir) {
       this.player.turn(dir);
+      this.view.draw();
       this._tickUntilPlayerCanAct();
     },
     playerFireWeapon() {
       this.player.fireWeapon(this.damageablesAimedAt);
+      this.view.draw();
       this._tickUntilPlayerCanAct();
     },
     playerUsePower() {
       this.player.useSelectedPower();
+      this.view.draw();
       this._tickUntilPlayerCanAct();
     },
-    setSelectedTile(tile: Tile | null) {
-      if (tile === null) {
-        this.selectedTile = null;
-        return;
-      }
-
-      if (!this.coordsVisible(tile)) return;
+    async setSelectedTile(tile: Tile | null) {
+      if (tile && !this.coordsVisible(tile)) return;
 
       this.selectedTile = tile;
+
+      await new Promise((res) => setTimeout(res, 0));
+
+      this.view.draw();
     },
     onPlayerDie() {
       this.actionUiState = ActionUiState.GameOver;
     },
+    toggleDirectionViewMode() {
+      this.directionViewMode = !this.directionViewMode;
+      this.view.draw();
+    },
     async playerWait() {
-      this.nonPlayerActors.forEach((actor) => actor.act());
+      this.nonPlayerActors.forEach((actor) => actor.actIfPossible());
 
       this._cullDeadActors();
       this._tick();
@@ -230,6 +248,8 @@ export const useGame = defineStore('game', {
         await new Promise((res) => setTimeout(res, 0));
         await this.animations.runAnimations();
       }
+
+      this.view.draw();
     },
     async _tickUntilPlayerCanAct() {
       if (this.animations.animations.length) {
@@ -238,7 +258,7 @@ export const useGame = defineStore('game', {
       }
 
       while (!this.player.canAct) {
-        this.nonPlayerActors.forEach((actor) => actor.act());
+        this.nonPlayerActors.forEach((actor) => actor.actIfPossible());
 
         this.actors.forEach((actor) => {
           const tile = this.map.tileAt(actor);
@@ -250,6 +270,8 @@ export const useGame = defineStore('game', {
         this._cullDeadActors();
         this._tick();
       }
+
+      this.view.draw();
 
       if (this.animations.animations.length) {
         await new Promise((res) => setTimeout(res, 0));

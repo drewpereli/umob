@@ -4,12 +4,15 @@ const activeOptions = {
   emptyMap: true,
   smallMap: true,
   randomWallsInEmptyMap: 0,
-  randomHalfWallsInEmptyMap: 10,
-  randomLavaInEmptyMap: 10,
+  randomHalfWallsInEmptyMap: 0,
+  randomLavaInEmptyMap: 0,
   docileEnemies: false,
-  extraEnemies: 1,
-  infiniteHealth: 0,
-  fullViewAngle: true,
+  wanderingEnemies: true,
+  extraEnemies: 10,
+  infiniteHealth: true,
+  infiniteAccuracy: true,
+  fullViewAngle: false,
+  showPlayerLastSeen: true,
 };
 
 export const debugOptions = debugMode

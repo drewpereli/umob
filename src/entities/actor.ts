@@ -1,8 +1,8 @@
 import {
   BulletAnimation,
   DamageAnimation,
+  KnockBackAnimation,
   useAnimations,
-  type GameAnimation,
 } from '@/stores/animations';
 import { useGame } from '@/stores/game';
 import type { Tile } from '@/stores/map';
@@ -15,15 +15,13 @@ import {
   DIRS,
   dirsBetween,
   distance,
+  FlankingDir,
+  flankingDirBetween,
 } from '@/utils/map';
 import { Grenade, type Power } from '@/utils/powers';
 import { random } from '@/utils/random';
 import type { Damageable } from './damageable';
 import { Pistol, ShotGun } from './gun';
-
-enum Mood {
-  Hostile = 'hostile',
-}
 
 export type Covers = Record<Dir, Cover>;
 
@@ -34,8 +32,14 @@ const dirChars: Record<Dir, string> = {
   [Dir.Left]: '←',
 };
 
-export default class Actor implements Damageable {
-  constructor({ x, y }: { x: number; y: number }) {
+const flankingDirBonusMultipliers: Record<FlankingDir, number> = {
+  [FlankingDir.Front]: 0,
+  [FlankingDir.Side]: 1,
+  [FlankingDir.Back]: 2,
+};
+
+export default abstract class Actor implements Damageable {
+  constructor({ x, y }: Coords) {
     this.x = x;
     this.y = y;
   }
@@ -83,21 +87,29 @@ export default class Actor implements Damageable {
   readonly game = useGame();
   readonly animationsStore = useAnimations();
 
-  mood = Mood.Hostile;
-
   move(tile: Tile) {
     if (!this.canAct) return;
 
-    this.x = tile.x;
-    this.y = tile.y;
+    this.updatePosition(tile);
+
     this.timeUntilNextAction =
       this.moveTime * (tile.terrain.moveTimeMultiplier as number);
+  }
+
+  updatePosition(coords: Coords) {
+    this.x = coords.x;
+    this.y = coords.y;
+  }
+
+  updateFacing(dir: Dir) {
+    this.facing = dir;
   }
 
   turn(dir: Dir) {
     if (!this.canAct || dir === this.facing) return;
 
-    this.facing = dir;
+    this.updateFacing(dir);
+
     this.timeUntilNextAction = this.turnTime;
   }
 
@@ -108,6 +120,8 @@ export default class Actor implements Damageable {
       const hitChance = this.hitChanceForDamageable(entity);
 
       const willHit = random.float(0, 1) < hitChance;
+
+      let damage = this.equippedWeapon.damage;
 
       if (willHit) {
         if (this.equippedWeapon.knockBack && entity instanceof Actor) {
@@ -120,7 +134,15 @@ export default class Actor implements Damageable {
           );
         }
 
-        entity.receiveDamage(this.equippedWeapon.damage);
+        if (entity instanceof Actor && this.equippedWeapon.flankingBonus) {
+          const flankingDir = flankingDirBetween(this, entity, entity.facing);
+          const bonusMultiplier = flankingDirBonusMultipliers[flankingDir];
+
+          damage +=
+            damage * this.equippedWeapon.flankingBonus * bonusMultiplier;
+        }
+
+        entity.receiveDamage(damage);
       }
 
       if (idx === 0) {
@@ -174,36 +196,6 @@ export default class Actor implements Damageable {
     return this.health > 0;
   }
 
-  act() {
-    if (debugOptions.docileEnemies) return;
-
-    if (!this.canAct) return;
-
-    if (this.mood === Mood.Hostile) {
-      if (this.canAttackPlayer) return this.fireWeapon([this.game.player]);
-
-      if (this.canSeePlayer) {
-        const coordsPathToPlayer = this.game.map.pathBetween(
-          this.coords,
-          this.game.player.coords,
-          this
-        );
-
-        const coordsTowardsPlayer = coordsPathToPlayer[0];
-
-        if (!coordsTowardsPlayer) return;
-
-        const tile = this.game.map.tileAt(coordsTowardsPlayer);
-
-        if (!this.canMoveTo(tile)) return;
-
-        this.moveOrTurn(tile);
-      } else {
-        this.wander();
-      }
-    }
-  }
-
   moveOrTurn(tile: Tile) {
     const dirs = dirsBetween(this, tile);
 
@@ -212,28 +204,6 @@ export default class Actor implements Damageable {
     } else {
       this.turn(dirs[0]);
     }
-  }
-
-  wander() {
-    const adjacentCoords = [
-      { x: this.x - 1, y: this.y },
-      { x: this.x + 1, y: this.y },
-      { x: this.x, y: this.y - 1 },
-      { x: this.x, y: this.y + 1 },
-    ];
-
-    const tiles = adjacentCoords
-      .map((coords) => this.game.map.tileAt(coords))
-      .filter((tile) => {
-        if (!tile) return false;
-        if (tile.terrain.blocksMovement) return false;
-        if (this.game.actorAt(tile)) return false;
-        return true;
-      });
-
-    if (tiles.length === 0) return;
-
-    this.moveOrTurn(random.arrayElement(tiles));
   }
 
   get coords(): Coords {
@@ -261,8 +231,14 @@ export default class Actor implements Damageable {
 
   get canSeePlayer() {
     if (distance(this, this.game.player) > this.viewRange) return false;
+
     if (!coordsInViewCone(this, this.game.player, this.viewAngle, this.facing))
       return false;
+
+    // See if view is blocked by a wall
+    const tilesBetween = this.game.map.tilesBetween(this, this.game.player);
+
+    if (tilesBetween.some((tile) => tile.blocksView)) return false;
 
     return true;
   }
@@ -340,7 +316,15 @@ export default class Actor implements Damageable {
       this.receiveDamage(damage * 0.25);
     }
 
-    this.x = toCoords.x;
-    this.y = toCoords.y;
+    this.game.animations.addAnimation(
+      new KnockBackAnimation(
+        this,
+        this.coords,
+        toCoords,
+        !!(hitWall || additionalActorDamaged)
+      )
+    );
+
+    this.updatePosition(toCoords);
   }
 }

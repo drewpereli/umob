@@ -1,103 +1,28 @@
 <script lang="ts">
 import { useAnimations } from '@/stores/animations';
-import { useCamera } from '@/stores/camera';
 import { useGame } from '@/stores/game';
 import { ActionUiState } from '@/utils/action-handlers';
-import {
-  drawTileMainCanvas,
-  drawTileVisibilityCanvas,
-  drawTileUiCanvas,
-} from '@/utils/canvas';
 import { defineComponent } from 'vue';
 
 export default defineComponent({
-  data() {
-    return {
-      ctxs: {} as Record<string, CanvasRenderingContext2D>,
-    };
-  },
   setup() {
-    const camera = useCamera();
     const game = useGame();
     const animations = useAnimations();
 
-    return { camera, game, animations };
+    return { game, animations };
   },
   computed: {
-    tiles() {
-      return this.camera.displayTiles;
-    },
-    style() {
-      return {
-        width: `${32 * (2 * this.camera.viewRadius + 1) + 2}px`,
-      };
-    },
     canvasLength() {
-      return 32 * (2 * this.camera.viewRadius + 1);
+      return this.game.view.canvasLength;
     },
     gameOver() {
       return this.game.actionUiState === ActionUiState.GameOver;
     },
   },
-  methods: {
-    draw() {
-      Object.values(this.ctxs).forEach((ctx) =>
-        ctx.clearRect(0, 0, this.canvasLength, this.canvasLength)
-      );
-
-      const visibleTileIds = this.game.visibleTiles.map((tile) => tile.id);
-
-      this.tiles.forEach((row, y) => {
-        row.forEach((tile, x) => {
-          const actor = this.game.actorAt(tile);
-          const visible = visibleTileIds.includes(tile.id);
-
-          drawTileMainCanvas({
-            ctx: this.ctxs.main,
-            tile,
-            actor,
-            position: { x, y },
-            visible: visibleTileIds.includes(tile.id),
-          });
-
-          drawTileVisibilityCanvas({
-            ctx: this.ctxs.visibility,
-            position: { x, y },
-            visible,
-            tile,
-          });
-
-          const aimedTileIds = this.game.tilesAimedAt.map((t) => t.id);
-          const tileIsAimedAt = aimedTileIds.includes(tile.id);
-          const tileHasActorAimedAt =
-            tileIsAimedAt && !!this.game.actorAt(tile);
-          const tileSelected = tile.id === this.game.selectedTile?.id;
-
-          drawTileUiCanvas({
-            ctx: this.ctxs.ui,
-            position: { x, y },
-            visible,
-            tileIsAimedAt,
-            tileHasActorAimedAt,
-            tileSelected,
-          });
-        });
-      });
-    },
-  },
-  watch: {
-    tiles() {
-      this.draw();
-    },
-    'game.visibleTiles'() {
-      this.draw();
-    },
-    'game.directionViewMode'() {
-      this.draw();
-    },
-  },
   mounted() {
     const canvasContainer = this.$refs.gameTiles as HTMLElement;
+
+    const contexts: Record<string, CanvasRenderingContext2D> = {};
 
     canvasContainer
       .querySelectorAll('canvas')
@@ -106,16 +31,13 @@ export default defineComponent({
 
         const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
 
-        this.ctxs[layer] = ctx;
+        contexts[layer] = ctx;
       });
 
-    this.ctxs.main.font = '28px Arial';
-    this.ctxs.main.textBaseline = 'middle';
-    this.ctxs.main.textAlign = 'center';
+    this.game.view.setContexts(contexts);
+    this.animations.setContexts(contexts);
 
-    this.animations.setContexts(this.ctxs);
-
-    this.draw();
+    this.game.view.draw();
   },
 });
 </script>

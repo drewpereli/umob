@@ -4,7 +4,7 @@ import { Tile, useMap } from './map';
 
 export const useCamera = defineStore('camera', {
   state: () => ({
-    viewRadius: 10,
+    viewRadius: 15,
     map: useMap(),
     game: useGame(),
   }),
