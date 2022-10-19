@@ -23,10 +23,6 @@ import { random } from '@/utils/random';
 import type { Damageable } from './damageable';
 import { Pistol, ShotGun } from './gun';
 
-enum Mood {
-  Hostile = 'hostile',
-}
-
 export type Covers = Record<Dir, Cover>;
 
 const dirChars: Record<Dir, string> = {
@@ -42,7 +38,7 @@ const flankingDirBonusMultipliers: Record<FlankingDir, number> = {
   [FlankingDir.Back]: 2,
 };
 
-export default class Actor implements Damageable {
+export default abstract class Actor implements Damageable {
   constructor({ x, y }: { x: number; y: number }) {
     this.x = x;
     this.y = y;
@@ -90,8 +86,6 @@ export default class Actor implements Damageable {
 
   readonly game = useGame();
   readonly animationsStore = useAnimations();
-
-  mood = Mood.Hostile;
 
   move(tile: Tile) {
     if (!this.canAct) return;
@@ -195,36 +189,6 @@ export default class Actor implements Damageable {
 
   get isCurrentlyDamageable() {
     return this.health > 0;
-  }
-
-  act() {
-    if (debugOptions.docileEnemies) return;
-
-    if (!this.canAct) return;
-
-    if (this.mood === Mood.Hostile) {
-      if (this.canAttackPlayer) return this.fireWeapon([this.game.player]);
-
-      if (this.canSeePlayer) {
-        const coordsPathToPlayer = this.game.map.pathBetween(
-          this.coords,
-          this.game.player.coords,
-          this
-        );
-
-        const coordsTowardsPlayer = coordsPathToPlayer[0];
-
-        if (!coordsTowardsPlayer) return;
-
-        const tile = this.game.map.tileAt(coordsTowardsPlayer);
-
-        if (!this.canMoveTo(tile)) return;
-
-        this.moveOrTurn(tile);
-      } else {
-        this.wander();
-      }
-    }
   }
 
   moveOrTurn(tile: Tile) {
