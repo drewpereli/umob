@@ -1,5 +1,5 @@
 import { debugOptions } from '@/utils/debug-options';
-import type { Dir } from '@/utils/map';
+import { coordsEqual, rotateDir, type Dir } from '@/utils/map';
 import { random } from '@/utils/random';
 import { NonPlayerActor } from './non-player-actor';
 
@@ -23,38 +23,44 @@ export class Enemy extends NonPlayerActor {
     if (debugOptions.wanderingEnemies) return this._wander();
 
     if (this.mood === Mood.Hostile) {
-      if (this.canAttackPlayer) return this.fireWeapon([this.game.player]);
-
-      if (this.canSeePlayer || this.lastSawPlayerAt) {
-        this._moveTowardsPlayerOrLastSeen();
-      } else {
-        this._wander();
-      }
+      this._actHostile();
     }
   }
 
-  _moveTowardsPlayerOrLastSeen() {
-    const targetCoords = this.canSeePlayer
-      ? this.game.player.coords
-      : this.lastSawPlayerAt;
-
-    if (!targetCoords) {
-      throw new Error(
-        `Called _moveTowardsPlayerOrLastSeen when cant see player and no lastSawPlayerAt`
-      );
+  /**
+   * If I can attack the player, attack the player
+   * else if I can see the player, move towards the player
+   * else if I last saw the player somewhere
+   *  If I'm on the tile I last saw them at, turn randomly (look around)
+   *  else, move towards where I last saw them
+   * else wander
+   */
+  _actHostile() {
+    if (this.canAttackPlayer) {
+      this.fireWeapon([this.game.player]);
+    } else if (this.canSeePlayer) {
+      this._moveTowards(this.game.player);
+    } else if (this.lastSawPlayerAt) {
+      if (coordsEqual(this, this.lastSawPlayerAt)) {
+        const randomTurnSegmentCount = random.polarity();
+        const dir = rotateDir(this.facing, randomTurnSegmentCount);
+        this.turn(dir);
+      } else {
+        this._moveTowards(this.lastSawPlayerAt);
+      }
+    } else {
+      this._wander();
     }
+  }
 
-    const coordsPathToPlayer = this.game.map.pathBetween(
-      this.coords,
-      targetCoords,
-      this
-    );
+  _moveTowards(coords: Coords) {
+    const coordsPath = this.game.map.pathBetween(this.coords, coords, this);
 
-    const coordsTowardsPlayer = coordsPathToPlayer[0];
+    const coordsTowardsTarget = coordsPath[0];
 
-    if (!coordsTowardsPlayer) return;
+    if (!coordsTowardsTarget) return;
 
-    const tile = this.game.map.tileAt(coordsTowardsPlayer);
+    const tile = this.game.map.tileAt(coordsTowardsTarget);
 
     if (!this.canMoveTo(tile)) return;
 
