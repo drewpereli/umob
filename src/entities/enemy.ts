@@ -20,6 +20,8 @@ export class Enemy extends NonPlayerActor {
   _act() {
     if (debugOptions.docileEnemies) return;
 
+    if (debugOptions.wanderingEnemies) return this._wander();
+
     if (this.mood === Mood.Hostile) {
       if (this.canAttackPlayer) return this.fireWeapon([this.game.player]);
 
