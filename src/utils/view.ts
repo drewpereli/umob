@@ -1,3 +1,4 @@
+import { Enemy } from '@/entities/enemy';
 import { useCamera } from '@/stores/camera';
 import { useGame } from '@/stores/game';
 import {
@@ -5,7 +6,9 @@ import {
   drawTileVisibilityCanvas,
   drawTileUiCanvas,
   CELL_LENGTH,
+  fillText,
 } from '@/utils/canvas';
+import { debugOptions } from './debug-options';
 
 export class View {
   ctxs: Record<string, CanvasRenderingContext2D> = {};
@@ -68,16 +71,27 @@ export class View {
         });
       });
     });
+
+    if (debugOptions.showPlayerLastSeen) {
+      const lastSeens = this.game.nonPlayerActors.flatMap((actor) => {
+        if (!(actor instanceof Enemy)) return [];
+        return actor.lastSawPlayerAt ?? [];
+      });
+
+      lastSeens.forEach((coords) => {
+        const viewCoords = this.camera.viewCoordsForAbsCoords(coords);
+
+        fillText(this.ctxs.ui, '@', viewCoords, 'red');
+      });
+    }
   }
 
   setContexts(contexts: Record<string, CanvasRenderingContext2D>) {
-    contexts.main.font = `${CELL_LENGTH * (28 / 32)}px Arial`;
-    contexts.main.textBaseline = 'middle';
-    contexts.main.textAlign = 'center';
-
-    contexts.animationObjects.font = `${CELL_LENGTH * (28 / 32)}px Arial`;
-    contexts.animationObjects.textBaseline = 'middle';
-    contexts.animationObjects.textAlign = 'center';
+    Object.values(contexts).forEach((context) => {
+      context.font = `${CELL_LENGTH * (28 / 32)}px Arial`;
+      context.textBaseline = 'middle';
+      context.textAlign = 'center';
+    });
 
     this.ctxs = contexts;
   }

@@ -12,6 +12,7 @@ const activeOptions = {
   infiniteHealth: true,
   infiniteAccuracy: true,
   fullViewAngle: false,
+  showPlayerLastSeen: true,
 };
 
 export const debugOptions = debugMode
