@@ -36,6 +36,8 @@ export class Wall extends Terrain implements Damageable {
   terrainOnDie = new HalfWall();
   cover = Cover.Full;
 
+  readonly IMPLEMENTS_DAMAGEABLE = true;
+
   receiveDamage(damage: number) {
     this.health -= damage;
   }

@@ -8,7 +8,6 @@ export default abstract class MapEntity {
   x;
   y;
   penetrationBlock = 0; // If and how much this block weapon fire
-  attackable = false; // Whether the player can attack this
 
   abstract blocksMovement: boolean;
   abstract char: string; // The character to display for this entity
@@ -17,4 +16,6 @@ export default abstract class MapEntity {
   get coords(): Coords {
     return { x: this.x, y: this.y };
   }
+
+  abstract shouldRemoveFromGame: boolean;
 }

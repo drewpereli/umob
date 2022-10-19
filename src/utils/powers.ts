@@ -34,7 +34,7 @@ export class Grenade extends Power {
 
   actorsAimedAt() {
     return this.tilesAimedAt().flatMap((tile) => {
-      const actor = this.game.actorAt(tile);
+      const actor = this.game.creatureAt(tile);
 
       return actor ? [actor] : [];
     });

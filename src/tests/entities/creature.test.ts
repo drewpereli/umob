@@ -12,6 +12,10 @@ class TestGun extends Gun {
   accuracy = 1;
 }
 
+class TestCreature extends Creature {
+  _act() {}
+}
+
 describe('Actor', () => {
   function createActor(coords: Coords) {
     const game = useGame();
@@ -19,12 +23,12 @@ describe('Actor', () => {
 
     const tile = map.tileAt(coords);
 
-    const actor = new Creature(tile);
+    const actor = new TestCreature(tile);
     actor.accuracyMultiplier = 1;
     actor.evasionMultiplier = 1;
     actor.equippedWeapon = new TestGun();
 
-    game.actors.push(actor);
+    game.mapEntities.push(actor);
 
     return actor;
   }

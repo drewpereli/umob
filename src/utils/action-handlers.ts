@@ -1,6 +1,8 @@
 import type Gun from '@/entities/gun';
+import type { Player } from '@/entities/player';
 import type { useGame } from '@/stores/game';
 import { Dir } from './map';
+import type { Power } from './powers';
 
 export enum ActionUiState {
   Default = 'default',
@@ -37,8 +39,6 @@ export const actionHandlers: Partial<
     },
     e: (game) => (game.actionUiState = ActionUiState.Inventory),
     x: (game) => {
-      game.player.selectedPower = game.player.powers[0];
-
       const playerTile = game.map.tileAt(game.player);
 
       const target = game.map.adjacentTile(playerTile, game.player.facing);

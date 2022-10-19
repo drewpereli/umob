@@ -20,6 +20,7 @@ import {
 } from '@/utils/map';
 import { Grenade, type Power } from '@/utils/powers';
 import { random } from '@/utils/random';
+import { Actor } from './actor';
 import type { Damageable } from './damageable';
 import { Pistol, ShotGun } from './gun';
 import MapEntity from './map-entity';
@@ -39,10 +40,10 @@ const flankingDirBonusMultipliers: Record<FlankingDir, number> = {
   [FlankingDir.Back]: 2,
 };
 
-export default abstract class Creature extends MapEntity implements Damageable {
+export default abstract class Creature extends Actor implements Damageable {
   name = 'actor';
 
-  attackable = true;
+  readonly IMPLEMENTS_DAMAGEABLE = true;
 
   health = 100;
   maxHealth = 100;
@@ -50,8 +51,6 @@ export default abstract class Creature extends MapEntity implements Damageable {
   moveTime = 2;
   turnTime = 1;
   attackTime = 2;
-
-  timeUntilNextAction = 0;
 
   penetrationBlock = 1;
 
@@ -81,8 +80,13 @@ export default abstract class Creature extends MapEntity implements Damageable {
 
   readonly color: string = 'white';
 
-  readonly game = useGame();
-  readonly animationsStore = useAnimations();
+  get game() {
+    return useGame();
+  }
+
+  get animationsStore() {
+    return useAnimations();
+  }
 
   move(tile: Tile) {
     if (!this.canAct) return;
@@ -175,12 +179,6 @@ export default abstract class Creature extends MapEntity implements Damageable {
     }
   }
 
-  tick() {
-    if (this.timeUntilNextAction > 0) {
-      this.timeUntilNextAction--;
-    }
-  }
-
   get canAct() {
     return this.timeUntilNextAction === 0 && !this.isDead;
   }
@@ -238,7 +236,7 @@ export default abstract class Creature extends MapEntity implements Damageable {
 
   canMoveTo(tile: Tile) {
     if (tile.terrain.blocksMovement) return false;
-    if (this.game.actorAt(tile)) return false;
+    if (this.game.entityAt(tile)?.blocksMovement) return false;
     return true;
   }
 
@@ -286,7 +284,7 @@ export default abstract class Creature extends MapEntity implements Damageable {
         break;
       }
 
-      const actor = this.game.actorAt(next);
+      const actor = this.game.creatureAt(next);
 
       if (actor) {
         additionalActorDamaged = actor;
@@ -319,5 +317,9 @@ export default abstract class Creature extends MapEntity implements Damageable {
     );
 
     this.updatePosition(toCoords);
+  }
+
+  get shouldRemoveFromGame() {
+    return this.isDead;
   }
 }

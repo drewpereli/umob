@@ -1,13 +1,13 @@
 import { debugOptions } from '@/utils/debug-options';
 import { coordsEqual, rotateDir, type Dir } from '@/utils/map';
 import { random } from '@/utils/random';
-import { Actor } from './actor';
+import Creature from './creature';
 
 enum Mood {
   Hostile = 'hostile',
 }
 
-export class Enemy extends Actor {
+export class Enemy extends Creature {
   constructor(coords: Coords) {
     super(coords);
     this.updateLastSawPlayerIfCanSee();
@@ -78,10 +78,7 @@ export class Enemy extends Actor {
     const tiles = adjacentCoords
       .map((coords) => this.game.map.tileAt(coords))
       .filter((tile) => {
-        if (!tile) return false;
-        if (tile.terrain.blocksMovement) return false;
-        if (this.game.actorAt(tile)) return false;
-        return true;
+        return tile && this.canMoveTo(tile);
       });
 
     if (tiles.length === 0) return;

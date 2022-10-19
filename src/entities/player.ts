@@ -13,6 +13,7 @@ export class Player extends Creature {
     new SubMachineGun(),
     new AssaultRifle(),
   ];
+
   equippedWeapon = this.inventory[0];
 
   health = debugOptions.infiniteHealth ? Infinity : 100;
@@ -32,5 +33,9 @@ export class Player extends Creature {
     if (debugOptions.infiniteAccuracy) return 1;
 
     return super.hitChanceForDamageable(damageable);
+  }
+
+  _act() {
+    throw new Error('_act should not be called on Player');
   }
 }

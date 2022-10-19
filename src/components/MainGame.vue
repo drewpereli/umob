@@ -48,7 +48,7 @@ export default defineComponent({
       if (this.game.actionUiState !== ActionUiState.Examining) return null;
       if (!this.game.selectedTile) return null;
 
-      const actor = this.game.actorAt(this.game.selectedTile);
+      const actor = this.game.creatureAt(this.game.selectedTile);
 
       if (!actor) return null;
 

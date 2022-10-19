@@ -1,5 +1,5 @@
-import type Creature from '@/entities/creature';
-import type { Damageable } from '@/entities/damageable';
+import Creature from '@/entities/creature';
+import { isDamageable, type Damageable } from '@/entities/damageable';
 import { Player } from '@/entities/player';
 import { ActionUiState } from '@/utils/action-handlers';
 import { debugOptions } from '@/utils/debug-options';
@@ -13,11 +13,13 @@ import { distance, coordsEqual, coordsInViewCone, Dir } from '@/utils/map';
 import { Wall } from '@/entities/terrain';
 import { View } from '@/utils/view';
 import { Enemy } from '@/entities/enemy';
-import type { Actor } from '@/entities/actor';
+import { Actor } from '@/entities/actor';
+import type MapEntity from '@/entities/map-entity';
 
 export const useGame = defineStore('game', {
   state: () => ({
-    actors: [] as (Player | Actor)[],
+    player: null as unknown as Player,
+    mapEntities: [] as MapEntity[],
     currTime: 0,
     map: useMap(),
     fovUtil: null as unknown as PermissiveFov,
@@ -29,13 +31,32 @@ export const useGame = defineStore('game', {
     view: new View(),
   }),
   getters: {
-    player: (state) => state.actors[0],
-    nonPlayerActors: (state): Actor[] => state.actors.slice(1) as Actor[],
-    actorAt() {
+    allActors(state): Actor[] {
+      return [state.player, ...this.nonPlayerActors];
+    },
+    nonPlayerActors(state): Actor[] {
+      return state.mapEntities.filter((entity): entity is Actor => {
+        return entity instanceof Actor && !(entity instanceof Player);
+      });
+    },
+    enemies(state): Enemy[] {
+      return state.mapEntities.filter(
+        (entity): entity is Enemy => entity instanceof Enemy
+      );
+    },
+    creatures(state): Creature[] {
+      return state.mapEntities.filter(
+        (entity): entity is Creature => entity instanceof Creature
+      );
+    },
+    entityAt() {
       return (coords: Coords) => {
-        return this.actors.find(
-          (actor) => actor.x === coords.x && actor.y === coords.y
-        );
+        return this.mapEntities.find((entity) => coordsEqual(coords, entity));
+      };
+    },
+    creatureAt() {
+      return (coords: Coords) => {
+        return this.creatures.find((entity) => coordsEqual(coords, entity));
       };
     },
     visibleTiles() {
@@ -118,7 +139,7 @@ export const useGame = defineStore('game', {
 
         tiles.push(tile);
 
-        const actor = this.actorAt(tile);
+        const actor = this.entityAt(tile);
 
         penetrationRemaining -= tile.terrain.penetrationBlock;
 
@@ -137,9 +158,9 @@ export const useGame = defineStore('game', {
       }
 
       return this.tilesAimedAt.flatMap((tile): (Damageable & Coords)[] => {
-        const actor = this.actorAt(tile);
+        const entity = this.entityAt(tile);
 
-        if (actor) return [actor];
+        if (entity && isDamageable(entity)) return [entity];
 
         if (tile.terrain instanceof Wall) return [tile];
 
@@ -170,15 +191,17 @@ export const useGame = defineStore('game', {
 
       this.fovUtil = fov;
 
-      this.actors.push(player);
+      this.player = player;
+      this.mapEntities.push(player);
 
       if (debugOptions.extraEnemies) {
         Array.from({ length: debugOptions.extraEnemies }).forEach(() => {
           let tile = this.map.randomFloorTile();
 
-          while (this.actorAt(tile)) tile = this.map.randomFloorTile();
+          while (this.entityAt(tile)) tile = this.map.randomFloorTile();
 
-          this.actors.push(new Enemy(tile));
+          const enemy = new Enemy(tile);
+          this.mapEntities.push(enemy);
         });
       }
     },
@@ -196,11 +219,7 @@ export const useGame = defineStore('game', {
 
       this.player.move(targetTile);
 
-      this.nonPlayerActors.forEach((actor) => {
-        if (actor instanceof Enemy && actor.canSeePlayer) {
-          actor.lastSawPlayerAt = targetTile;
-        }
-      });
+      this.enemies.forEach((actor) => actor.updateLastSawPlayerIfCanSee());
 
       this.view.draw();
 
@@ -259,7 +278,7 @@ export const useGame = defineStore('game', {
       while (!this.player.canAct) {
         this.nonPlayerActors.forEach((actor) => actor.actIfPossible());
 
-        this.actors.forEach((actor) => {
+        this.creatures.forEach((actor) => {
           const tile = this.map.tileAt(actor);
           tile.terrain.affectActorStandingOn?.(actor);
         });
@@ -278,11 +297,13 @@ export const useGame = defineStore('game', {
       }
     },
     _tick() {
-      this.actors.forEach((actor) => actor.tick());
+      this.allActors.forEach((actor) => actor.tick());
       this.currTime++;
     },
     _cullDeadActors() {
-      this.actors = this.actors.filter((actor) => !actor.isDead);
+      this.mapEntities = this.mapEntities.filter(
+        (entity) => !entity.shouldRemoveFromGame
+      );
     },
   },
 });

@@ -1,4 +1,5 @@
 import type Creature from '@/entities/creature';
+import type MapEntity from '@/entities/map-entity';
 import type { TerrainData, Tile } from '@/stores/map';
 import { scale } from 'chroma-js';
 import { random } from './random';
@@ -42,13 +43,13 @@ export function drawTileMainCanvas({
   ctx,
   position,
   tile,
-  actor,
+  entity: actor,
   visible,
 }: {
   ctx: CanvasRenderingContext2D;
   position: Coords;
   tile: Tile;
-  actor?: Creature;
+  entity?: MapEntity;
   visible: boolean;
 }) {
   fillRect(ctx, position, 'black');

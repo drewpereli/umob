@@ -38,13 +38,13 @@ export class View {
 
     this.tiles.forEach((row, y) => {
       row.forEach((tile, x) => {
-        const actor = this.game.actorAt(tile);
+        const actor = this.game.entityAt(tile);
         const visible = visibleTileIds.includes(tile.id);
 
         drawTileMainCanvas({
           ctx: this.ctxs.main,
           tile,
-          actor,
+          entity: actor,
           position: { x, y },
           visible: visibleTileIds.includes(tile.id),
         });
@@ -58,7 +58,7 @@ export class View {
 
         const aimedTileIds = this.game.tilesAimedAt.map((t) => t.id);
         const tileIsAimedAt = aimedTileIds.includes(tile.id);
-        const tileHasActorAimedAt = tileIsAimedAt && !!this.game.actorAt(tile);
+        const tileHasActorAimedAt = tileIsAimedAt && !!this.game.entityAt(tile);
         const tileSelected = tile.id === this.game.selectedTile?.id;
 
         drawTileUiCanvas({

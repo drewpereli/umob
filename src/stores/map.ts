@@ -49,11 +49,11 @@ export const useMap = defineStore('map', {
           });
         });
 
-        actor.game.actors.forEach((actor) => {
-          if (coordsEqual(actor, to)) {
-            matrix[actor.y][actor.x] = 1;
+        actor.game.creatures.forEach((creature) => {
+          if (coordsEqual(creature, to)) {
+            matrix[creature.y][creature.x] = 1;
           } else {
-            matrix[actor.y][actor.x] = 0;
+            matrix[creature.y][creature.x] = 0;
           }
         });
 
@@ -124,6 +124,8 @@ export class Tile implements Damageable {
   terrain;
 
   terrainLastSeenByPlayer?: TerrainData;
+
+  readonly IMPLEMENTS_DAMAGEABLE = true;
 
   get blocksView() {
     return this.terrain.blocksView;
