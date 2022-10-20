@@ -51,6 +51,7 @@ export default abstract class Creature extends Actor implements Damageable {
   moveTime = 2;
   turnTime = 1;
   attackTime = 2;
+  reloadTime = 4;
 
   penetrationBlock = 1;
 
@@ -114,8 +115,18 @@ export default abstract class Creature extends Actor implements Damageable {
     this.timeUntilNextAction = this.turnTime;
   }
 
+  reload() {
+    if (this.equippedWeapon.amoLoaded === this.equippedWeapon.clipSize) return;
+
+    this.equippedWeapon.amoLoaded = this.equippedWeapon.clipSize;
+
+    this.timeUntilNextAction =
+      this.reloadTime * this.equippedWeapon.reloadTimeMultiplier;
+  }
+
   fireWeapon(entities: (Damageable & Coords)[]) {
     if (!this.canAct) return;
+    if (this.mustReload) return;
 
     entities.forEach((entity, idx) => {
       const hitChance = this.hitChanceForDamageable(entity);
@@ -152,6 +163,8 @@ export default abstract class Creature extends Actor implements Damageable {
         );
       }
     });
+
+    this.equippedWeapon.amoLoaded--;
 
     if (entities.length === 0) {
       this.game.animations.addAnimation(
@@ -317,5 +330,9 @@ export default abstract class Creature extends Actor implements Damageable {
 
   get shouldRemoveFromGame() {
     return this.isDead;
+  }
+
+  get mustReload() {
+    return this.equippedWeapon.amoLoaded === 0;
   }
 }
