@@ -2,7 +2,7 @@ import type Gun from '@/entities/gun';
 import type { Player } from '@/entities/player';
 import type { useGame } from '@/stores/game';
 import { Dir } from './map';
-import type { Power } from './powers';
+import type { Power } from '../powers/power';
 
 export enum ActionUiState {
   Default = 'default',

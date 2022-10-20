@@ -23,7 +23,7 @@ import {
   CreateBlackHole,
   Grenade,
   type Power,
-} from '@/utils/powers';
+} from '@/powers/power';
 import { random } from '@/utils/random';
 import { Actor } from './actor';
 import type { Damageable } from './damageable';

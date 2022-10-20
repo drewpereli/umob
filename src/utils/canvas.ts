@@ -2,7 +2,7 @@ import Creature from '@/entities/creature';
 import type MapEntity from '@/entities/map-entity';
 import type { TerrainData, Tile } from '@/stores/map';
 import { scale } from 'chroma-js';
-import { BlackHole } from './powers';
+import { BlackHole } from '../powers/power';
 import { random } from './random';
 
 export const CELL_LENGTH = 28;

@@ -4,9 +4,9 @@ import { HalfWall } from '@/entities/terrain';
 import { ExplosionAnimation } from '@/stores/animations';
 import { useGame } from '@/stores/game';
 import type { Tile } from '@/stores/map';
-import bresenham from './bresnham';
-import { dirsBetween, distance } from './map';
-import { random } from './random';
+import bresenham from '../utils/bresnham';
+import { dirsBetween, distance } from '../utils/map';
+import { random } from '../utils/random';
 
 export abstract class Power {
   useTime = 5;
