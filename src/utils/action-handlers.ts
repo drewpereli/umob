@@ -1,8 +1,8 @@
 import type Gun from '@/entities/gun';
-import type { Player } from '@/entities/player';
+import { NonTargetedPower } from '@/powers/non-targeted-power';
+import { TargetedPower } from '@/powers/targeted-power';
 import type { useGame } from '@/stores/game';
 import { Dir } from './map';
-import type { Power } from '../powers/power';
 
 export enum ActionUiState {
   Default = 'default',
@@ -53,19 +53,24 @@ export const actionHandlers: Partial<
       game.actionUiState = ActionUiState.Examining;
     },
     1: (game) => {
-      game.player.selectedPower = game.player.powers[0];
+      const power = game.player.powers[0];
+      game.player.selectedPower = power;
 
-      const playerTile = game.map.tileAt(game.player);
+      if (power instanceof TargetedPower) {
+        const playerTile = game.map.tileAt(game.player);
 
-      const target = game.map.adjacentTile(playerTile, game.player.facing);
+        const target = game.map.adjacentTile(playerTile, game.player.facing);
 
-      if (!target) {
-        return;
+        if (!target) {
+          return;
+        }
+
+        game.setSelectedTile(target);
+
+        game.actionUiState = ActionUiState.AimingPower;
+      } else if (power instanceof NonTargetedPower) {
+        game.playerUsePower();
       }
-
-      game.setSelectedTile(target);
-
-      game.actionUiState = ActionUiState.AimingPower;
     },
     '.': (game) => {
       game.playerWait();

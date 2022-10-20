@@ -4,9 +4,9 @@ import type { Tile } from '@/stores/map';
 import bresenham from '@/utils/bresnham';
 import { dirsBetween, distance } from '@/utils/map';
 import { random } from '@/utils/random';
-import { Power } from './power';
+import { TargetedPower } from './targeted-power';
 
-export class CreateBlackHole extends Power {
+export class CreateBlackHole extends TargetedPower {
   range = 8;
 
   tilesAimedAt() {

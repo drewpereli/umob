@@ -1,7 +1,7 @@
 import { HalfWall } from '@/entities/terrain';
-import { Power } from './power';
+import { TargetedPower } from './targeted-power';
 
-export class BuildCover extends Power {
+export class BuildCover extends TargetedPower {
   range = 2;
 
   tilesAimedAt() {

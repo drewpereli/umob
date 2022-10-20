@@ -1,7 +1,7 @@
 import { ExplosionAnimation } from '@/stores/animations';
-import { Power } from './power';
+import { TargetedPower } from './targeted-power';
 
-export class Grenade extends Power {
+export class Grenade extends TargetedPower {
   range = 8;
   radius = 3;
 

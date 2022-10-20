@@ -15,6 +15,7 @@ import { View } from '@/utils/view';
 import { Enemy } from '@/entities/enemy';
 import { Actor } from '@/entities/actor';
 import type MapEntity from '@/entities/map-entity';
+import type { TargetedPower } from '@/powers/targeted-power';
 
 export const useGame = defineStore('game', {
   state: () => ({
@@ -108,7 +109,9 @@ export const useGame = defineStore('game', {
       if (!this.selectedTile) return [];
 
       if (this.actionUiState === ActionUiState.AimingPower) {
-        const coords = this.player.selectedPower?.tilesAimedAt();
+        const coords = (
+          this.player.selectedPower as TargetedPower
+        )?.tilesAimedAt();
 
         return coords?.map((coord) => this.map.tileAt(coord)) ?? [];
       }
@@ -161,7 +164,9 @@ export const useGame = defineStore('game', {
     },
     damageablesAimedAt(): (Damageable & Coords)[] {
       if (this.actionUiState === ActionUiState.AimingPower) {
-        return this.player.selectedPower?.actorsAimedAt() ?? [];
+        return (
+          (this.player.selectedPower as TargetedPower)?.actorsAimedAt() ?? []
+        );
       }
 
       return this.tilesAimedAt.flatMap((tile): (Damageable & Coords)[] => {
