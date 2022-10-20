@@ -10,6 +10,9 @@ class TestGun extends Gun {
   name = 'test gun';
   damage = 0;
   accuracy = 1;
+  description = '';
+  clipSize = 10;
+  amoLoaded = 10;
 }
 
 class TestCreature extends Creature {
