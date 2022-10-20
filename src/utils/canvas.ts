@@ -1,8 +1,8 @@
 import Creature from '@/entities/creature';
 import type MapEntity from '@/entities/map-entity';
+import { BlackHole } from '@/powers/create-black-hole';
 import type { TerrainData, Tile } from '@/stores/map';
 import { scale } from 'chroma-js';
-import { BlackHole } from '../powers/power';
 import { random } from './random';
 
 export const CELL_LENGTH = 28;

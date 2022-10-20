@@ -6,7 +6,6 @@ import {
 } from '@/stores/animations';
 import { useGame } from '@/stores/game';
 import type { Tile } from '@/stores/map';
-import { debugOptions } from '@/utils/debug-options';
 import {
   coordsInViewCone,
   Cover,
@@ -18,17 +17,12 @@ import {
   FlankingDir,
   flankingDirBetween,
 } from '@/utils/map';
-import {
-  BuildCover,
-  CreateBlackHole,
-  Grenade,
-  type Power,
-} from '@/powers/power';
+import type { Power } from '@/powers/power';
 import { random } from '@/utils/random';
 import { Actor } from './actor';
 import type { Damageable } from './damageable';
-import { Pistol, ShotGun } from './gun';
-import MapEntity from './map-entity';
+import { Pistol } from './gun';
+import { BuildCover } from '@/powers/build-cover';
 
 export type Covers = Record<Dir, Cover>;
 
