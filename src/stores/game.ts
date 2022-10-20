@@ -182,10 +182,16 @@ export const useGame = defineStore('game', {
       };
     },
     creatureCanOccupy() {
-      return (tile: Tile) => {
-        if (tile.terrain.blocksMovement) return false;
-        if (this.entitiesAt(tile).some((e) => e.blocksMovement)) return false;
-        return true;
+      return (coords: Coords) => {
+        return !this.coordsBlocksMovement(coords);
+      };
+    },
+    coordsBlocksMovement() {
+      return (coords: Coords) => {
+        const tile = coords instanceof Tile ? coords : this.map.tileAt(coords);
+        if (tile.terrain.blocksMovement) return true;
+        if (this.entitiesAt(tile).some((e) => e.blocksMovement)) return true;
+        return false;
       };
     },
   },

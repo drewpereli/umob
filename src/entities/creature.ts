@@ -18,7 +18,12 @@ import {
   FlankingDir,
   flankingDirBetween,
 } from '@/utils/map';
-import { CreateBlackHole, Grenade, type Power } from '@/utils/powers';
+import {
+  BuildCover,
+  CreateBlackHole,
+  Grenade,
+  type Power,
+} from '@/utils/powers';
 import { random } from '@/utils/random';
 import { Actor } from './actor';
 import type { Damageable } from './damageable';
@@ -68,7 +73,7 @@ export default abstract class Creature extends Actor implements Damageable {
   inventory = [new Pistol()];
   equippedWeapon = this.inventory[0];
 
-  powers = [new CreateBlackHole()];
+  powers = [new BuildCover()];
   selectedPower: Power | null = null;
 
   defaultChar = 'd';
