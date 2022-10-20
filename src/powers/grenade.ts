@@ -2,6 +2,7 @@ import { ExplosionAnimation } from '@/stores/animations';
 import { TargetedPower } from './targeted-power';
 
 export class Grenade extends TargetedPower {
+  useTime = 2;
   range = 8;
   radius = 3;
 

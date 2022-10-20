@@ -2,6 +2,7 @@ import { HalfWall } from '@/entities/terrain';
 import { TargetedPower } from './targeted-power';
 
 export class BuildCover extends TargetedPower {
+  useTime = 5;
   range = 2;
 
   tilesAimedAt() {

@@ -7,6 +7,7 @@ import { random } from '@/utils/random';
 import { TargetedPower } from './targeted-power';
 
 export class CreateBlackHole extends TargetedPower {
+  useTime = 2;
   range = 8;
 
   tilesAimedAt() {

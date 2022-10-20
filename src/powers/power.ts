@@ -1,7 +1,7 @@
 import { useGame } from '@/stores/game';
 
 export abstract class Power {
-  useTime = 5;
+  abstract useTime: number;
 
   game = useGame();
 
