@@ -28,7 +28,8 @@ export class Enemy extends Creature {
   }
 
   /**
-   * If I can attack the player, attack the player
+   * If gun is empty, reload
+   * else if I can attack the player, attack the player
    * else if I can see the player, move towards the player
    * else if I last saw the player somewhere
    *  If I'm on the tile I last saw them at, turn randomly (look around)
@@ -36,7 +37,9 @@ export class Enemy extends Creature {
    * else wander
    */
   _actHostile() {
-    if (this.canAttackPlayer) {
+    if (this.mustReload) {
+      this.reload();
+    } else if (this.canAttackPlayer) {
       this.fireWeapon([this.game.player]);
     } else if (this.canSeePlayer) {
       this._moveTowards(this.game.player);

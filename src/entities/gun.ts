@@ -11,6 +11,9 @@ export default abstract class Gun {
   accuracy = 0.5;
   knockBack = 0;
   flankingBonus = DEFAULT_FLANKING_BONUS;
+  abstract clipSize: number;
+  abstract amoLoaded: number;
+  reloadTimeMultiplier = 1;
 }
 
 export class ShotGun extends Gun {
@@ -19,6 +22,8 @@ export class ShotGun extends Gun {
   spread = 20;
   range = 10;
   attackTimeMultiplier = 4;
+  clipSize = 4;
+  amoLoaded = 4;
   description = "It's your basic shotgun. It shoots enemies in a cone.";
 }
 
@@ -27,6 +32,8 @@ export class Pistol extends Gun {
   damage = 5;
   range = 5;
   attackTimeMultiplier = 4;
+  clipSize = 16;
+  amoLoaded = 16;
   description = 'Not a lot of damage';
 }
 
@@ -36,7 +43,10 @@ export class AssaultRifle extends Gun {
   range = 20;
   penetration = 4;
   attackTimeMultiplier = 10;
+  clipSize = 24;
+  amoLoaded = 24;
   description = 'High damage and range. Can shoot through multiple enemies.';
+  reloadTimeMultiplier = 2;
 }
 
 export class SubMachineGun extends Gun {
@@ -45,6 +55,8 @@ export class SubMachineGun extends Gun {
   range = 10;
   penetration = 0;
   attackTimeMultiplier = 1;
+  clipSize = 50;
+  amoLoaded = 50;
   description = 'Low damage and range, but shoots really fast.';
 }
 
@@ -53,6 +65,9 @@ export class RailGun extends Gun {
   damage = 5;
   range = 10;
   knockBack = 5;
+  clipSize = 8;
+  amoLoaded = 8;
   description =
     'Electromagnetic force to accelerate a metal slug to high speeds. Knocks back enemies.';
+  reloadTimeMultiplier = 2;
 }

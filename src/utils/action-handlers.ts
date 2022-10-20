@@ -37,6 +37,7 @@ export const actionHandlers: Partial<
       game.setSelectedTile(target);
       game.actionUiState = ActionUiState.Aiming;
     },
+    r: (game) => game.playerReload(),
     e: (game) => (game.actionUiState = ActionUiState.Inventory),
     x: (game) => {
       const playerTile = game.map.tileAt(game.player);
@@ -83,6 +84,7 @@ export const actionHandlers: Partial<
     f: (game) => {
       game.playerFireWeapon();
     },
+    r: (game) => game.playerReload(),
   },
   [ActionUiState.AimingPower]: {
     ArrowUp: (game) => updateAim(game, Dir.Up),

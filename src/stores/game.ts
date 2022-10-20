@@ -256,6 +256,11 @@ export const useGame = defineStore('game', {
         this._tickUntilPlayerCanAct();
       }
     },
+    playerReload() {
+      this.player.reload();
+      this.view.draw();
+      this._tickUntilPlayerCanAct();
+    },
     async setSelectedTile(tile: Tile | null) {
       if (tile && !this.coordsVisible(tile)) return;
 
