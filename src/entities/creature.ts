@@ -47,6 +47,10 @@ export default abstract class Creature extends Actor implements Damageable {
   health = 100;
   maxHealth = 100;
 
+  energy = 100;
+  maxEnergy = 100;
+  energyRechargePerTick = 1;
+
   moveTime = 2;
   turnTime = 1;
   attackTime = 2;
@@ -177,8 +181,10 @@ export default abstract class Creature extends Actor implements Damageable {
 
   useSelectedPower() {
     if (!this.selectedPower) return;
+    if (this.selectedPower.energyCost > this.energy) return;
 
     if (this.selectedPower.activate()) {
+      this.energy -= this.selectedPower.energyCost;
       this.timeUntilNextAction = this.selectedPower.useTime;
       return true;
     }
@@ -333,5 +339,16 @@ export default abstract class Creature extends Actor implements Damageable {
 
   get mustReload() {
     return this.equippedWeapon.amoLoaded === 0;
+  }
+
+  tick() {
+    super.tick();
+
+    if (this.energy < this.maxEnergy) {
+      this.energy = Math.min(
+        this.maxEnergy,
+        this.energy + this.energyRechargePerTick
+      );
+    }
   }
 }

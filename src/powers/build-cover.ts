@@ -3,6 +3,7 @@ import { TargetedPower } from './targeted-power';
 
 export class BuildCover extends TargetedPower {
   useTime = 5;
+  energyCost = 30;
   range = 2;
 
   tilesAimedAt() {

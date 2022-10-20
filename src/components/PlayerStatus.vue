@@ -5,9 +5,16 @@ import EquippedWeapon from './player-status/EquippedWeapon.vue';
 import { useGame } from '@/stores/game';
 import CoverIndicators from './CoverIndicators.vue';
 import WeaponClipStatus from './WeaponClipStatus.vue';
+import EnergyBar from './player-status/EnergyBar.vue';
 
 export default defineComponent({
-  components: { HealthBar, EquippedWeapon, CoverIndicators, WeaponClipStatus },
+  components: {
+    HealthBar,
+    EquippedWeapon,
+    CoverIndicators,
+    WeaponClipStatus,
+    EnergyBar,
+  },
   setup() {
     return { game: useGame() };
   },
@@ -17,6 +24,7 @@ export default defineComponent({
 <template>
   <div class="player-status">
     <HealthBar :actor="game.player" />
+    <EnergyBar :actor="game.player" />
     <EquippedWeapon />
     <WeaponClipStatus :gun="game.player.equippedWeapon" />
     <CoverIndicators :covers="game.player.covers" />

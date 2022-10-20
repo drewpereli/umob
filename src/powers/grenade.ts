@@ -3,6 +3,7 @@ import { TargetedPower } from './targeted-power';
 
 export class Grenade extends TargetedPower {
   useTime = 2;
+  energyCost = 20;
   range = 8;
   radius = 3;
 
