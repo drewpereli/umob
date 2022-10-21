@@ -2,27 +2,32 @@ import { useGame } from '@/stores/game';
 import bresenham from '@/utils/bresnham';
 import { coordsEqual } from '@/utils/map';
 import { angle, angularDifference, polarToCartesian } from '@/utils/math';
+import { random } from '@/utils/random';
 import { Actor } from './actor';
 import Creature from './creature';
+import { isDamageable } from './damageable';
+import type MapEntity from './map-entity';
 
 export class Centrifuge extends Actor {
   shouldRemoveFromGame = false;
   blocksMovement = true;
   canAct = true;
 
-  currAngle = 225;
+  currAngle = random.int(0, 359);
 
   length = 4.5;
 
   char = '+';
 
-  angleChangePerTick = 10;
+  angleChangePerTick = random.int(10, 45);
+
+  damageWhenCantPush = 10;
 
   _act() {
     const game = useGame();
 
     // Any actors in the way will be pushed at this angle.
-    // Almost perpendicular to where the centrigure arm will be next tick,
+    // Almost perpendicular to where the centrifuge arm will be next tick,
     // but slightly angled outwards, so entities are pushed away from the centrifuge
     const pushAngle = this.currAngle + this.angleChangePerTick + 60;
 
@@ -31,6 +36,9 @@ export class Centrifuge extends Actor {
       this.currAngle + this.angleChangePerTick
     );
 
+    // For each tile that the centrifuge will sweep this turn, and for where it'll end up next turn,
+    // if there are entities there, figure out where to move them.
+    // If we can't find anywhere to move them, do damage
     [...sweptNextTick, ...occupiedNextTick].forEach((t) => {
       const entities = game
         .entitiesAt(t)
@@ -38,62 +46,72 @@ export class Centrifuge extends Actor {
         .filter((e) => e !== this);
 
       entities.forEach((e) => {
-        // push the entity at pushAngle until it is
-        // not within tilesSweptNextTick
-        // not within coordsOccupiedAt(this.currAngle + this.angleChangePerTick)
-        // Not occupied by another entity
-        let lastCheckedPolar: PolarCoords = { t: pushAngle, r: 0 };
-        let moveTo: Coords | null = null;
+        const moveTo = this.findNewSpotForEntityAfterPush(
+          e,
+          pushAngle,
+          sweptNextTick,
+          occupiedNextTick
+        );
 
-        let i = 0;
-        while (!moveTo) {
-          i++;
-
-          if (i > 100) {
-            return;
-          }
-
-          const checkPolar: PolarCoords = {
-            t: pushAngle,
-            r: lastCheckedPolar.r + 1,
-          };
-
-          lastCheckedPolar = checkPolar;
-
-          const checkRelToEntity = polarToCartesian(checkPolar);
-          const check: Coords = {
-            x: Math.round(e.x + checkRelToEntity.x),
-            y: Math.round(e.y + checkRelToEntity.y),
-          };
-
-          // If coords in tileSweptNextTick, continue
-          if (sweptNextTick.some((c) => coordsEqual(c, check))) {
-            continue;
-          }
-
-          // If coords in tiles that will be occupied next tick
-          if (occupiedNextTick.some((c) => coordsEqual(c, check))) {
-            continue;
-          }
-
-          if (!game.creatureCanOccupy(check)) {
-            continue;
-          }
-
-          moveTo = check;
-          break;
-        }
-
-        if (e instanceof Creature) {
+        if (moveTo) {
           e.updatePosition(moveTo);
-        } else {
-          e.x = moveTo.x;
-          e.y = moveTo.y;
+        } else if (isDamageable(e)) {
+          e.receiveDamage(this.damageWhenCantPush);
         }
       });
     });
 
     this.rotate(this.angleChangePerTick);
+  }
+
+  findNewSpotForEntityAfterPush(
+    e: MapEntity,
+    pushAngle: number,
+    sweptNextTick: Coords[],
+    occupiedNextTick: Coords[]
+  ): Coords | undefined {
+    const game = useGame();
+
+    // push the entity at pushAngle until it is
+    // not within tilesSweptNextTick
+    // not within coordsOccupiedAt(this.currAngle + this.angleChangePerTick)
+    // Not occupied by another entity
+    let lastCheckedPolar: PolarCoords = { t: pushAngle, r: 0 };
+
+    // This is really a while loop. We're just using a for loop to make sure we don't
+    // get caught in an infinite loop
+    for (let i = 0; i < 100; i++) {
+      const checkPolar: PolarCoords = {
+        t: pushAngle,
+        r: lastCheckedPolar.r + 1,
+      };
+
+      lastCheckedPolar = checkPolar;
+
+      const checkRelToEntity = polarToCartesian(checkPolar);
+      const check: Coords = {
+        x: Math.round(e.x + checkRelToEntity.x),
+        y: Math.round(e.y + checkRelToEntity.y),
+      };
+
+      // If coords in tileSweptNextTick, continue
+      if (sweptNextTick.some((c) => coordsEqual(c, check))) {
+        continue;
+      }
+
+      // If coords in tiles that will be occupied next tick
+      if (occupiedNextTick.some((c) => coordsEqual(c, check))) {
+        continue;
+      }
+
+      if (!game.map.coordsInBounds(check)) return;
+
+      if (!game.creatureCanOccupy(check)) {
+        continue;
+      }
+
+      return check;
+    }
   }
 
   rotate(degrees: number) {

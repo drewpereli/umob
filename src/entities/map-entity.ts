@@ -27,4 +27,9 @@ export default abstract class MapEntity {
       coordsEqual(entityCoords, coords)
     );
   }
+
+  updatePosition(coords: Coords) {
+    this.x = coords.x;
+    this.y = coords.y;
+  }
 }

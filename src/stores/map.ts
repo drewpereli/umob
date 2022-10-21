@@ -102,6 +102,16 @@ export const useMap = defineStore('map', {
         };
       };
     },
+    coordsInBounds() {
+      return (coords: Coords) => {
+        return (
+          coords.x >= 0 &&
+          coords.x < this.width &&
+          coords.y > 0 &&
+          coords.y < this.height
+        );
+      };
+    },
   },
   actions: {
     generate() {
