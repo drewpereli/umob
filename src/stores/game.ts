@@ -16,6 +16,7 @@ import { Enemy } from '@/entities/enemy';
 import { Actor } from '@/entities/actor';
 import type MapEntity from '@/entities/map-entity';
 import type { TargetedPower } from '@/powers/targeted-power';
+import { Centrifuge } from '@/entities/centrifuge';
 
 export const useGame = defineStore('game', {
   state: () => ({
@@ -52,7 +53,9 @@ export const useGame = defineStore('game', {
     },
     entitiesAt() {
       return (coords: Coords): MapEntity[] => {
-        return this.mapEntities.filter((entity) => coordsEqual(coords, entity));
+        return this.mapEntities.filter((entity) =>
+          entity.occupiesCoords(coords)
+        );
       };
     },
     damageablesAt() {
