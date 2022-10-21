@@ -312,6 +312,7 @@ export const useGame = defineStore('game', {
 
       while (!this.player.canAct) {
         this._processOneTick();
+        if (this.actionUiState === ActionUiState.GameOver) return;
       }
 
       this.view.draw();
