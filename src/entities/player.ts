@@ -21,6 +21,8 @@ export class Player extends Creature {
 
   viewAngle = debugOptions.fullViewAngle ? 360 : 90;
 
+  mass = 100;
+
   receiveDamage(damage: number) {
     super.receiveDamage(damage);
 

@@ -4,7 +4,6 @@ import { coordsEqual } from '@/utils/map';
 import { angle, angularDifference, polarToCartesian } from '@/utils/math';
 import { random } from '@/utils/random';
 import { Actor } from './actor';
-import Creature from './creature';
 import { isDamageable } from './damageable';
 import type MapEntity from './map-entity';
 
@@ -23,6 +22,10 @@ export class Centrifuge extends Actor {
 
   damageWhenCantPush = 10;
 
+  mass = 10000;
+
+  maxPushableMass = 1000;
+
   _act() {
     const game = useGame();
 
@@ -36,29 +39,37 @@ export class Centrifuge extends Actor {
       this.currAngle + this.angleChangePerTick
     );
 
-    // For each tile that the centrifuge will sweep this turn, and for where it'll end up next turn,
-    // if there are entities there, figure out where to move them.
+    // For each entity that will be swept by the centrifuge, figure out where to move them.
     // If we can't find anywhere to move them, do damage
-    [...sweptNextTick, ...occupiedNextTick].forEach((t) => {
-      const entities = game
-        .entitiesAt(t)
-        .filter((e) => e.blocksMovement)
-        .filter((e) => e !== this);
+    const entitiesToMove = [...sweptNextTick, ...occupiedNextTick].flatMap(
+      (t) => {
+        return game
+          .entitiesAt(t)
+          .filter((e) => e.blocksMovement)
+          .filter((e) => e !== this);
+      }
+    );
 
-      entities.forEach((e) => {
-        const moveTo = this.findNewSpotForEntityAfterPush(
-          e,
-          pushAngle,
-          sweptNextTick,
-          occupiedNextTick
-        );
+    const totalMass = entitiesToMove.reduce(
+      (mass, entity) => mass + entity.mass,
+      0
+    );
 
-        if (moveTo) {
-          e.updatePosition(moveTo);
-        } else if (isDamageable(e)) {
-          e.receiveDamage(this.damageWhenCantPush);
-        }
-      });
+    if (totalMass > this.maxPushableMass) return;
+
+    entitiesToMove.forEach((e) => {
+      const moveTo = this.findNewSpotForEntityAfterPush(
+        e,
+        pushAngle,
+        sweptNextTick,
+        occupiedNextTick
+      );
+
+      if (moveTo) {
+        e.updatePosition(moveTo);
+      } else if (isDamageable(e)) {
+        e.receiveDamage(this.damageWhenCantPush);
+      }
     });
 
     this.rotate(this.angleChangePerTick);

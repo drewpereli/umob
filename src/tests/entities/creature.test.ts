@@ -17,6 +17,8 @@ class TestGun extends Gun {
 
 class TestCreature extends Creature {
   _act() {}
+
+  mass = 100;
 }
 
 describe('Actor', () => {

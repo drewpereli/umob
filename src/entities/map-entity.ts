@@ -22,6 +22,8 @@ export default abstract class MapEntity {
 
   abstract shouldRemoveFromGame: boolean;
 
+  abstract mass: number;
+
   occupiesCoords(coords: Coords) {
     return this.occupies.some((entityCoords) =>
       coordsEqual(entityCoords, coords)

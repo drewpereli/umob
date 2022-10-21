@@ -57,9 +57,11 @@ export class BlackHole extends Actor {
 
   blocksMovement = true;
 
-  ticksBeforeDeath = 10;
+  ticksBeforeDeath = 100;
 
   range = 5;
+
+  mass = 1000000000000;
 
   _act() {
     const game = useGame();

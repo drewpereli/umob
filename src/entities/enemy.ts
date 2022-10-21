@@ -17,6 +17,8 @@ export class Enemy extends Creature {
 
   lastSawPlayerAt: Coords | null = null;
 
+  mass = 100;
+
   _act() {
     if (debugOptions.docileEnemies) return;
 

@@ -101,11 +101,6 @@ export default abstract class Creature extends Actor implements Damageable {
       this.moveTime * (tile.terrain.moveTimeMultiplier as number);
   }
 
-  updatePosition(coords: Coords) {
-    this.x = coords.x;
-    this.y = coords.y;
-  }
-
   updateFacing(dir: Dir) {
     this.facing = dir;
   }
