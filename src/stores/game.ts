@@ -31,6 +31,14 @@ export const useGame = defineStore('game', {
     menu: useMenu(),
     directionViewMode: false, // Actors chars will be replaced with arrows showing where they're facing
     view: new View(),
+    // Sometimes there are actors that want to affect an entity, but only if the entity is
+    // in a certain state at the beginning of the tick. i.e. Conveyor belts.
+    // If a converyor belt moves the player directly in its "act" function, it might move the player
+    // on to another conveyor belt, which might move the player onto another one, etc etc, until
+    // we've moved the player all the way accross the map in one tick. With the system,
+    // if the player is on a conveyor belt when it's "act" is called. It can add an action to the queue
+    // that will move the player at the end of the tick. That way, no other conveyor belt will be able to act on the player that tick.
+    endOfTickActionQueue: [] as Array<() => unknown>,
   }),
   getters: {
     allActors(state): Actor[] {
@@ -320,6 +328,9 @@ export const useGame = defineStore('game', {
         tile.terrain.affectActorStandingOn?.(actor);
       });
 
+      this.endOfTickActionQueue.forEach((action) => action());
+      this.endOfTickActionQueue = [];
+
       if (this.actionUiState === ActionUiState.GameOver) return;
 
       this._cullEntities();
@@ -336,6 +347,9 @@ export const useGame = defineStore('game', {
     },
     addMapEntity(entity: MapEntity) {
       this.mapEntities.push(entity);
+    },
+    addEndOfTickAction(action: () => unknown) {
+      this.endOfTickActionQueue.push(action);
     },
   },
 });

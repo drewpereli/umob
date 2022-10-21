@@ -32,6 +32,8 @@ export class ConveyorBelt extends Actor implements AsciiDrawable {
   }
 
   _act(): void {
+    this.timeUntilNextAction = 2;
+
     const game = useGame();
 
     const entities = game.entitiesAt(this).filter((e) => e !== this);
@@ -40,13 +42,16 @@ export class ConveyorBelt extends Actor implements AsciiDrawable {
 
     if (totalMass > 500) return;
 
-    entities.forEach((entity) => {
-      const adjacent = game.map.adjacentTile(entity, this.dir);
+    game.addEndOfTickAction(
+      (() => {
+        entities.forEach((entity) => {
+          const adjacent = game.map.adjacentTile(entity, this.dir);
 
-      if (adjacent && game.creatureCanOccupy(adjacent)) {
-        entity.updatePosition(adjacent);
-        this.timeUntilNextAction = 2;
-      }
-    });
+          if (adjacent && game.creatureCanOccupy(adjacent)) {
+            entity.updatePosition(adjacent);
+          }
+        });
+      }).bind(this)
+    );
   }
 }
