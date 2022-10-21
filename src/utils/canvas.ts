@@ -1,10 +1,9 @@
-import { Centrifuge } from '@/entities/centrifuge';
-import Creature from '@/entities/creature';
 import type MapEntity from '@/entities/map-entity';
 import { BlackHole } from '@/powers/create-black-hole';
 import type { TerrainData, Tile } from '@/stores/map';
 import { scale } from 'chroma-js';
 import { random } from './random';
+import { isAsciiDrawable } from './types';
 
 export const CELL_LENGTH = 28;
 
@@ -101,10 +100,6 @@ function drawEntity(
   position: Coords,
   entity: MapEntity
 ) {
-  if (entity instanceof Creature) {
-    return fillText(ctx, entity.char, position, entity.color);
-  }
-
   if (entity instanceof BlackHole) {
     const pxCoords = positionToPx(position, 'center');
 
@@ -114,10 +109,8 @@ function drawEntity(
     ctx.beginPath();
     ctx.arc(pxCoords.x, pxCoords.y, radius, 0, 2 * Math.PI);
     ctx.fill();
-  }
-
-  if (entity instanceof Centrifuge) {
-    return fillText(ctx, entity.char, position, 'white');
+  } else if (isAsciiDrawable(entity)) {
+    fillText(ctx, entity.char, position, entity.color);
   }
 }
 

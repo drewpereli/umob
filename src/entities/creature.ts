@@ -23,6 +23,7 @@ import { Actor } from './actor';
 import type { Damageable } from './damageable';
 import { Pistol } from './gun';
 import { BuildCover } from '@/powers/build-cover';
+import type { AsciiDrawable } from '@/utils/types';
 
 export type Covers = Record<Dir, Cover>;
 
@@ -39,7 +40,10 @@ const flankingDirBonusMultipliers: Record<FlankingDir, number> = {
   [FlankingDir.Back]: 2,
 };
 
-export default abstract class Creature extends Actor implements Damageable {
+export default abstract class Creature
+  extends Actor
+  implements Damageable, AsciiDrawable
+{
   name = 'actor';
 
   readonly IMPLEMENTS_DAMAGEABLE = true;

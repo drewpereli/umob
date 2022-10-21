@@ -3,11 +3,12 @@ import bresenham from '@/utils/bresnham';
 import { coordsEqual } from '@/utils/map';
 import { angle, angularDifference, polarToCartesian } from '@/utils/math';
 import { random } from '@/utils/random';
+import type { AsciiDrawable } from '@/utils/types';
 import { Actor } from './actor';
 import { isDamageable } from './damageable';
 import type MapEntity from './map-entity';
 
-export class Centrifuge extends Actor {
+export class Centrifuge extends Actor implements AsciiDrawable {
   shouldRemoveFromGame = false;
   blocksMovement = true;
   canAct = true;
@@ -17,6 +18,7 @@ export class Centrifuge extends Actor {
   length = 4.5;
 
   char = '+';
+  color = '#eee';
 
   angleChangePerTick = random.int(10, 45);
 
