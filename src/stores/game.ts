@@ -61,9 +61,8 @@ export const useGame = defineStore('game', {
     },
     entitiesAt() {
       return (coords: Coords): MapEntity[] => {
-        return this.mapEntities.filter((entity) =>
-          entity.occupiesCoords(coords)
-        );
+        const tile = this.map.tileAt(coords);
+        return tile.entities;
       };
     },
     damageablesAt() {
@@ -75,7 +74,9 @@ export const useGame = defineStore('game', {
     },
     creatureAt() {
       return (coords: Coords) => {
-        return this.creatures.find((entity) => coordsEqual(coords, entity));
+        return this.entitiesAt(coords).find(
+          (entity): entity is Creature => entity instanceof Creature
+        );
       };
     },
     visibleTiles() {

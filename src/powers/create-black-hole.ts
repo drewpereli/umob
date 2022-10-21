@@ -28,7 +28,9 @@ export class CreateBlackHole extends TargetedPower {
 
     if (!closest) return;
 
-    this.game.addMapEntity(new BlackHole(closest));
+    const tile = this.game.map.tileAt(closest);
+
+    this.game.addMapEntity(new BlackHole(tile));
 
     return true;
   }

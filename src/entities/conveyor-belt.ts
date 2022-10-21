@@ -1,11 +1,12 @@
 import { useGame } from '@/stores/game';
+import type { Tile } from '@/stores/map';
 import { Dir } from '@/utils/map';
 import type { AsciiDrawable } from '@/utils/types';
 import { Actor } from './actor';
 
 export class ConveyorBelt extends Actor implements AsciiDrawable {
-  constructor(coords: Coords, public dir: Dir) {
-    super(coords);
+  constructor(tile: Tile, public dir: Dir) {
+    super(tile);
   }
 
   blocksMovement = false;

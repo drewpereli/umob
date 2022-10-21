@@ -68,7 +68,8 @@ export class Centrifuge extends Actor implements AsciiDrawable {
       );
 
       if (moveTo) {
-        e.updatePosition(moveTo);
+        const tile = game.map.tileAt(moveTo);
+        e.updatePosition(tile);
       } else if (isDamageable(e)) {
         e.receiveDamage(this.damageWhenCantPush);
       }

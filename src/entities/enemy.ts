@@ -1,3 +1,4 @@
+import type { Tile } from '@/stores/map';
 import { debugOptions } from '@/utils/debug-options';
 import { coordsEqual, rotateDir, type Dir } from '@/utils/map';
 import { random } from '@/utils/random';
@@ -8,8 +9,8 @@ enum Mood {
 }
 
 export class Enemy extends Creature {
-  constructor(coords: Coords) {
-    super(coords);
+  constructor(tile: Tile) {
+    super(tile);
     this.updateLastSawPlayerIfCanSee();
   }
 
@@ -91,8 +92,8 @@ export class Enemy extends Creature {
     this.moveOrTurn(random.arrayElement(tiles));
   }
 
-  updatePosition(coords: Coords) {
-    super.updatePosition(coords);
+  updatePosition(tile: Tile) {
+    super.updatePosition(tile);
     this.updateLastSawPlayerIfCanSee();
   }
 

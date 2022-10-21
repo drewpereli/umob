@@ -8,6 +8,7 @@ import { astar, Graph } from '@/utils/astar';
 import type { Damageable } from '@/entities/damageable';
 import { distance, coordsEqual, Dir, Cover } from '@/utils/map';
 import { Floor, Terrain, Wall } from '@/entities/terrain';
+import type MapEntity from '@/entities/map-entity';
 
 export const useMap = defineStore('map', {
   state: () => ({
@@ -139,6 +140,8 @@ export class Tile implements Damageable {
 
   readonly IMPLEMENTS_DAMAGEABLE = true;
 
+  entities: MapEntity[] = [];
+
   get blocksView() {
     return this.terrain.blocksView;
   }
@@ -168,5 +171,17 @@ export class Tile implements Damageable {
 
   get cover() {
     return this.terrain.cover;
+  }
+
+  addEntity(e: MapEntity) {
+    this.entities.push(e);
+  }
+
+  removeEntity(e: MapEntity) {
+    const idx = this.entities.indexOf(e);
+
+    if (idx === -1) return;
+
+    this.entities.splice(idx, 1);
   }
 }

@@ -329,7 +329,9 @@ export default abstract class Creature
       )
     );
 
-    this.updatePosition(toCoords);
+    const tile = this.game.map.tileAt(toCoords);
+
+    this.updatePosition(tile);
   }
 
   get shouldRemoveFromGame() {

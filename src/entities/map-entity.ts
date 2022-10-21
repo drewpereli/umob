@@ -1,14 +1,19 @@
+import type { Tile } from '@/stores/map';
 import { coordsEqual } from '@/utils/map';
 
 // Basically any item, creature, etc that can exist on the map
 export default abstract class MapEntity {
-  constructor({ x, y }: Coords) {
-    this.x = x;
-    this.y = y;
+  constructor(tile: Tile) {
+    this.x = tile.x;
+    this.y = tile.y;
+    this.tile = tile;
+
+    tile.addEntity(this);
   }
 
   x;
   y;
+  tile;
 
   abstract blocksMovement: boolean;
 
@@ -30,8 +35,11 @@ export default abstract class MapEntity {
     );
   }
 
-  updatePosition(coords: Coords) {
-    this.x = coords.x;
-    this.y = coords.y;
+  updatePosition(tile: Tile) {
+    this.tile.removeEntity(this);
+    this.x = tile.x;
+    this.y = tile.y;
+    this.tile = tile;
+    tile.addEntity(this);
   }
 }
