@@ -1,4 +1,5 @@
 import { useGame } from '@/stores/game';
+import { useMap, type Tile } from '@/stores/map';
 import bresenham from '@/utils/bresnham';
 import { coordsEqual } from '@/utils/map';
 import { angle, angularDifference, polarToCartesian } from '@/utils/math';
@@ -9,6 +10,13 @@ import { isDamageable } from './damageable';
 import type MapEntity from './map-entity';
 
 export class Centrifuge extends Actor implements AsciiDrawable {
+  constructor(tile: Tile) {
+    super(tile);
+    this.updateTilesOccupied();
+  }
+
+  tilesOccupied: Tile[] = [];
+
   shouldRemoveFromGame = false;
   blocksMovement = true;
   canAct = true;
@@ -68,7 +76,8 @@ export class Centrifuge extends Actor implements AsciiDrawable {
       );
 
       if (moveTo) {
-        e.updatePosition(moveTo);
+        const tile = game.map.tileAt(moveTo);
+        e.updatePosition(tile);
       } else if (isDamageable(e)) {
         e.receiveDamage(this.damageWhenCantPush);
       }
@@ -129,14 +138,10 @@ export class Centrifuge extends Actor implements AsciiDrawable {
 
   rotate(degrees: number) {
     this.currAngle = (this.currAngle + degrees) % 360;
+    this.updateTilesOccupied();
   }
 
-  get occupies(): Coords[] {
-    // return [...this.tilesOccupied, ...this.tilesSweptNextTick];
-    return this.tilesOccupied;
-  }
-
-  get tilesOccupied(): Coords[] {
+  get coordsOccupied(): Coords[] {
     return this.coordsOccupiedAtAngle(this.currAngle);
   }
 
@@ -170,5 +175,14 @@ export class Centrifuge extends Actor implements AsciiDrawable {
     };
 
     return bresenham(this, currTip);
+  }
+
+  updateTilesOccupied() {
+    const map = useMap();
+    this.tilesOccupied.forEach((t) => t.removeEntity(this));
+    this.tilesOccupied = this.coordsOccupied.map((coords) =>
+      map.tileAt(coords)
+    );
+    this.tilesOccupied.forEach((t) => t.addEntity(this));
   }
 }
