@@ -211,6 +211,9 @@ export const useGame = defineStore('game', {
 
       const player = new Player(tile);
 
+      this.player = player;
+      this.addMapEntity(player);
+
       const fov = new PermissiveFov(
         this.map.width,
         this.map.height,
@@ -218,9 +221,6 @@ export const useGame = defineStore('game', {
       );
 
       this.fovUtil = fov;
-
-      this.player = player;
-      this.mapEntities.push(player);
 
       if (debugOptions.extraEnemies) {
         Array.from({ length: debugOptions.extraEnemies }).forEach(() => {
