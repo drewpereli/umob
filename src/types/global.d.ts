@@ -5,4 +5,9 @@ declare global {
     x: number;
     y: number;
   }
+
+  interface PolarCoords {
+    t: number; // Angle
+    r: number; // Radius
+  }
 }

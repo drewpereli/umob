@@ -1,3 +1,4 @@
+import { Centrifuge } from '@/entities/centrifuge';
 import Creature from '@/entities/creature';
 import type MapEntity from '@/entities/map-entity';
 import { BlackHole } from '@/powers/create-black-hole';
@@ -113,6 +114,10 @@ function drawEntity(
     ctx.beginPath();
     ctx.arc(pxCoords.x, pxCoords.y, radius, 0, 2 * Math.PI);
     ctx.fill();
+  }
+
+  if (entity instanceof Centrifuge) {
+    return fillText(ctx, entity.char, position, 'white');
   }
 }
 
