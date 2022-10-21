@@ -141,10 +141,6 @@ export class Centrifuge extends Actor implements AsciiDrawable {
     this.updateTilesOccupied();
   }
 
-  get occupies(): Coords[] {
-    return this.coordsOccupied;
-  }
-
   get coordsOccupied(): Coords[] {
     return this.coordsOccupiedAtAngle(this.currAngle);
   }
