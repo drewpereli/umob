@@ -1,5 +1,9 @@
 @import './base.css';
 
+body {
+  overflow: hidden;
+}
+
 #app {
   padding: 2rem;
 }
