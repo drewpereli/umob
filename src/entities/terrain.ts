@@ -1,6 +1,6 @@
 import { Cover } from '@/utils/map';
-import type Creature from './creature';
-import type { Damageable } from './damageable';
+import { isDamageable, type Damageable } from './damageable';
+import type MapEntity from './map-entity';
 
 export abstract class Terrain {
   abstract readonly type: string;
@@ -17,7 +17,7 @@ export abstract class Terrain {
     return this.moveTimeMultiplier === null;
   }
 
-  affectActorStandingOn?(actor: Creature): void;
+  affectEntityOn?(entity: MapEntity): void;
 }
 
 export class Floor extends Terrain {
@@ -58,7 +58,9 @@ export class Lava extends Terrain {
   char = '~';
   moveTimeMultiplier = 2;
 
-  affectActorStandingOn(actor: Creature) {
-    actor.receiveDamage(20);
+  affectEntityOn(entity: MapEntity) {
+    if (isDamageable(entity)) {
+      entity.receiveDamage(20);
+    }
   }
 }

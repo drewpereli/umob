@@ -325,9 +325,8 @@ export const useGame = defineStore('game', {
     _processOneTick() {
       this.nonPlayerActors.forEach((actor) => actor.actIfPossible());
 
-      this.creatures.forEach((actor) => {
-        const tile = this.map.tileAt(actor);
-        tile.terrain.affectActorStandingOn?.(actor);
+      this.mapEntities.forEach((entity) => {
+        entity.tile.terrain.affectEntityOn?.(entity);
       });
 
       this.endOfTickActionQueue.forEach((action) => action());
