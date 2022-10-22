@@ -5,7 +5,7 @@ import type Creature from '@/entities/creature';
 import { debugOptions } from '@/utils/debug-options';
 import { random } from '@/utils/random';
 import { astar, Graph } from '@/utils/astar';
-import { distance, coordsEqual, Dir, Cover } from '@/utils/map';
+import { distance, coordsEqual, Dir, Cover, DIRS } from '@/utils/map';
 import { isTerrain, type Terrain } from '@/entities/terrain';
 import type MapEntity from '@/entities/map-entity';
 
@@ -37,6 +37,13 @@ export const useMap = defineStore('map', {
         const y = coords.y + yDiff;
 
         return this.tileAt({ x, y });
+      };
+    },
+    adjacentTiles() {
+      return (coords: Coords): Tile[] => {
+        return DIRS.map((dir) => this.adjacentTile(coords, dir)).filter(
+          (t): t is Tile => !!t
+        );
       };
     },
     pathBetween() {
