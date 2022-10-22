@@ -2,6 +2,7 @@ import type { Tile } from '@/stores/map';
 
 export enum EntityLayer {
   Terrain = 'terrain',
+  Fluid = 'fluid',
   Object = 'object',
   Item = 'item',
   Creature = 'creature',

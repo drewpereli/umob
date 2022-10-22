@@ -1,3 +1,4 @@
+import { Lava } from '@/entities/fluid';
 import type MapEntity from '@/entities/map-entity';
 import { BlackHole } from '@/powers/create-black-hole';
 import { FLOOR_TERRAIN_DATA, type TerrainData, type Tile } from '@/stores/map';
@@ -71,7 +72,24 @@ function drawTerrain(
   position: Coords,
   terrain: TerrainData = FLOOR_TERRAIN_DATA
 ) {
-  if (terrain?.type === 'lava') {
+  fillText(ctx, terrain.char as string, position, terrain.color as string);
+}
+
+function drawEntity(
+  ctx: CanvasRenderingContext2D,
+  position: Coords,
+  entity: MapEntity
+) {
+  if (entity instanceof BlackHole) {
+    const pxCoords = positionToPx(position, 'center');
+
+    const radius = CELL_LENGTH / 2 - 2;
+
+    ctx.fillStyle = '#37334d';
+    ctx.beginPath();
+    ctx.arc(pxCoords.x, pxCoords.y, radius, 0, 2 * Math.PI);
+    ctx.fill();
+  } else if (entity instanceof Lava) {
     const pallette = scale(['#db1e14', '#ff8936']);
 
     // Create a 4 x 4 grid of different colors in the cell
@@ -90,25 +108,6 @@ function drawTerrain(
         ctx.fillRect(xPx, yPx, length, length);
       });
     });
-  } else {
-    fillText(ctx, terrain.char as string, position, terrain.color as string);
-  }
-}
-
-function drawEntity(
-  ctx: CanvasRenderingContext2D,
-  position: Coords,
-  entity: MapEntity
-) {
-  if (entity instanceof BlackHole) {
-    const pxCoords = positionToPx(position, 'center');
-
-    const radius = CELL_LENGTH / 2 - 2;
-
-    ctx.fillStyle = '#37334d';
-    ctx.beginPath();
-    ctx.arc(pxCoords.x, pxCoords.y, radius, 0, 2 * Math.PI);
-    ctx.fill();
   } else if (isAsciiDrawable(entity)) {
     fillText(ctx, entity.char, position, entity.color);
   }
