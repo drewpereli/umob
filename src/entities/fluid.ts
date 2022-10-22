@@ -64,3 +64,5 @@ export class Lava extends Fluid {
     });
   }
 }
+
+export class Water extends Fluid {}

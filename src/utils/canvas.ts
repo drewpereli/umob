@@ -1,4 +1,4 @@
-import { Lava } from '@/entities/fluid';
+import { Lava, Water } from '@/entities/fluid';
 import type MapEntity from '@/entities/map-entity';
 import { BlackHole } from '@/powers/create-black-hole';
 import { FLOOR_TERRAIN_DATA, type TerrainData, type Tile } from '@/stores/map';
@@ -91,6 +91,25 @@ function drawEntity(
     ctx.fill();
   } else if (entity instanceof Lava) {
     const pallette = scale(['#db1e14', '#ff8936']);
+
+    // Create a 4 x 4 grid of different colors in the cell
+    Array.from({ length: 4 }).forEach((_, y) => {
+      const offsetY = y / 4;
+      Array.from({ length: 4 }).forEach((_, x) => {
+        const offsetX = x / 4;
+
+        const color = pallette(random.float()).css();
+
+        ctx.fillStyle = color;
+        const xPx = (position.x + offsetX) * CELL_LENGTH;
+        const yPx = (position.y + offsetY) * CELL_LENGTH;
+        const length = CELL_LENGTH / 4;
+
+        ctx.fillRect(xPx, yPx, length, length);
+      });
+    });
+  } else if (entity instanceof Water) {
+    const pallette = scale(['#4287f5', '#1b51a8']);
 
     // Create a 4 x 4 grid of different colors in the cell
     Array.from({ length: 4 }).forEach((_, y) => {
