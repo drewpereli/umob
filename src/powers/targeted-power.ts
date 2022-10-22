@@ -7,11 +7,17 @@ export abstract class TargetedPower extends Power {
   abstract range: number;
 
   tilesAimedAt(): Coords[] {
-    return [];
+    const closest = this.closestValidToSelected();
+
+    return closest ? [closest] : [];
   }
 
-  actorsAimedAt(): Creature[] {
-    return [];
+  actorsAimedAt() {
+    return this.tilesAimedAt().flatMap((tile) => {
+      const actor = this.game.creatureAt(tile);
+
+      return actor ? [actor] : [];
+    });
   }
 
   closestValidToSelected(): Coords | undefined {

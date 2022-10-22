@@ -15,14 +15,6 @@ export class Grenade extends TargetedPower {
     return this.game.map.tilesInRadius(closest, this.radius);
   }
 
-  actorsAimedAt() {
-    return this.tilesAimedAt().flatMap((tile) => {
-      const actor = this.game.creatureAt(tile);
-
-      return actor ? [actor] : [];
-    });
-  }
-
   activate() {
     const closest = this.closestValidToSelected();
     if (!closest) return;

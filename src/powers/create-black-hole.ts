@@ -12,18 +12,6 @@ export class CreateBlackHole extends TargetedPower {
   energyCost = 50;
   range = 8;
 
-  tilesAimedAt() {
-    const coords: Coords[] = [];
-
-    if (this.game.selectedTile) coords.push(this.game.selectedTile);
-
-    const closest = this.closestValidToSelected();
-
-    if (closest) coords.push(closest);
-
-    return coords;
-  }
-
   activate() {
     const closest = this.closestValidToSelected();
 

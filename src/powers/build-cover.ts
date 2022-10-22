@@ -17,14 +17,6 @@ export class BuildCover extends TargetedPower {
     return [closest];
   }
 
-  actorsAimedAt() {
-    return this.tilesAimedAt().flatMap((tile) => {
-      const actor = this.game.creatureAt(tile);
-
-      return actor ? [actor] : [];
-    });
-  }
-
   activate() {
     const closest = this.closestValidToSelected();
     if (!closest) return;
