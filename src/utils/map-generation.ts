@@ -1,4 +1,5 @@
-import { Floor, Wall, HalfWall, Lava } from '@/entities/terrain';
+import { Wall, HalfWall, Lava } from '@/entities/terrain';
+import { useGame } from '@/stores/game';
 import { Tile } from '@/stores/map';
 import { debugOptions } from './debug-options';
 import { random } from './random';
@@ -6,12 +7,14 @@ import { random } from './random';
 type Map = Tile[][];
 
 export function generate(width: number, height: number): Map {
+  const game = useGame();
+
   if (debugOptions.emptyMap) {
     const map = generateEmpty(width, height);
 
     if (debugOptions.randomWallsInEmptyMap) {
       const openTiles = map.flatMap((row) => {
-        return row.filter((tile) => tile.terrain instanceof Floor);
+        return row.filter((tile) => !tile.terrain);
       });
 
       const randOpen = random.arrayElements(
@@ -19,12 +22,12 @@ export function generate(width: number, height: number): Map {
         debugOptions.randomWallsInEmptyMap
       );
 
-      randOpen.forEach((tile) => (tile.terrain = new Wall()));
+      randOpen.forEach((tile) => game.addMapEntity(new Wall(tile)));
     }
 
     if (debugOptions.randomHalfWallsInEmptyMap) {
       const openTiles = map.flatMap((row) => {
-        return row.filter((tile) => tile.terrain instanceof Floor);
+        return row.filter((tile) => !tile.terrain);
       });
 
       const randOpen = random.arrayElements(
@@ -32,12 +35,12 @@ export function generate(width: number, height: number): Map {
         debugOptions.randomHalfWallsInEmptyMap
       );
 
-      randOpen.forEach((tile) => (tile.terrain = new HalfWall()));
+      randOpen.forEach((tile) => game.addMapEntity(new HalfWall(tile)));
     }
 
     if (debugOptions.randomLavaInEmptyMap) {
       const openTiles = map.flatMap((row) => {
-        return row.filter((tile) => tile.terrain instanceof Floor);
+        return row.filter((tile) => !tile.terrain);
       });
 
       const randOpen = random.arrayElements(
@@ -45,7 +48,7 @@ export function generate(width: number, height: number): Map {
         debugOptions.randomLavaInEmptyMap
       );
 
-      randOpen.forEach((tile) => (tile.terrain = new Lava()));
+      randOpen.forEach((tile) => game.addMapEntity(new Lava(tile)));
     }
 
     return map;
@@ -62,10 +65,13 @@ export function generate(width: number, height: number): Map {
       const tile = new Tile({
         x,
         y,
-        terrain: terrain === 1 ? new Wall() : new Floor(),
       });
 
       mapRow.push(tile);
+
+      if (terrain === 1) {
+        game.addMapEntity(new Wall(tile));
+      }
     });
 
     map.push(mapRow);
@@ -75,21 +81,27 @@ export function generate(width: number, height: number): Map {
 }
 
 export function generateEmpty(width: number, height: number): Map {
+  const game = useGame();
+
   return Array.from({ length: height }).map((_, y) => {
     return Array.from({ length: width }).map((_, x) => {
       const onEdge = x === 0 || y === 0 || x === width - 1 || y === height - 1;
 
       if (onEdge) {
-        return new Tile({
+        const tile = new Tile({
           x,
           y,
-          terrain: new Wall(),
         });
+
+        const wall = new Wall(tile);
+
+        game.addMapEntity(wall);
+
+        return tile;
       } else {
         return new Tile({
           x,
           y,
-          terrain: new Floor(),
         });
       }
     });

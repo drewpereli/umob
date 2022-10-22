@@ -1,4 +1,5 @@
 import { HalfWall } from '@/entities/terrain';
+import { useGame } from '@/stores/game';
 import { TargetedPower } from './targeted-power';
 
 export class BuildCover extends TargetedPower {
@@ -30,7 +31,7 @@ export class BuildCover extends TargetedPower {
 
     const tile = this.game.map.tileAt(closest);
 
-    tile.terrain = new HalfWall();
+    useGame().addMapEntity(new HalfWall(tile));
 
     return true;
   }

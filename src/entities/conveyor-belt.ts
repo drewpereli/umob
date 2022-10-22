@@ -3,6 +3,7 @@ import type { Tile } from '@/stores/map';
 import { Dir } from '@/utils/map';
 import type { AsciiDrawable } from '@/utils/types';
 import { Actor } from './actor';
+import { EntityLayer } from './map-entity';
 
 export class ConveyorBelt extends Actor implements AsciiDrawable {
   constructor(tile: Tile, public dir: Dir) {
@@ -10,6 +11,8 @@ export class ConveyorBelt extends Actor implements AsciiDrawable {
   }
 
   blocksMovement = false;
+  blocksView = false;
+  layer = EntityLayer.Object;
 
   mass = 1000;
 

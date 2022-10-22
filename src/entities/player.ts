@@ -14,6 +14,8 @@ export class Player extends Creature {
     new AssaultRifle(),
   ];
 
+  blocksView = false;
+
   equippedWeapon = this.inventory[0];
 
   health = debugOptions.infiniteHealth ? Infinity : 100;

@@ -163,8 +163,6 @@ export const useGame = defineStore('game', {
 
         const damageables = this.damageablesAt(tile);
 
-        penetrationRemaining -= tile.terrain.penetrationBlock;
-
         damageables.forEach((d) => {
           penetrationRemaining -= d.penetrationBlock;
         });
@@ -182,13 +180,7 @@ export const useGame = defineStore('game', {
       }
 
       return this.tilesAimedAt.flatMap((tile): (Damageable & Coords)[] => {
-        const damageables = this.damageablesAt(tile);
-
-        if (damageables.length) return damageables;
-
-        if (tile.terrain instanceof Wall) return [tile];
-
-        return [];
+        return this.damageablesAt(tile);
       });
     },
     coordsVisible() {
@@ -206,9 +198,7 @@ export const useGame = defineStore('game', {
     coordsBlocksMovement() {
       return (coords: Coords) => {
         const tile = coords instanceof Tile ? coords : this.map.tileAt(coords);
-        if (tile.terrain.blocksMovement) return true;
-        if (this.entitiesAt(tile).some((e) => e.blocksMovement)) return true;
-        return false;
+        return tile.hasEntityThatBlocksMovement;
       };
     },
   },
@@ -226,7 +216,8 @@ export const useGame = defineStore('game', {
       const fov = new PermissiveFov(
         this.map.width,
         this.map.height,
-        (x: number, y: number) => !this.map.tileAt({ x, y }).blocksView
+        (x: number, y: number) =>
+          !this.map.tileAt({ x, y }).hasEntityThatBlocksView
       );
 
       this.fovUtil = fov;
@@ -325,9 +316,9 @@ export const useGame = defineStore('game', {
     _processOneTick() {
       this.nonPlayerActors.forEach((actor) => actor.actIfPossible());
 
-      this.mapEntities.forEach((entity) => {
-        entity.tile.terrain.affectEntityOn?.(entity);
-      });
+      // this.mapEntities.forEach((entity) => {
+      //   entity.tile.terrain.affectEntityOn?.(entity);
+      // });
 
       this.endOfTickActionQueue.forEach((action) => action());
       this.endOfTickActionQueue = [];
@@ -342,9 +333,19 @@ export const useGame = defineStore('game', {
       this.currTime++;
     },
     _cullEntities() {
-      this.mapEntities = this.mapEntities.filter(
-        (entity) => !entity.shouldRemoveFromGame
-      );
+      // this.mapEntities = this.mapEntities.filter(
+      //   (entity) => !entity.shouldRemoveFromGame
+      // );
+
+      this.mapEntities = this.mapEntities.reduce((all, entity) => {
+        if (entity.shouldRemoveFromGame) {
+          entity.tile.removeEntity(entity);
+        } else {
+          all.push(entity);
+        }
+
+        return all;
+      }, [] as MapEntity[]);
     },
     addMapEntity(entity: MapEntity) {
       this.mapEntities.push(entity);

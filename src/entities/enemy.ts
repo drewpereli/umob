@@ -16,6 +16,8 @@ export class Enemy extends Creature {
 
   mood = Mood.Hostile;
 
+  blocksView = false;
+
   lastSawPlayerAt: Coords | null = null;
 
   mass = 100;

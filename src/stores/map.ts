@@ -5,9 +5,8 @@ import type Creature from '@/entities/creature';
 import { debugOptions } from '@/utils/debug-options';
 import { random } from '@/utils/random';
 import { astar, Graph } from '@/utils/astar';
-import type { Damageable } from '@/entities/damageable';
 import { distance, coordsEqual, Dir, Cover } from '@/utils/map';
-import { Floor, Terrain, Wall } from '@/entities/terrain';
+import { isTerrain, type Terrain } from '@/entities/terrain';
 import type MapEntity from '@/entities/map-entity';
 
 export const useMap = defineStore('map', {
@@ -44,7 +43,7 @@ export const useMap = defineStore('map', {
       return (from: Coords, to: Coords, actor: Creature): Coords[] => {
         const matrix = this.tiles.map((row) => {
           return row.map((tile) => {
-            if (tile.terrain.blocksMovement || tile.terrain.type === 'lava')
+            if (tile.hasEntityThatBlocksView || tile.terrain?.type === 'lava')
               return 0;
             return 1;
           });
@@ -70,7 +69,7 @@ export const useMap = defineStore('map', {
       return () => {
         const floorTiles: Tile[] = this.tiles
           .flat()
-          .filter((tile) => tile.terrain instanceof Floor);
+          .filter((tile) => !tile.terrain);
 
         return random.arrayElement(floorTiles);
       };
@@ -123,58 +122,74 @@ export const useMap = defineStore('map', {
 
 export type TerrainData = Pick<Terrain, 'type' | 'char' | 'color'>;
 
-export class Tile implements Damageable {
-  constructor({ x, y, terrain }: Coords & { terrain?: Terrain }) {
+export const FLOOR_TERRAIN_DATA: TerrainData = {
+  type: 'floor',
+  char: '•',
+  color: 'rgba(255,255,255,0.2)',
+};
+
+export class Tile {
+  constructor({ x, y }: Coords) {
     this.x = x;
     this.y = y;
-    this.terrain = terrain ?? new Floor();
   }
 
   readonly x;
   readonly y;
-  terrain;
 
   terrainLastSeenByPlayer?: TerrainData;
 
-  penetrationBlock = 0;
+  moveTimeMultiplier: number | null = 1;
+
+  get hasEntityThatBlocksMovement() {
+    return this.entities.some((e) => e.blocksMovement);
+  }
+
+  get hasEntityThatBlocksView() {
+    return this.entities.some((e) => e.blocksView);
+  }
+
+  get terrain() {
+    return this.entities.find(isTerrain);
+  }
 
   readonly IMPLEMENTS_DAMAGEABLE = true;
 
   entities: MapEntity[] = [];
-
-  get blocksView() {
-    return this.terrain.blocksView;
-  }
 
   get id() {
     return `${this.x},${this.y}`;
   }
 
   onPlayerSees() {
-    const { type, char, color } = this.terrain;
-    this.terrainLastSeenByPlayer = { type, char, color };
-  }
+    const terrain = this.terrain ?? FLOOR_TERRAIN_DATA;
 
-  receiveDamage(damage: number) {
-    if (!this.isCurrentlyDamageable) return;
-
-    (this.terrain as Wall).receiveDamage(damage);
-
-    if (this.terrain.health <= 0) {
-      this.terrain = this.terrain.terrainOnDie as Terrain;
-    }
-  }
-
-  get isCurrentlyDamageable() {
-    return this.terrain instanceof Wall;
+    this.terrainLastSeenByPlayer = {
+      type: terrain.type,
+      char: terrain.char,
+      color: terrain.color,
+    };
   }
 
   get cover() {
-    return this.terrain.cover;
+    return this.terrain?.cover ?? Cover.None;
   }
 
   addEntity(e: MapEntity) {
     this.entities.push(e);
+
+    // if (e.blocksMovement) {
+    //   this.hasEntityThatBlocksMovement = true;
+    // }
+
+    // if (e.blocksView) {
+    //   this.hasEntityThatBlocksView = true;
+    // }
+
+    // if (isTerrain(e)) {
+    //   this.terrain = e;
+    //   this.moveTimeMultiplier = e.moveTimeMultiplier;
+    // }
   }
 
   removeEntity(e: MapEntity) {
@@ -183,5 +198,22 @@ export class Tile implements Damageable {
     if (idx === -1) return;
 
     this.entities.splice(idx, 1);
+
+    // if (e === this.terrain) {
+    //   this.terrain === undefined;
+    //   this.moveTimeMultiplier = 1;
+    // }
+
+    // if (e.blocksMovement) {
+    //   this.hasEntityThatBlocksMovement = this.entities.some(
+    //     (entity) => entity.blocksMovement
+    //   );
+    // }
+
+    // if (e.blocksView) {
+    //   this.hasEntityThatBlocksView = this.entities.some(
+    //     (entity) => entity.blocksView
+    //   );
+    // }
   }
 }

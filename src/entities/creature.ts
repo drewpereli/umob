@@ -20,10 +20,11 @@ import {
 import type { Power } from '@/powers/power';
 import { random } from '@/utils/random';
 import { Actor } from './actor';
-import type { Damageable } from './damageable';
+import { isDamageable, type Damageable } from './damageable';
 import { Pistol } from './gun';
 import { BuildCover } from '@/powers/build-cover';
 import type { AsciiDrawable } from '@/utils/types';
+import { EntityLayer } from './map-entity';
 
 export type Covers = Record<Dir, Cover>;
 
@@ -47,6 +48,8 @@ export default abstract class Creature
   name = 'actor';
 
   readonly IMPLEMENTS_DAMAGEABLE = true;
+
+  layer = EntityLayer.Creature;
 
   health = 100;
   maxHealth = 100;
@@ -102,7 +105,7 @@ export default abstract class Creature
     this.updatePosition(tile);
 
     this.timeUntilNextAction =
-      this.moveTime * (tile.terrain.moveTimeMultiplier as number);
+      this.moveTime * (tile.moveTimeMultiplier as number);
   }
 
   updateFacing(dir: Dir) {
@@ -232,8 +235,8 @@ export default abstract class Creature
       .tilesBetween(this, this.game.player)
       .slice(1, -1);
 
-    const aimIsBlocked = tilesBetween.some(
-      (tile) => tile.terrain.penetrationBlock > 0
+    const aimIsBlocked = tilesBetween.some((tile) =>
+      tile.entities.some((e) => isDamageable(e) && e.penetrationBlock > 0)
     );
 
     return !aimIsBlocked;
@@ -248,7 +251,7 @@ export default abstract class Creature
     // See if view is blocked by a wall
     const tilesBetween = this.game.map.tilesBetween(this, this.game.player);
 
-    if (tilesBetween.some((tile) => tile.blocksView)) return false;
+    if (tilesBetween.some((tile) => tile.hasEntityThatBlocksView)) return false;
 
     return true;
   }
@@ -304,7 +307,7 @@ export default abstract class Creature
         break;
       }
 
-      if (next.terrain.blocksMovement) {
+      if (next.hasEntityThatBlocksMovement) {
         hitWall = true;
         break;
       }

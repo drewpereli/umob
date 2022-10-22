@@ -4,7 +4,7 @@ import { useGame } from '@/stores/game';
 import { Tile, useMap } from '@/stores/map';
 import Creature from '@/entities/creature';
 import Gun from '@/entities/gun';
-import { Floor, Wall, HalfWall } from '@/entities/terrain';
+import { Wall, HalfWall } from '@/entities/terrain';
 
 class TestGun extends Gun {
   name = 'test gun';
@@ -19,6 +19,8 @@ class TestCreature extends Creature {
   _act() {}
 
   mass = 100;
+
+  blocksView = false;
 }
 
 describe('Actor', () => {
@@ -48,7 +50,7 @@ describe('Actor', () => {
 
     map.tiles = Array.from({ length: map.height }).map((_, y) => {
       return Array.from({ length: map.width }).map((_, x) => {
-        return new Tile({ x, y, terrain: new Floor() });
+        return new Tile({ x, y });
       });
     });
   });
@@ -78,28 +80,34 @@ describe('Actor', () => {
       const source = createActor({ x: 1, y: 1 });
       const target = useMap().tileAt({ x: 5, y: 5 });
 
-      target.terrain = new Wall();
+      const wall = new Wall(target);
+
+      useGame().addMapEntity(wall);
 
       source.accuracyMultiplier = 0.75;
       source.equippedWeapon.accuracy = 0.33;
 
-      const hitChance = source.hitChanceForDamageable(target);
+      const hitChance = source.hitChanceForDamageable(wall);
 
       expect(hitChance).toEqual(1);
     });
 
     test('when damageable is a wall behind cover', () => {
+      const game = useGame();
+
       const source = createActor({ x: 1, y: 1 });
       const target = useMap().tileAt({ x: 5, y: 1 });
 
-      target.terrain = new Wall();
+      const wall = new Wall(target);
 
-      useMap().tileAt({ x: 4, y: 1 }).terrain = new HalfWall();
+      game.addMapEntity(wall);
+
+      game.addMapEntity(new HalfWall(useMap().tileAt({ x: 4, y: 1 })));
 
       source.accuracyMultiplier = 0.75;
       source.equippedWeapon.accuracy = 0.33;
 
-      const hitChance = source.hitChanceForDamageable(target);
+      const hitChance = source.hitChanceForDamageable(wall);
 
       expect(hitChance).toEqual(1);
     });
@@ -108,7 +116,7 @@ describe('Actor', () => {
       const source = createActor({ x: 0, y: 0 });
       const target = createActor({ x: 5, y: 0 });
 
-      useMap().tileAt({ x: 4, y: 0 }).terrain = new HalfWall();
+      useGame().addMapEntity(new HalfWall(useMap().tileAt({ x: 4, y: 0 })));
 
       const hitChance = source.hitChanceForDamageable(target);
 
@@ -119,7 +127,7 @@ describe('Actor', () => {
       const source = createActor({ x: 0, y: 0 });
       const target = createActor({ x: 5, y: 0 });
 
-      useMap().tileAt({ x: 4, y: 0 }).terrain = new Wall();
+      useGame().addMapEntity(new Wall(useMap().tileAt({ x: 4, y: 0 })));
 
       const hitChance = source.hitChanceForDamageable(target);
 
@@ -130,7 +138,7 @@ describe('Actor', () => {
       const source = createActor({ x: 0, y: 5 });
       const target = createActor({ x: 5, y: 0 });
 
-      useMap().tileAt({ x: 4, y: 0 }).terrain = new Wall();
+      useGame().addMapEntity(new Wall(useMap().tileAt({ x: 4, y: 0 })));
 
       const hitChance = source.hitChanceForDamageable(target);
 

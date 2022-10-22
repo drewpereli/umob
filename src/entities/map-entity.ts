@@ -1,5 +1,12 @@
 import type { Tile } from '@/stores/map';
 
+export enum EntityLayer {
+  Terrain = 'terrain',
+  Object = 'object',
+  Item = 'item',
+  Creature = 'creature',
+}
+
 // Basically any item, creature, etc that can exist on the map
 export default abstract class MapEntity {
   constructor(tile: Tile) {
@@ -14,7 +21,10 @@ export default abstract class MapEntity {
   y;
   tile;
 
+  abstract layer: EntityLayer;
+
   abstract blocksMovement: boolean;
+  abstract blocksView: boolean;
 
   get coords(): Coords {
     return { x: this.x, y: this.y };

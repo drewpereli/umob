@@ -1,66 +1,92 @@
+import { useGame } from '@/stores/game';
 import { Cover } from '@/utils/map';
+import type { AsciiDrawable } from '@/utils/types';
+import { Actor } from './actor';
 import { isDamageable, type Damageable } from './damageable';
-import type MapEntity from './map-entity';
+import MapEntity, { EntityLayer } from './map-entity';
 
-export abstract class Terrain {
-  abstract readonly type: string;
-  abstract readonly char: string;
-  abstract readonly moveTimeMultiplier: number | null;
-  readonly color: string = '#ccc';
-  readonly blocksView: boolean = false;
+export type Terrain = MapEntity & {
+  readonly type: string;
+  readonly moveTimeMultiplier: number | null;
+  readonly blocksView: boolean;
   readonly terrainOnDie?: Terrain;
-  readonly penetrationBlock: number = 0;
-  readonly cover: Cover = Cover.None;
-  health = 100;
+  readonly cover: Cover;
+  readonly char?: string;
+  readonly color?: string;
+  readonly layer: EntityLayer.Terrain;
+};
 
-  get blocksMovement() {
-    return this.moveTimeMultiplier === null;
-  }
-
-  affectEntityOn?(entity: MapEntity): void;
-}
-
-export class Floor extends Terrain {
-  type = 'floor';
-  char = '•';
-  moveTimeMultiplier = 1;
-  color = 'rgba(255,255,255,0.2)';
-}
-
-export class Wall extends Terrain implements Damageable {
+export class Wall
+  extends MapEntity
+  implements Terrain, Damageable, AsciiDrawable
+{
   type = 'wall';
   char = '#';
+  color = 'white';
+  shouldRemoveFromGame = false;
+  blocksMovement = true;
   moveTimeMultiplier = null;
   penetrationBlock = 2;
   blocksView = true;
-  terrainOnDie = new HalfWall();
+  mass = 2000;
   cover = Cover.Full;
+
+  readonly layer = EntityLayer.Terrain;
 
   readonly IMPLEMENTS_DAMAGEABLE = true;
 
+  health = 100;
+
   receiveDamage(damage: number) {
     this.health -= damage;
+
+    if (this.health <= 0) {
+      const halfWall = new HalfWall(this.tile);
+      useGame().addMapEntity(halfWall);
+      console.log('in here');
+      this.shouldRemoveFromGame = true;
+    }
   }
 
   isCurrentlyDamageable = true;
 }
 
-export class HalfWall extends Terrain {
+export class HalfWall extends MapEntity implements Terrain, AsciiDrawable {
   type = 'half-wall';
   char = '▄';
+  blocksView = false;
+  blocksMovement = false;
   moveTimeMultiplier = 2;
   color = '#aaa';
   cover = Cover.Half;
+  mass = 1000;
+  shouldRemoveFromGame = false;
+  readonly layer = EntityLayer.Terrain;
 }
 
-export class Lava extends Terrain {
+export class Lava extends Actor implements Terrain {
   type = 'lava';
   char = '~';
-  moveTimeMultiplier = 2;
+  moveTimeMultiplier = 4;
+  mass = 0;
+  shouldRemoveFromGame = false;
+  cover = Cover.None;
+  canAct = true;
+  blocksMovement = false;
+  blocksView = false;
+  readonly layer: EntityLayer.Terrain = EntityLayer.Terrain;
 
-  affectEntityOn(entity: MapEntity) {
-    if (isDamageable(entity)) {
-      entity.receiveDamage(20);
-    }
+  _act() {
+    this.tile.entities.forEach((entity) => {
+      if (entity === this) return;
+
+      if (isDamageable(entity)) {
+        entity.receiveDamage(20);
+      }
+    });
   }
+}
+
+export function isTerrain(entity: MapEntity): entity is Terrain {
+  return entity.layer === EntityLayer.Terrain;
 }

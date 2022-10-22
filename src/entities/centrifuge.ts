@@ -8,6 +8,7 @@ import type { AsciiDrawable } from '@/utils/types';
 import { Actor } from './actor';
 import { isDamageable } from './damageable';
 import type MapEntity from './map-entity';
+import { EntityLayer } from './map-entity';
 
 export class Centrifuge extends Actor implements AsciiDrawable {
   constructor(tile: Tile) {
@@ -15,10 +16,13 @@ export class Centrifuge extends Actor implements AsciiDrawable {
     this.updateTilesOccupied();
   }
 
+  layer = EntityLayer.Object;
+
   tilesOccupied: Tile[] = [];
 
   shouldRemoveFromGame = false;
   blocksMovement = true;
+  blocksView = false;
   canAct = true;
 
   currAngle = random.int(0, 359);

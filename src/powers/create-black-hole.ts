@@ -1,4 +1,5 @@
 import { Actor } from '@/entities/actor';
+import { EntityLayer } from '@/entities/map-entity';
 import { useGame } from '@/stores/game';
 import type { Tile } from '@/stores/map';
 import bresenham from '@/utils/bresnham';
@@ -58,6 +59,9 @@ export class BlackHole extends Actor {
   canAct = true;
 
   blocksMovement = true;
+  blocksView = true;
+
+  layer = EntityLayer.Object;
 
   ticksBeforeDeath = 100;
 

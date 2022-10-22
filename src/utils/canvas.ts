@@ -1,6 +1,6 @@
 import type MapEntity from '@/entities/map-entity';
 import { BlackHole } from '@/powers/create-black-hole';
-import type { TerrainData, Tile } from '@/stores/map';
+import { FLOOR_TERRAIN_DATA, type TerrainData, type Tile } from '@/stores/map';
 import { scale } from 'chroma-js';
 import { random } from './random';
 import { isAsciiDrawable } from './types';
@@ -58,20 +58,20 @@ export function drawTileMainCanvas({
   const terrainLastSeen = tile.terrainLastSeenByPlayer;
 
   if (visible) {
-    drawTerrain(ctx, tile.terrain, position);
+    drawTerrain(ctx, position, tile.terrain);
 
     entities.forEach((e) => drawEntity(ctx, position, e));
   } else if (terrainLastSeen) {
-    drawTerrain(ctx, terrainLastSeen, position);
+    drawTerrain(ctx, position, terrainLastSeen);
   }
 }
 
 function drawTerrain(
   ctx: CanvasRenderingContext2D,
-  terrain: TerrainData,
-  position: Coords
+  position: Coords,
+  terrain: TerrainData = FLOOR_TERRAIN_DATA
 ) {
-  if (terrain.type === 'lava') {
+  if (terrain?.type === 'lava') {
     const pallette = scale(['#db1e14', '#ff8936']);
 
     // Create a 4 x 4 grid of different colors in the cell
@@ -91,7 +91,7 @@ function drawTerrain(
       });
     });
   } else {
-    fillText(ctx, terrain.char, position, terrain.color);
+    fillText(ctx, terrain.char as string, position, terrain.color as string);
   }
 }
 
