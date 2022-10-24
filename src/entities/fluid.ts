@@ -3,6 +3,7 @@ import { useMap, type Tile } from '@/stores/map';
 import { random } from '@/utils/random';
 import { Actor } from './actor';
 import { isDamageable } from './damageable';
+import { Steam } from './gas';
 import MapEntity, { EntityLayer } from './map-entity';
 
 export function isFluid(entity: MapEntity): entity is Fluid {
@@ -119,13 +120,22 @@ export class Water extends Fluid {
 }
 
 function reactFluids(a: Fluid, b: Fluid) {
-  const names = [a.name, b.name];
+  const game = useGame();
+
+  const fluids = [a, b];
+
+  const names = fluids.map((f) => f.name);
 
   if (names.includes('water') && names.includes('lava')) {
-    a.reactedThisTick = true;
-    b.reactedThisTick = true;
-    a.shouldRemoveFromGame = true;
-    b.shouldRemoveFromGame = true;
+    fluids.forEach((f) => {
+      f.reactedThisTick = true;
+      f.shouldRemoveFromGame = true;
+
+      const steam = new Steam(f.tile, f.pressure);
+
+      game.addMapEntity(steam);
+    });
+
     return;
   }
 }
