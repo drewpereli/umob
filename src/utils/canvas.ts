@@ -1,13 +1,16 @@
-import { Lava, Oil, Water } from '@/entities/fluid';
+import { isFlammable } from '@/entities/flammable';
+import { isFluid } from '@/entities/fluid';
 import { Gas } from '@/entities/gas';
 import type MapEntity from '@/entities/map-entity';
 import { BlackHole } from '@/powers/create-black-hole';
-import { FLOOR_TERRAIN_DATA, type TerrainData, type Tile } from '@/stores/map';
-import { scale } from 'chroma-js';
+import { FLOOR_TERRAIN_DATA, type TerrainData } from '@/stores/map';
+import chroma, { scale } from 'chroma-js';
 import { random } from './random';
 import { isAsciiDrawable } from './types';
 
 export const CELL_LENGTH = 28;
+
+const burningPallette = scale(['orange', 'red']);
 
 export function fillRect(
   ctx: CanvasRenderingContext2D,
@@ -57,6 +60,37 @@ export function drawEntity(
 ) {
   if (entity instanceof Gas) {
     fillRect(ctx, position, entity.color);
+  } else if (isFluid(entity)) {
+    const baseColor = entity.baseColor;
+
+    const darker = chroma(baseColor).darken(0.3);
+    const lighter = chroma(baseColor).brighten(0.3);
+
+    const pallette = scale([darker, lighter]);
+
+    const burning = isFlammable(entity) && entity.isBurning;
+
+    // Create a 4 x 4 grid of different colors in the cell
+    Array.from({ length: 4 }).forEach((_, y) => {
+      const offsetY = y / 4;
+      Array.from({ length: 4 }).forEach((_, x) => {
+        const offsetX = x / 4;
+
+        let chromaColor = pallette(random.float());
+
+        if (burning) {
+          const burningColor = burningPallette(random.float());
+          chromaColor = chromaColor.mix(burningColor, 0.1);
+        }
+
+        ctx.fillStyle = chromaColor.hex();
+        const xPx = (position.x + offsetX) * CELL_LENGTH;
+        const yPx = (position.y + offsetY) * CELL_LENGTH;
+        const length = CELL_LENGTH / 4;
+
+        ctx.fillRect(xPx, yPx, length, length);
+      });
+    });
   } else if (entity instanceof BlackHole) {
     const pxCoords = positionToPx(position, 'center');
 
@@ -66,46 +100,6 @@ export function drawEntity(
     ctx.beginPath();
     ctx.arc(pxCoords.x, pxCoords.y, radius, 0, 2 * Math.PI);
     ctx.fill();
-  } else if (entity instanceof Lava) {
-    const pallette = scale(['#db1e14', '#ff8936']);
-
-    // Create a 4 x 4 grid of different colors in the cell
-    Array.from({ length: 4 }).forEach((_, y) => {
-      const offsetY = y / 4;
-      Array.from({ length: 4 }).forEach((_, x) => {
-        const offsetX = x / 4;
-
-        const color = pallette(random.float()).css();
-
-        ctx.fillStyle = color;
-        const xPx = (position.x + offsetX) * CELL_LENGTH;
-        const yPx = (position.y + offsetY) * CELL_LENGTH;
-        const length = CELL_LENGTH / 4;
-
-        ctx.fillRect(xPx, yPx, length, length);
-      });
-    });
-  } else if (entity instanceof Water) {
-    const pallette = scale(['#4287f5', '#1b51a8']);
-
-    // Create a 4 x 4 grid of different colors in the cell
-    Array.from({ length: 4 }).forEach((_, y) => {
-      const offsetY = y / 4;
-      Array.from({ length: 4 }).forEach((_, x) => {
-        const offsetX = x / 4;
-
-        const color = pallette(random.float()).css();
-
-        ctx.fillStyle = color;
-        const xPx = (position.x + offsetX) * CELL_LENGTH;
-        const yPx = (position.y + offsetY) * CELL_LENGTH;
-        const length = CELL_LENGTH / 4;
-
-        ctx.fillRect(xPx, yPx, length, length);
-      });
-    });
-  } else if (entity instanceof Oil) {
-    fillRect(ctx, position, entity.isBurning ? 'orange' : 'purple');
   } else if (isAsciiDrawable(entity)) {
     fillText(ctx, entity.char, position, entity.color);
   }

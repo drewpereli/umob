@@ -22,6 +22,7 @@ export abstract class Fluid extends Actor {
   }
 
   abstract readonly name: string;
+  abstract readonly baseColor: string;
 
   blocksMovement = false;
   blocksView = false;
@@ -105,6 +106,7 @@ export abstract class Fluid extends Actor {
 
 export class Lava extends Fluid {
   name = 'lava';
+  baseColor = '#f00';
   moveTimeMultiplier = 4;
 
   _act() {
@@ -122,11 +124,13 @@ export class Lava extends Fluid {
 
 export class Water extends Fluid {
   name = 'water';
+  baseColor = '#4287f5';
   moveTimeMultiplier = 2;
 }
 
 export class Oil extends Fluid implements Flammable {
   name = 'oil';
+  baseColor = '#301934';
   isBurning = false;
   burningDuration = 0;
   maxBurningDuration = 300;
