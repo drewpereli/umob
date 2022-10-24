@@ -104,21 +104,27 @@ export abstract class Fluid extends Actor {
   }
 }
 
-export class Lava extends Fluid {
+export class Lava extends Fluid implements Flammable {
   name = 'lava';
   baseColor = '#f00';
   moveTimeMultiplier = 4;
 
-  _act() {
-    super._act();
+  isBurning = true;
+  burnCollocatedChance = 1;
+  burnAdjacentChance = 0.1;
+  burningDuration = 0;
+  readonly IMPLEMENTS_FLAMMABLE = true;
 
-    this.tile.entities.forEach((entity) => {
-      if (entity === this) return;
+  startBurning() {
+    return;
+  }
 
-      if (isDamageable(entity)) {
-        entity.receiveDamage(20);
-      }
-    });
+  burn() {
+    defaultBurn(this);
+  }
+
+  stopBurning() {
+    return;
   }
 }
 
@@ -134,6 +140,7 @@ export class Oil extends Fluid implements Flammable {
   isBurning = false;
   burningDuration = 0;
   maxBurningDuration = 300;
+  burnCollocatedChance = 1;
   burnAdjacentChance = 1;
   readonly IMPLEMENTS_FLAMMABLE = true;
 
@@ -180,12 +187,5 @@ function reactFluids(a: Fluid, b: Fluid) {
     });
 
     return;
-  }
-
-  if (names.includes('lava') && names.includes('oil')) {
-    const oil: Oil = fluids.find((f) => f instanceof Oil) as Oil;
-    if (!oil.isBurning) {
-      oil.startBurning();
-    }
   }
 }

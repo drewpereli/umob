@@ -12,9 +12,10 @@ import type { Actor } from './actor';
 
 export type Flammable = Actor & {
   isBurning: boolean;
+  burnCollocatedChance: number;
   burnAdjacentChance: number;
   burningDuration: number;
-  maxBurningDuration: number;
+  maxBurningDuration?: number;
   readonly IMPLEMENTS_FLAMMABLE: true;
   startBurning: () => unknown;
   burn: () => unknown;
@@ -30,7 +31,10 @@ export function defaultStartBurning(flammable: Flammable) {
 }
 
 export function defaultBurn(flammable: Flammable) {
-  if (flammable.burningDuration >= flammable.maxBurningDuration) {
+  if (
+    typeof flammable.maxBurningDuration === 'number' &&
+    flammable.burningDuration >= flammable.maxBurningDuration
+  ) {
     flammable.stopBurning();
     return;
   }
@@ -38,6 +42,19 @@ export function defaultBurn(flammable: Flammable) {
   flammable.burningDuration++;
 
   const map = useMap();
+
+  const collocatedFlammables = flammable.tile.entities
+    .filter((e) => e !== flammable)
+    .filter(isFlammable)
+    .filter((e) => !e.isBurning);
+
+  collocatedFlammables.forEach((entity) => {
+    const willBurn = random.float(0, 1) < flammable.burnCollocatedChance;
+
+    if (willBurn) {
+      entity.startBurning();
+    }
+  });
 
   const adjacentFlammables = map
     .adjacentTiles(flammable.tile)
@@ -55,5 +72,6 @@ export function defaultBurn(flammable: Flammable) {
 }
 
 export function defaultStopBurning(flammable: Flammable) {
+  flammable.isBurning = false;
   flammable.shouldRemoveFromGame = true;
 }
