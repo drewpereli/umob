@@ -166,6 +166,7 @@ export class Oil extends Fluid implements Flammable {
 
   stopBurning() {
     defaultStopBurning(this);
+    this.shouldRemoveFromGame = true;
   }
 }
 

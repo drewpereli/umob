@@ -73,5 +73,5 @@ export function defaultBurn(flammable: Flammable) {
 
 export function defaultStopBurning(flammable: Flammable) {
   flammable.isBurning = false;
-  flammable.shouldRemoveFromGame = true;
+  flammable.burningDuration = 0;
 }
