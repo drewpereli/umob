@@ -1,4 +1,4 @@
-import { Lava, Water } from '@/entities/fluid';
+import { Lava, Oil, Water } from '@/entities/fluid';
 import { Gas } from '@/entities/gas';
 import type MapEntity from '@/entities/map-entity';
 import { BlackHole } from '@/powers/create-black-hole';
@@ -104,6 +104,8 @@ export function drawEntity(
         ctx.fillRect(xPx, yPx, length, length);
       });
     });
+  } else if (entity instanceof Oil) {
+    fillRect(ctx, position, entity.isBurning ? 'orange' : 'purple');
   } else if (isAsciiDrawable(entity)) {
     fillText(ctx, entity.char, position, entity.color);
   }

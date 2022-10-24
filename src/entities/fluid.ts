@@ -3,6 +3,12 @@ import { useMap, type Tile } from '@/stores/map';
 import { random } from '@/utils/random';
 import { Actor } from './actor';
 import { isDamageable } from './damageable';
+import {
+  defaultBurn,
+  defaultStartBurning,
+  defaultStopBurning,
+  type Flammable,
+} from './flammable';
 import { Steam } from './gas';
 import MapEntity, { EntityLayer } from './map-entity';
 
@@ -119,6 +125,39 @@ export class Water extends Fluid {
   moveTimeMultiplier = 2;
 }
 
+export class Oil extends Fluid implements Flammable {
+  name = 'oil';
+  isBurning = false;
+  burningDuration = 0;
+  maxBurningDuration = 300;
+  burnAdjacentChance = 1;
+  readonly IMPLEMENTS_FLAMMABLE = true;
+
+  _act(): void {
+    super._act();
+
+    if (this.isBurning) {
+      this.burningDuration += 1;
+
+      if (this.burningDuration >= this.maxBurningDuration) {
+        this.shouldRemoveFromGame = true;
+      }
+    }
+  }
+
+  startBurning() {
+    defaultStartBurning(this);
+  }
+
+  burn() {
+    defaultBurn(this);
+  }
+
+  stopBurning() {
+    defaultStopBurning(this);
+  }
+}
+
 function reactFluids(a: Fluid, b: Fluid) {
   const game = useGame();
 
@@ -137,5 +176,12 @@ function reactFluids(a: Fluid, b: Fluid) {
     });
 
     return;
+  }
+
+  if (names.includes('lava') && names.includes('oil')) {
+    const oil: Oil = fluids.find((f) => f instanceof Oil) as Oil;
+    if (!oil.isBurning) {
+      oil.startBurning();
+    }
   }
 }
