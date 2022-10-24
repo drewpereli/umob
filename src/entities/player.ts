@@ -1,9 +1,15 @@
 import { debugOptions } from '@/utils/debug-options';
 import Creature from './creature';
 import type { Damageable } from './damageable';
+import {
+  defaultBurn,
+  defaultStartBurning,
+  defaultStopBurning,
+  type Flammable,
+} from './flammable';
 import { AssaultRifle, Pistol, RailGun, SubMachineGun } from './gun';
 
-export class Player extends Creature {
+export class Player extends Creature implements Flammable {
   defaultChar = '@';
   color = 'yellow';
 
@@ -25,6 +31,13 @@ export class Player extends Creature {
   viewAngle = debugOptions.fullViewAngle ? 360 : 90;
 
   mass = 100;
+
+  isBurning = false;
+  burnCollocatedChance = 0.5;
+  burnAdjacentChance = 0.1;
+  burningDuration = 0;
+  maxBurningDuration = 20;
+  readonly IMPLEMENTS_FLAMMABLE = true;
 
   receiveDamage(damage: number) {
     super.receiveDamage(damage);
@@ -48,5 +61,18 @@ export class Player extends Creature {
     if (!this.canAct) return;
 
     this.timeUntilNextAction = 1;
+  }
+
+  startBurning() {
+    defaultStartBurning(this);
+  }
+
+  burn() {
+    defaultBurn(this);
+    this.receiveDamage(1);
+  }
+
+  stopBurning() {
+    defaultStopBurning(this);
   }
 }
