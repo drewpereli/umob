@@ -41,33 +41,7 @@ export function fillText(
   ctx.fillText(char, (pos.x + 0.5) * CELL_LENGTH, (pos.y + 0.5) * CELL_LENGTH);
 }
 
-export function drawTileMainCanvas({
-  ctx,
-  position,
-  tile,
-  entities,
-  visible,
-}: {
-  ctx: CanvasRenderingContext2D;
-  position: Coords;
-  tile: Tile;
-  entities: MapEntity[];
-  visible: boolean;
-}) {
-  fillRect(ctx, position, 'black');
-
-  const terrainLastSeen = tile.terrainLastSeenByPlayer;
-
-  if (visible) {
-    drawTerrain(ctx, position, tile.terrain);
-
-    entities.forEach((e) => drawEntity(ctx, position, e));
-  } else if (terrainLastSeen) {
-    drawTerrain(ctx, position, terrainLastSeen);
-  }
-}
-
-function drawTerrain(
+export function drawTerrain(
   ctx: CanvasRenderingContext2D,
   position: Coords,
   terrain: TerrainData = FLOOR_TERRAIN_DATA
@@ -75,7 +49,7 @@ function drawTerrain(
   fillText(ctx, terrain.char as string, position, terrain.color as string);
 }
 
-function drawEntity(
+export function drawEntity(
   ctx: CanvasRenderingContext2D,
   position: Coords,
   entity: MapEntity
@@ -130,58 +104,6 @@ function drawEntity(
   } else if (isAsciiDrawable(entity)) {
     fillText(ctx, entity.char, position, entity.color);
   }
-}
-
-export function drawTileVisibilityCanvas({
-  ctx,
-  position,
-  tile,
-  visible,
-}: {
-  ctx: CanvasRenderingContext2D;
-  position: Coords;
-  tile: Tile;
-  visible: boolean;
-}) {
-  let color = 'black';
-
-  if (visible) {
-    color = 'transparent';
-  } else if (tile.terrainLastSeenByPlayer) {
-    color = 'rgba(0,0,0,0.6)';
-  }
-
-  fillRect(ctx, position, color);
-}
-
-export function drawTileUiCanvas({
-  ctx,
-  position,
-  visible,
-  tileIsAimedAt,
-  tileSelected,
-  tileHasDamageableAimedAt,
-}: {
-  ctx: CanvasRenderingContext2D;
-  position: Coords;
-  visible: boolean;
-  tileIsAimedAt: boolean;
-  tileSelected: boolean;
-  tileHasDamageableAimedAt: boolean;
-}) {
-  let color: string | null = null;
-
-  if (tileHasDamageableAimedAt && visible) {
-    color = 'rgba(136,0,0,0.5)';
-  } else if (tileSelected) {
-    color = 'rgba(136,136,0,0.75)';
-  } else if (tileIsAimedAt) {
-    color = 'rgba(85,85,0,0.75)';
-  }
-
-  if (!color) return;
-
-  fillRect(ctx, position, color);
 }
 
 function positionToPx(coords: Coords, positionInCell?: 'center'): Coords {

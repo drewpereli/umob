@@ -1,4 +1,5 @@
 <script lang="ts">
+import { EntityLayer } from '@/entities/map-entity';
 import { useAnimations } from '@/stores/animations';
 import { useGame } from '@/stores/game';
 import { ActionUiState } from '@/utils/action-handlers';
@@ -17,6 +18,14 @@ export default defineComponent({
     },
     gameOver() {
       return this.game.actionUiState === ActionUiState.GameOver;
+    },
+    canvasNames() {
+      return [
+        ...Object.values(EntityLayer),
+        'animationObjects',
+        'visibility',
+        'ui',
+      ];
     },
   },
   mounted() {
@@ -48,21 +57,13 @@ export default defineComponent({
     ref="gameTiles"
     :style="{ width: `${canvasLength}px` }"
   >
-    <canvas data-layer="main" :width="canvasLength" :height="canvasLength" />
-
     <canvas
-      data-layer="animationObjects"
+      v-for="(name, idx) in canvasNames"
+      :key="idx"
+      :data-layer="name"
       :width="canvasLength"
       :height="canvasLength"
     />
-
-    <canvas
-      data-layer="visibility"
-      :width="canvasLength"
-      :height="canvasLength"
-    />
-
-    <canvas data-layer="ui" :width="canvasLength" :height="canvasLength" />
 
     <div v-if="gameOver" class="game-over-container">
       <div class="message">You Died</div>

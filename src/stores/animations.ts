@@ -54,7 +54,7 @@ export class DamageAnimation extends GameAnimation {
   actor;
 
   async run(ctxs: Record<string, CanvasRenderingContext2D>) {
-    const ctx = ctxs.main;
+    const ctx = ctxs[this.actor.layer];
 
     const actor = this.actor;
 
