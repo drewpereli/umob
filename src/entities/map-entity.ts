@@ -6,6 +6,7 @@ export enum EntityLayer {
   Object = 'object',
   Item = 'item',
   Creature = 'creature',
+  Gas = 'gas',
 }
 
 // Basically any item, creature, etc that can exist on the map

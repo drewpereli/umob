@@ -1,4 +1,5 @@
 import { Lava, Water } from '@/entities/fluid';
+import { Gas } from '@/entities/gas';
 import type MapEntity from '@/entities/map-entity';
 import { BlackHole } from '@/powers/create-black-hole';
 import { FLOOR_TERRAIN_DATA, type TerrainData, type Tile } from '@/stores/map';
@@ -54,7 +55,9 @@ export function drawEntity(
   position: Coords,
   entity: MapEntity
 ) {
-  if (entity instanceof BlackHole) {
+  if (entity instanceof Gas) {
+    fillRect(ctx, position, entity.color);
+  } else if (entity instanceof BlackHole) {
     const pxCoords = positionToPx(position, 'center');
 
     const radius = CELL_LENGTH / 2 - 2;
