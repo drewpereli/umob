@@ -147,7 +147,19 @@ export class Tile {
 
   terrainLastSeenByPlayer?: TerrainData;
 
-  moveTimeMultiplier: number | null = 1;
+  get moveTimeMultiplier() {
+    const terrainMultiplier = this.terrain
+      ? this.terrain.moveTimeMultiplier
+      : 1;
+
+    if (terrainMultiplier === null) {
+      return null;
+    }
+
+    const fluidMultiplier = this.fluid?.moveTimeMultiplier ?? 1;
+
+    return terrainMultiplier * fluidMultiplier;
+  }
 
   get hasEntityThatBlocksMovement() {
     return this.entities.some((e) => e.blocksMovement);

@@ -19,6 +19,7 @@ export abstract class Fluid extends Actor {
   blocksMovement = false;
   blocksView = false;
   mass = 0;
+  moveTimeMultiplier = 1;
   shouldRemoveFromGame = false;
 
   reactedThisTick = false; // Whether this fluid has already reacted with another fluid this tick
@@ -97,6 +98,7 @@ export abstract class Fluid extends Actor {
 
 export class Lava extends Fluid {
   name = 'lava';
+  moveTimeMultiplier = 4;
 
   _act() {
     super._act();
@@ -113,6 +115,7 @@ export class Lava extends Fluid {
 
 export class Water extends Fluid {
   name = 'water';
+  moveTimeMultiplier = 2;
 }
 
 function reactFluids(a: Fluid, b: Fluid) {
