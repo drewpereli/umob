@@ -1,6 +1,6 @@
 import { TargetedPower } from './targeted-power';
 import bresenham from '@/utils/bresnham';
-import { ProximityMine } from '@/entities/trap';
+import { ProximityMine } from '@/entities/traps/trap';
 
 export class CreateProximityMine extends TargetedPower {
   range = 5;

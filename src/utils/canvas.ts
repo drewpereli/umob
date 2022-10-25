@@ -2,7 +2,7 @@ import { isFlammable } from '@/entities/flammable';
 import { isFluid } from '@/entities/fluid';
 import { Gas } from '@/entities/gas';
 import type MapEntity from '@/entities/map-entity';
-import { Orientation, TripWire } from '@/entities/trap';
+import { Orientation, TripWire } from '@/entities/traps/trap';
 import { BlackHole } from '@/powers/create-black-hole';
 import { FLOOR_TERRAIN_DATA, Tile, type TerrainData } from '@/stores/map';
 import chroma, { scale } from 'chroma-js';
