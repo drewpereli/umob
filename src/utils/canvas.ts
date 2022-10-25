@@ -2,6 +2,7 @@ import { isFlammable } from '@/entities/flammable';
 import { isFluid } from '@/entities/fluid';
 import { Gas } from '@/entities/gas';
 import type MapEntity from '@/entities/map-entity';
+import { FireTripWire } from '@/entities/traps/fire-tripwire';
 import { Orientation } from '@/entities/traps/trap';
 import { TripWire } from '@/entities/traps/tripwire';
 import { BlackHole } from '@/powers/create-black-hole';
@@ -120,10 +121,12 @@ export function drawEntityTile(
     ctx.arc(pxCoords.x, pxCoords.y, radius, 0, 2 * Math.PI);
     ctx.fill();
   } else if (entity instanceof TripWire) {
+    const color = entity instanceof FireTripWire ? 'red' : 'white';
+
     const centerPx = positionToPx(position, 'center');
 
     if (entity.anchorTiles.has(tile)) {
-      fillCirclePxPosition(ctx, centerPx, 4, 'white');
+      fillCirclePxPosition(ctx, centerPx, 4, color);
 
       const dir = entity.anchorTiles.get(tile);
 
@@ -148,7 +151,7 @@ export function drawEntityTile(
         rectStartPx.y -= 1;
       }
 
-      fillRectPx(ctx, rectStartPx, rectEndPx, 'white');
+      fillRectPx(ctx, rectStartPx, rectEndPx, color);
     } else {
       if (entity.orientation === Orientation.Horizontal) {
         const rectStartPx = {
@@ -161,7 +164,7 @@ export function drawEntityTile(
           x: centerPx.x + CELL_LENGTH / 2,
         };
 
-        fillRectPx(ctx, rectStartPx, rectEndPx, 'white');
+        fillRectPx(ctx, rectStartPx, rectEndPx, color);
       } else {
         const rectStartPx = {
           x: centerPx.x + 1,
@@ -173,7 +176,7 @@ export function drawEntityTile(
           y: centerPx.y + CELL_LENGTH / 2,
         };
 
-        fillRectPx(ctx, rectStartPx, rectEndPx, 'white');
+        fillRectPx(ctx, rectStartPx, rectEndPx, color);
       }
     }
   } else if (isAsciiDrawable(entity)) {
