@@ -3,6 +3,7 @@ import { useMap } from '@/stores/map';
 import { TargetedPower } from './targeted-power';
 
 export class CreateWaterPool extends TargetedPower {
+  readonly name = 'create water pool';
   range = 5;
   energyCost = 10;
   useTime = 2;

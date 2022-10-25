@@ -2,6 +2,7 @@ import { TargetedPower } from './targeted-power';
 import { ProximityMine } from '@/entities/traps/proximity-mine';
 
 export class CreateProximityMine extends TargetedPower {
+  readonly name = 'create proximity mine';
   range = 5;
 
   useTime = 1;

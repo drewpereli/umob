@@ -8,6 +8,7 @@ import { random } from '@/utils/random';
 import { TargetedPower } from './targeted-power';
 
 export class CreateBlackHole extends TargetedPower {
+  readonly name = 'create black hole';
   useTime = 2;
   energyCost = 50;
   range = 8;

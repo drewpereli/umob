@@ -4,6 +4,7 @@ import { useGame } from '@/stores/game';
 import { TripWire } from '@/entities/traps/tripwire';
 
 export class CreateTripWire extends TargetedPower {
+  name = 'create tripwire';
   range = 5;
 
   useTime = 1;

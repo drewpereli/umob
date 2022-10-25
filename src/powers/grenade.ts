@@ -3,6 +3,7 @@ import { createExplosion } from '@/utils/explosions';
 import { TargetedPower } from './targeted-power';
 
 export class Grenade extends TargetedPower {
+  readonly name = 'grenade';
   useTime = 2;
   energyCost = 20;
   range = 8;

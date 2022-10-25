@@ -2,6 +2,8 @@ import { CreateTripWire } from './create-trip-wire';
 import { FireTripWire } from '@/entities/traps/fire-tripwire';
 
 export class CreateFireTripWire extends CreateTripWire {
+  readonly name = 'create fire tripwire';
+
   activate() {
     const closest = this.closestValidToSelected();
 
