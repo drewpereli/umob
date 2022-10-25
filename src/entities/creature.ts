@@ -25,6 +25,7 @@ import { Pistol } from './gun';
 import { BuildCover } from '@/powers/build-cover';
 import type { AsciiDrawable } from '@/utils/types';
 import { EntityLayer } from './map-entity';
+import type { StatusEffect } from '@/status-effects/status-effect';
 
 export type Covers = Record<Dir, Cover>;
 
