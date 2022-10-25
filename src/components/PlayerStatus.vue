@@ -24,6 +24,19 @@ export default defineComponent({
     statusEffects() {
       return this.game.player.statusEffects;
     },
+    powerHotKeys() {
+      return Object.entries(this.game.player.powerHotkeys)
+        .filter(([_, power]) => !!power)
+        .map(([key, power]) => {
+          return { key, power };
+        })
+        .sort((a, b) => {
+          const aSort = a.key === '0' ? 10 : Number(a.key);
+          const bSort = b.key === '0' ? 10 : Number(b.key);
+
+          return aSort - bSort;
+        });
+    },
   },
 });
 </script>
@@ -40,6 +53,13 @@ export default defineComponent({
       :key="idx"
       :statusEffect="statusEffect"
     />
+
+    <div>
+      <h3>Powers:</h3>
+      <div v-for="powerData in powerHotKeys" :key="powerData.key">
+        {{ powerData.key }}. {{ powerData.power.name }}
+      </div>
+    </div>
   </div>
 </template>
 
