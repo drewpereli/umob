@@ -2,7 +2,7 @@ import { Actor } from '@/entities/actor';
 import { EntityLayer } from '@/entities/map-entity';
 import { useGame } from '@/stores/game';
 import type { Tile } from '@/stores/map';
-import bresenham from '@/utils/bresnham';
+import bresenham from '@/utils/bresenham';
 import { dirsBetween, distance } from '@/utils/map';
 import { random } from '@/utils/random';
 import { TargetedPower } from './targeted-power';

@@ -1,6 +1,6 @@
 import type Creature from '@/entities/creature';
 import { Power } from './power';
-import bresenham from '../utils/bresnham';
+import bresenham from '../utils/bresenham';
 import { distance } from '../utils/map';
 
 export abstract class TargetedPower extends Power {

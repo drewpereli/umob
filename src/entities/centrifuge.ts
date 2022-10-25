@@ -1,6 +1,6 @@
 import { useGame } from '@/stores/game';
 import { useMap, type Tile } from '@/stores/map';
-import bresenham from '@/utils/bresnham';
+import bresenham from '@/utils/bresenham';
 import { coordsEqual } from '@/utils/map';
 import { angle, angularDifference, polarToCartesian } from '@/utils/math';
 import { random } from '@/utils/random';

@@ -1,4 +1,4 @@
-import bresenham from '@/utils/bresnham';
+import bresenham from '@/utils/bresenham';
 import { generate } from '@/utils/map-generation';
 import { defineStore } from 'pinia';
 import type Creature from '@/entities/creature';
