@@ -1,9 +1,9 @@
+import { Item } from './items/item';
+
 export const DEFAULT_FLANKING_BONUS = 0.5;
 
-export default abstract class Gun {
-  abstract name: string;
+export default abstract class Gun extends Item {
   abstract damage: number;
-  abstract description: string;
   penetration = 0;
   attackTimeMultiplier = 1;
   range = Infinity;
@@ -14,6 +14,9 @@ export default abstract class Gun {
   abstract clipSize: number;
   abstract amoLoaded: number;
   reloadTimeMultiplier = 1;
+
+  char = '¬';
+  color = '#32CD32';
 }
 
 export class ShotGun extends Gun {

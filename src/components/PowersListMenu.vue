@@ -7,7 +7,7 @@ function computeMenuItems() {
   const game = useGame();
   const menu = game.menu;
 
-  menu.items = game.player.powers.map((power, idx) => {
+  const items = game.player.powers.map((power, idx) => {
     const currHotkey = Object.keys(game.player.powerHotkeys).find(
       (hotKey) => game.player.powerHotkeys[hotKey] === power
     );
@@ -20,6 +20,8 @@ function computeMenuItems() {
       },
     };
   });
+
+  menu.setItems(items);
 }
 
 export default defineComponent({

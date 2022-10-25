@@ -4,17 +4,20 @@ import { Grenade } from '@/powers/grenade';
 import { Heal } from '@/powers/heal';
 import type { Power } from '@/powers/power';
 import { Burning } from '@/status-effects/burning';
+import type { Tile } from '@/stores/map';
 import { debugOptions } from '@/utils/debug-options';
 import Creature from './creature';
 import type { Damageable } from './damageable';
 import { defaultBurn, defaultStopBurning, type Flammable } from './flammable';
-import { AssaultRifle, Pistol, RailGun, SubMachineGun } from './gun';
+import Gun, { AssaultRifle, Pistol, RailGun, SubMachineGun } from './gun';
+import type { Item } from './items/item';
+import { ItemInMap } from './items/item-in-map';
 
 export class Player extends Creature implements Flammable {
   defaultChar = '@';
   color = 'yellow';
 
-  inventory = [
+  inventory: Item[] = [
     new Pistol(),
     new RailGun(),
     new SubMachineGun(),
@@ -42,7 +45,7 @@ export class Player extends Creature implements Flammable {
 
   blocksView = false;
 
-  equippedWeapon = this.inventory[0];
+  equippedWeapon = this.inventory[0] as Gun;
 
   health = debugOptions.infiniteHealth ? Infinity : 100;
   maxHealth = debugOptions.infiniteHealth ? Infinity : 100;
@@ -103,5 +106,33 @@ export class Player extends Creature implements Flammable {
 
   stopBurning() {
     defaultStopBurning(this);
+  }
+
+  pickupItem(item: Item) {
+    this.inventory.push(item);
+  }
+
+  dropItem(item: Item) {
+    const idx = this.inventory.indexOf(item);
+
+    if (idx === -1) return;
+
+    const inventory = this.inventory;
+    inventory.splice(idx, 1);
+    this.inventory = [...inventory];
+
+    const mapItem = new ItemInMap(this.tile, item);
+
+    this.game.addMapEntity(mapItem);
+    this.game.view.draw();
+  }
+
+  updatePosition(tile: Tile) {
+    super.updatePosition(tile);
+
+    tile.items.forEach((itemInMap) => {
+      this.pickupItem(itemInMap.item);
+      itemInMap.shouldRemoveFromGame = true;
+    });
   }
 }

@@ -1,4 +1,5 @@
 import type Gun from '@/entities/gun';
+import type { Item } from '@/entities/items/item';
 import { NonTargetedPower } from '@/powers/non-targeted-power';
 import type { Power } from '@/powers/power';
 import { TargetedPower } from '@/powers/targeted-power';
@@ -126,6 +127,10 @@ export const actionHandlers: Partial<
     Escape: (game) => (game.actionUiState = ActionUiState.Default),
     ArrowUp: (game) => game.menu.previousItem(),
     ArrowDown: (game) => game.menu.nextItem(),
+    d: (game) => {
+      const item = game.menu.selectedItem.model as Item;
+      game.player.dropItem(item);
+    },
     Enter: (game) => {
       const weapon = game.menu.selectedItem.model as Gun;
       game.player.equippedWeapon = weapon;

@@ -21,12 +21,12 @@ import type { Power } from '@/powers/power';
 import { random } from '@/utils/random';
 import { Actor } from './actor';
 import { isDamageable, type Damageable } from './damageable';
-import { Pistol } from './gun';
-import { BuildCover } from '@/powers/build-cover';
+import Gun, { Pistol } from './gun';
 import type { AsciiDrawable } from '@/utils/types';
 import MapEntity, { EntityLayer } from './map-entity';
 import type { StatusEffect } from '@/status-effects/status-effect';
 import { isTrap } from './traps/trap';
+import type { Item } from './items/item';
 
 export type Covers = Record<Dir, Cover>;
 
@@ -81,8 +81,8 @@ export default abstract class Creature
   facing: Dir = random.arrayElement([Dir.Up, Dir.Right, Dir.Down, Dir.Left]);
   viewAngle: number = 90;
 
-  inventory = [new Pistol()];
-  equippedWeapon = this.inventory[0];
+  inventory: Item[] = [new Pistol()];
+  equippedWeapon: Gun = this.inventory[0] as Gun;
 
   powers: Power[] = [];
   selectedPower: Power | null = null;

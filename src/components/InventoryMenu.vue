@@ -6,14 +6,28 @@ import { defineComponent } from 'vue';
 import UiMenu from './UiMenu.vue';
 import WeaponStats from './WeaponStats.vue';
 
+function setMenuItems() {
+  const game = useGame();
+  const menu = game.menu;
+
+  const items = game.player.inventory.map((item) => {
+    return { label: item.name, model: item, description: item.description };
+  });
+
+  menu.setItems(items);
+}
+
 export default defineComponent({
   setup() {
     const game = useGame();
     const menu = game.menu;
-    menu.items = game.player.inventory.map((item) => {
-      return { label: item.name, model: item, description: item.description };
-    });
-    return { menu };
+    setMenuItems();
+    return { menu, game };
+  },
+  watch: {
+    'game.player.inventory'() {
+      setMenuItems();
+    },
   },
   components: { UiMenu, WeaponStats },
 });

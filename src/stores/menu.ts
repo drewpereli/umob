@@ -25,6 +25,13 @@ export const useMenu = defineStore('menu', {
 
       if (this.selectedItemIdx === this.items.length) this.selectedItemIdx = 0;
     },
+    setItems(items: MenuItem[]) {
+      this.items = items;
+
+      if (this.selectedItemIdx > items.length - 1) {
+        this.selectedItemIdx = items.length - 1;
+      }
+    },
   },
   getters: {
     selectedItem(state) {
