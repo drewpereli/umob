@@ -1,6 +1,8 @@
+import { Burning } from '@/status-effects/burning';
 import { useMap } from '@/stores/map';
 import { random } from '@/utils/random';
 import type { Actor } from './actor';
+import Creature from './creature';
 
 // Actors that are flammable.
 // If an actor is flammable, and its "isBurning" is true,
@@ -52,7 +54,11 @@ export function defaultBurn(flammable: Flammable) {
     const willBurn = random.float(0, 1) < flammable.burnCollocatedChance;
 
     if (willBurn) {
-      entity.startBurning();
+      if (entity instanceof Creature) {
+        entity.addStatusEffect(new Burning(entity));
+      } else {
+        entity.startBurning();
+      }
     }
   });
 
@@ -66,7 +72,11 @@ export function defaultBurn(flammable: Flammable) {
     const willBurn = random.float(0, 1) < flammable.burnAdjacentChance;
 
     if (willBurn) {
-      entity.startBurning();
+      if (entity instanceof Creature) {
+        entity.addStatusEffect(new Burning(entity));
+      } else {
+        entity.startBurning();
+      }
     }
   });
 }

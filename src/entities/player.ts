@@ -36,7 +36,6 @@ export class Player extends Creature implements Flammable {
   burnCollocatedChance = 0.5;
   burnAdjacentChance = 0.1;
   burningDuration = 0;
-  maxBurningDuration = 20;
   readonly IMPLEMENTS_FLAMMABLE = true;
 
   receiveDamage(damage: number) {
