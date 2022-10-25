@@ -3,9 +3,9 @@ import type { Tile } from '@/stores/map';
 import { createExplosion } from '@/utils/explosions';
 import { Dir } from '@/utils/map';
 import type { AsciiDrawable } from '@/utils/types';
-import { Actor } from './actor';
-import { isCreature } from './creature';
-import MapEntity, { EntityLayer } from './map-entity';
+import { Actor } from '../actor';
+import { isCreature } from '../creature';
+import MapEntity, { EntityLayer } from '../map-entity';
 
 export enum Orientation {
   Vertical = 'vertical',

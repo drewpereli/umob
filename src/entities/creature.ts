@@ -26,7 +26,7 @@ import { BuildCover } from '@/powers/build-cover';
 import type { AsciiDrawable } from '@/utils/types';
 import MapEntity, { EntityLayer } from './map-entity';
 import type { StatusEffect } from '@/status-effects/status-effect';
-import { isTrap } from './trap';
+import { isTrap } from './traps/trap';
 
 export type Covers = Record<Dir, Cover>;
 

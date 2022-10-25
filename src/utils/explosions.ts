@@ -1,5 +1,5 @@
 import { isDamageable } from '@/entities/damageable';
-import { isTrap } from '@/entities/trap';
+import { isTrap } from '@/entities/traps/trap';
 import { ExplosionAnimation } from '@/stores/animations';
 import { useGame } from '@/stores/game';
 import type { Tile } from '@/stores/map';
