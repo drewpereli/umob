@@ -47,22 +47,24 @@ export function defaultBurn(flammable: Flammable) {
 
   const collocatedFlammables = flammable.tile.entities
     .filter((e) => e !== flammable)
-    .filter(isFlammable)
-    .filter((e) => !e.isBurning);
+    .filter(isFlammable);
 
   collocatedFlammables.forEach((entity) => {
     const willBurn = random.float(0, 1) < flammable.burnCollocatedChance;
 
     if (willBurn) {
-      entity.startBurning();
+      if (entity instanceof Creature) {
+        entity.addStatusEffect(new Burning(entity));
+      } else if (!entity.isBurning) {
+        entity.startBurning();
+      }
     }
   });
 
   const adjacentFlammables = map
     .adjacentTiles(flammable.tile)
     .flatMap((tile) => tile.entities)
-    .filter(isFlammable)
-    .filter((entity) => !entity.isBurning);
+    .filter(isFlammable);
 
   adjacentFlammables.forEach((entity) => {
     const willBurn = random.float(0, 1) < flammable.burnAdjacentChance;
@@ -70,7 +72,7 @@ export function defaultBurn(flammable: Flammable) {
     if (willBurn) {
       if (entity instanceof Creature) {
         entity.addStatusEffect(new Burning(entity));
-      } else {
+      } else if (!entity.isBurning) {
         entity.startBurning();
       }
     }
