@@ -10,6 +10,7 @@ const activeOptions = {
   wanderingEnemies: false,
   extraEnemies: 0,
   infiniteHealth: true,
+  infiniteEnergy: true,
   infiniteAccuracy: false,
   infiniteViewRange: true,
   fullViewAngle: true,
