@@ -26,6 +26,7 @@ import { BuildCover } from '@/powers/build-cover';
 import type { AsciiDrawable } from '@/utils/types';
 import MapEntity, { EntityLayer } from './map-entity';
 import type { StatusEffect } from '@/status-effects/status-effect';
+import { isTrap } from './trap';
 
 export type Covers = Record<Dir, Cover>;
 
@@ -300,6 +301,8 @@ export default abstract class Creature
     let additionalActorDamaged: Creature | null = null;
     let hitWall = false;
 
+    const tilesMovedThrough: Tile[] = [];
+
     for (let i = 0; i < amount; i++) {
       const next = this.game.map.adjacentTile(toCoords, dir);
 
@@ -318,6 +321,8 @@ export default abstract class Creature
         hitWall = true;
         break;
       }
+
+      tilesMovedThrough.push(next);
 
       toCoords = next;
     }
@@ -338,6 +343,15 @@ export default abstract class Creature
         !!(hitWall || additionalActorDamaged)
       )
     );
+
+    // Trigger any traps in tiles moved through
+    tilesMovedThrough.forEach((tile) => {
+      tile.entities.forEach((entity) => {
+        if (isTrap(entity)) {
+          entity.trigger();
+        }
+      });
+    });
 
     const tile = this.game.map.tileAt(toCoords);
 
