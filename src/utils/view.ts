@@ -42,38 +42,13 @@ export class View {
 
     this.tiles.forEach((row, y) => {
       row.forEach((tile, x) => {
-        const entities = this.game.entitiesAt(tile);
         const isVisible = visibleTileIds.includes(tile.id);
-
-        // drawTileMainCanvas({
-        //   ctx: this.ctxs.main,
-        //   tile,
-        //   entities,
-        //   position: { x, y },
-        //   visible: visibleTileIds.includes(tile.id),
-        // });
-
-        // drawTileVisibilityCanvas({
-        //   ctx: this.ctxs.visibility,
-        //   position: { x, y },
-        //   visible,
-        //   tile,
-        // });
 
         const isAimedAt = aimedTileIds.includes(tile.id);
         const hasDamageableAimedAt = damageablesAimedAt.some((d) =>
           coordsEqual(d, tile)
         );
         const selected = tile.id === this.game.selectedTile?.id;
-
-        // drawTileUiCanvas({
-        //   ctx: this.ctxs.ui,
-        //   position: { x, y },
-        //   visible,
-        //   tileIsAimedAt,
-        //   tileHasDamageableAimedAt,
-        //   tileSelected,
-        // });
 
         this.drawTile({
           tile,
@@ -128,9 +103,9 @@ export class View {
     if (!isVisible) {
       if (tile.terrainLastSeenByPlayer) {
         drawTerrain(this.ctxs.terrain, position, tile.terrainLastSeenByPlayer);
-        fillRect(this.ctxs.visibility, position, 'black');
+        fillRect(this.ctxs.visibility, position, 'rgba(0,0,0,0.5)');
       } else {
-        fillRect(this.ctxs.visibility, position, 'rgba(0,0,0,0.6)');
+        fillRect(this.ctxs.visibility, position, 'black');
       }
 
       return;
