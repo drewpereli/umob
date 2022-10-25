@@ -1,7 +1,7 @@
 import { TargetedPower } from './targeted-power';
-import { ProximityMine } from '@/entities/traps/proximity-mine';
+import { FireProximityMine } from '@/entities/traps/proximity-mine';
 
-export class CreateProximityMine extends TargetedPower {
+export class CreateFireProximityMine extends TargetedPower {
   range = 5;
 
   useTime = 1;
@@ -14,7 +14,7 @@ export class CreateProximityMine extends TargetedPower {
 
     const tile = this.game.map.tileAt(closest);
 
-    const mine = new ProximityMine(tile);
+    const mine = new FireProximityMine(tile);
     this.game.addMapEntity(mine);
 
     return true;
