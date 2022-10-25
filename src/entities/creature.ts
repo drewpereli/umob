@@ -84,7 +84,7 @@ export default abstract class Creature
   inventory = [new Pistol()];
   equippedWeapon = this.inventory[0];
 
-  powers = [new BuildCover()];
+  powers: Power[] = [];
   selectedPower: Power | null = null;
 
   defaultChar = 'd';

@@ -1,13 +1,13 @@
+import { BuildCover } from '@/powers/build-cover';
+import { CreateBlackHole } from '@/powers/create-black-hole';
+import { Grenade } from '@/powers/grenade';
+import { Heal } from '@/powers/heal';
+import type { Power } from '@/powers/power';
 import { Burning } from '@/status-effects/burning';
 import { debugOptions } from '@/utils/debug-options';
 import Creature from './creature';
 import type { Damageable } from './damageable';
-import {
-  defaultBurn,
-  defaultStartBurning,
-  defaultStopBurning,
-  type Flammable,
-} from './flammable';
+import { defaultBurn, defaultStopBurning, type Flammable } from './flammable';
 import { AssaultRifle, Pistol, RailGun, SubMachineGun } from './gun';
 
 export class Player extends Creature implements Flammable {
@@ -20,6 +20,25 @@ export class Player extends Creature implements Flammable {
     new SubMachineGun(),
     new AssaultRifle(),
   ];
+
+  powers: Power[] = [
+    new BuildCover(),
+    new CreateBlackHole(),
+    new Grenade(),
+    new Heal(this),
+  ];
+
+  powerHotkeys: Record<string, Power> = this.powers.reduce(
+    (acc, power, idx) => {
+      if (idx >= 10) return acc;
+      const hotKey = idx === 9 ? '0' : `${idx + 1}`;
+
+      acc[hotKey] = power;
+
+      return acc;
+    },
+    {} as Record<string, Power>
+  );
 
   blocksView = false;
 

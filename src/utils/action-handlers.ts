@@ -1,5 +1,6 @@
 import type Gun from '@/entities/gun';
 import { NonTargetedPower } from '@/powers/non-targeted-power';
+import type { Power } from '@/powers/power';
 import { TargetedPower } from '@/powers/targeted-power';
 import type { useGame } from '@/stores/game';
 import { Dir } from './map';
@@ -11,6 +12,7 @@ export enum ActionUiState {
   Inventory = 'inventory',
   AimingPower = 'aiming-power',
   Examining = 'examining',
+  PowersList = 'powers-list',
 }
 
 type Game = ReturnType<typeof useGame>;
@@ -39,6 +41,7 @@ export const actionHandlers: Partial<
     },
     r: (game) => game.playerReload(),
     e: (game) => (game.actionUiState = ActionUiState.Inventory),
+    p: (game) => (game.actionUiState = ActionUiState.PowersList),
     x: (game) => {
       const playerTile = game.map.tileAt(game.player);
 
@@ -52,26 +55,38 @@ export const actionHandlers: Partial<
 
       game.actionUiState = ActionUiState.Examining;
     },
-    1: (game) => {
-      const power = game.player.powers[0];
-      game.player.selectedPower = power;
+    ...Array.from({ length: 10 })
+      .map((_, idx) => idx)
+      .reduce((acc, key) => {
+        acc[key] = (game) => {
+          const power = game.player.powerHotkeys[`${key}`];
 
-      if (power instanceof TargetedPower) {
-        const playerTile = game.map.tileAt(game.player);
+          if (!power) return;
 
-        const target = game.map.adjacentTile(playerTile, game.player.facing);
+          game.player.selectedPower = power;
 
-        if (!target) {
-          return;
-        }
+          if (power instanceof TargetedPower) {
+            const playerTile = game.map.tileAt(game.player);
 
-        game.setSelectedTile(target);
+            const target = game.map.adjacentTile(
+              playerTile,
+              game.player.facing
+            );
 
-        game.actionUiState = ActionUiState.AimingPower;
-      } else if (power instanceof NonTargetedPower) {
-        game.playerUsePower();
-      }
-    },
+            if (!target) {
+              return;
+            }
+
+            game.setSelectedTile(target);
+
+            game.actionUiState = ActionUiState.AimingPower;
+          } else if (power instanceof NonTargetedPower) {
+            game.playerUsePower();
+          }
+        };
+
+        return acc;
+      }, {} as Record<string, KeyHandler>),
     '.': (game) => {
       game.playerWait();
     },
@@ -116,6 +131,34 @@ export const actionHandlers: Partial<
       game.player.equippedWeapon = weapon;
       game.actionUiState = ActionUiState.Default;
     },
+  },
+  [ActionUiState.PowersList]: {
+    Escape: (game) => (game.actionUiState = ActionUiState.Default),
+    ArrowUp: (game) => game.menu.previousItem(),
+    ArrowDown: (game) => game.menu.nextItem(),
+    ...Array.from({ length: 10 })
+      .map((_, idx) => idx)
+      .reduce((acc, key) => {
+        acc[key] = (game) => {
+          const powerHotkeys = game.player.powerHotkeys;
+
+          const selectedPower = game.menu.selectedItem.model as Power;
+
+          const currentHotKeyForPower = Object.keys(powerHotkeys).find(
+            (hotKey) => powerHotkeys[hotKey] === selectedPower
+          );
+
+          powerHotkeys[`${key}`] = selectedPower;
+
+          if (currentHotKeyForPower) {
+            delete powerHotkeys[currentHotKeyForPower];
+          }
+
+          game.player.powerHotkeys = { ...powerHotkeys };
+        };
+
+        return acc;
+      }, {} as Record<string, KeyHandler>),
   },
   [ActionUiState.Examining]: {
     ArrowUp: (game) => updateAim(game, Dir.Up),

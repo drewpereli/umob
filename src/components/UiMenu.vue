@@ -15,6 +15,10 @@ export default defineComponent({
     title: {
       type: String,
     },
+    includeDescription: {
+      type: Boolean,
+      default: true,
+    },
   },
   computed: {
     selectedItem() {
@@ -42,7 +46,7 @@ export default defineComponent({
         </div>
       </div>
 
-      <div class="description">
+      <div v-if="includeDescription" class="description">
         <slot name="selected-item-description" :selectedItem="selectedItem">
           {{ selectedItem.description }}
         </slot>

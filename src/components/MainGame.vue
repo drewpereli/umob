@@ -7,9 +7,16 @@ import PlayerStatus from './PlayerStatus.vue';
 import InventoryMenu from './InventoryMenu.vue';
 import EntityDescription from './EntityDescription.vue';
 import { useAnimations } from '@/stores/animations';
+import PowersListMenu from './PowersListMenu.vue';
 
 export default defineComponent({
-  components: { GameTiles, PlayerStatus, InventoryMenu, EntityDescription },
+  components: {
+    GameTiles,
+    PlayerStatus,
+    InventoryMenu,
+    EntityDescription,
+    PowersListMenu,
+  },
   methods: {
     async onKey({ key }: KeyboardEvent) {
       if (this.onKeyIsRunning) return;
@@ -44,6 +51,9 @@ export default defineComponent({
     showInventoryMenu() {
       return this.game.actionUiState === ActionUiState.Inventory;
     },
+    showPowersList() {
+      return this.game.actionUiState === ActionUiState.PowersList;
+    },
     examinedEntity() {
       if (this.game.actionUiState !== ActionUiState.Examining) return null;
       if (!this.game.selectedTile) return null;
@@ -70,7 +80,9 @@ export default defineComponent({
 
     <EntityDescription v-if="examinedEntity" :entity="examinedEntity" />
 
-    <InventoryMenu v-if="showInventoryMenu" class="inventory-menu" />
+    <InventoryMenu v-if="showInventoryMenu" class="menu" />
+
+    <PowersListMenu v-if="showPowersList" class="menu" />
   </div>
 </template>
 
@@ -82,7 +94,7 @@ export default defineComponent({
   &:focus
     outline none
 
-  .inventory-menu
+  .menu
     position absolute
     left: 50%;
     transform: translateX(-50%);
