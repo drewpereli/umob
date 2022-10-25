@@ -17,6 +17,8 @@ export default abstract class MapEntity {
     this.tile = tile;
 
     tile.addEntity(this);
+
+    this.tilesOccupied = [tile];
   }
 
   x;
@@ -36,11 +38,14 @@ export default abstract class MapEntity {
 
   abstract mass: number;
 
+  tilesOccupied: Tile[] = [];
+
   updatePosition(tile: Tile) {
     this.tile.removeEntity(this);
     this.x = tile.x;
     this.y = tile.y;
     this.tile = tile;
     tile.addEntity(this);
+    this.tilesOccupied = [tile];
   }
 }

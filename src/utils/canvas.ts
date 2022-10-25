@@ -2,9 +2,11 @@ import { isFlammable } from '@/entities/flammable';
 import { isFluid } from '@/entities/fluid';
 import { Gas } from '@/entities/gas';
 import type MapEntity from '@/entities/map-entity';
+import { Orientation, TripWire } from '@/entities/trap';
 import { BlackHole } from '@/powers/create-black-hole';
-import { FLOOR_TERRAIN_DATA, type TerrainData } from '@/stores/map';
+import { FLOOR_TERRAIN_DATA, Tile, type TerrainData } from '@/stores/map';
 import chroma, { scale } from 'chroma-js';
+import { Dir } from './map';
 import { random } from './random';
 import { isAsciiDrawable } from './types';
 
@@ -24,6 +26,21 @@ export function fillRect(
     CELL_LENGTH,
     CELL_LENGTH
   );
+}
+
+function fillRectPx(
+  ctx: CanvasRenderingContext2D,
+  startPosPx: Coords,
+  endPosPx: Coords,
+  color: string
+) {
+  const startX = Math.min(startPosPx.x, endPosPx.x);
+  const startY = Math.min(startPosPx.y, endPosPx.y);
+  const width = Math.abs(startPosPx.x - endPosPx.x);
+  const height = Math.abs(startPosPx.y - endPosPx.y);
+
+  ctx.fillStyle = color;
+  ctx.fillRect(startX, startY, width, height);
 }
 
 export function clearRect(ctx: CanvasRenderingContext2D, pos: Coords) {
@@ -53,10 +70,11 @@ export function drawTerrain(
   fillText(ctx, terrain.char as string, position, terrain.color as string);
 }
 
-export function drawEntity(
+export function drawEntityTile(
   ctx: CanvasRenderingContext2D,
   position: Coords,
-  entity: MapEntity
+  entity: MapEntity,
+  tile: Tile
 ) {
   if (entity instanceof Gas) {
     fillRect(ctx, position, entity.color);
@@ -100,6 +118,63 @@ export function drawEntity(
     ctx.beginPath();
     ctx.arc(pxCoords.x, pxCoords.y, radius, 0, 2 * Math.PI);
     ctx.fill();
+  } else if (entity instanceof TripWire) {
+    const centerPx = positionToPx(position, 'center');
+
+    if (entity.anchorTiles.has(tile)) {
+      fillCirclePxPosition(ctx, centerPx, 4, 'white');
+
+      const dir = entity.anchorTiles.get(tile);
+
+      const rectStartPx = { ...centerPx };
+      const rectEndPx = { ...centerPx };
+
+      if (dir === Dir.Up) {
+        rectEndPx.y += CELL_LENGTH / 2;
+        rectEndPx.x += 1;
+        rectStartPx.x -= 1;
+      } else if (dir === Dir.Down) {
+        rectEndPx.y -= CELL_LENGTH / 2;
+        rectEndPx.x += 1;
+        rectStartPx.x -= 1;
+      } else if (dir === Dir.Left) {
+        rectEndPx.x += CELL_LENGTH / 2;
+        rectEndPx.y += 1;
+        rectStartPx.y -= 1;
+      } else if (dir === Dir.Right) {
+        rectEndPx.x -= CELL_LENGTH / 2;
+        rectEndPx.y += 1;
+        rectStartPx.y -= 1;
+      }
+
+      fillRectPx(ctx, rectStartPx, rectEndPx, 'white');
+    } else {
+      if (entity.orientation === Orientation.Horizontal) {
+        const rectStartPx = {
+          y: centerPx.y + 1,
+          x: centerPx.x - CELL_LENGTH / 2,
+        };
+
+        const rectEndPx = {
+          y: centerPx.y - 1,
+          x: centerPx.x + CELL_LENGTH / 2,
+        };
+
+        fillRectPx(ctx, rectStartPx, rectEndPx, 'white');
+      } else {
+        const rectStartPx = {
+          x: centerPx.x + 1,
+          y: centerPx.y - CELL_LENGTH / 2,
+        };
+
+        const rectEndPx = {
+          x: centerPx.x - 1,
+          y: centerPx.y + CELL_LENGTH / 2,
+        };
+
+        fillRectPx(ctx, rectStartPx, rectEndPx, 'white');
+      }
+    }
   } else if (isAsciiDrawable(entity)) {
     fillText(ctx, entity.char, position, entity.color);
   }
@@ -114,4 +189,16 @@ function positionToPx(coords: Coords, positionInCell?: 'center'): Coords {
       coords.y * CELL_LENGTH +
       (positionInCell === 'center' ? CELL_LENGTH / 2 : 0),
   };
+}
+
+function fillCirclePxPosition(
+  ctx: CanvasRenderingContext2D,
+  pxCoords: Coords,
+  pxRadius: number,
+  color: string
+) {
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  ctx.arc(pxCoords.x, pxCoords.y, pxRadius, 0, 2 * Math.PI);
+  ctx.fill();
 }

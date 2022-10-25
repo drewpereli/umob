@@ -17,6 +17,7 @@ import { Actor } from '@/entities/actor';
 import type MapEntity from '@/entities/map-entity';
 import type { TargetedPower } from '@/powers/targeted-power';
 import { Centrifuge } from '@/entities/centrifuge';
+import { CreateTripWire } from '@/powers/create-trip-wire';
 
 export const useGame = defineStore('game', {
   state: () => ({
@@ -270,6 +271,17 @@ export const useGame = defineStore('game', {
         this._tickUntilPlayerCanAct();
       }
     },
+    rotateSelectedPowerAim() {
+      if (this.actionUiState !== ActionUiState.AimingPower) return;
+
+      const power = this.player.selectedPower;
+
+      if (!(power instanceof CreateTripWire)) return;
+
+      power.rotateAim();
+
+      this.view.draw();
+    },
     playerReload() {
       this.player.reload();
       this.view.draw();
@@ -339,7 +351,7 @@ export const useGame = defineStore('game', {
 
       this.mapEntities = this.mapEntities.reduce((all, entity) => {
         if (entity.shouldRemoveFromGame) {
-          entity.tile.removeEntity(entity);
+          entity.tilesOccupied.forEach((t) => t.removeEntity(entity));
         } else {
           all.push(entity);
         }
