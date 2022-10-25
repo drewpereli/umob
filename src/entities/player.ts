@@ -1,3 +1,4 @@
+import { Burning } from '@/status-effects/burning';
 import { debugOptions } from '@/utils/debug-options';
 import Creature from './creature';
 import type { Damageable } from './damageable';
@@ -66,7 +67,8 @@ export class Player extends Creature implements Flammable {
   }
 
   startBurning() {
-    defaultStartBurning(this);
+    this.isBurning = true;
+    this.addStatusEffect(new Burning(this));
   }
 
   burn() {

@@ -54,11 +54,7 @@ export function defaultBurn(flammable: Flammable) {
     const willBurn = random.float(0, 1) < flammable.burnCollocatedChance;
 
     if (willBurn) {
-      if (entity instanceof Creature) {
-        entity.addStatusEffect(new Burning(entity));
-      } else {
-        entity.startBurning();
-      }
+      entity.startBurning();
     }
   });
 
