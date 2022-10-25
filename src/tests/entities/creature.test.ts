@@ -3,7 +3,7 @@ import { setActivePinia, createPinia } from 'pinia';
 import { useGame } from '@/stores/game';
 import { Tile, useMap } from '@/stores/map';
 import Creature from '@/entities/creature';
-import Gun from '@/entities/gun';
+import Gun from '@/entities/weapons/gun';
 import { Wall, HalfWall } from '@/entities/terrain';
 
 class TestGun extends Gun {

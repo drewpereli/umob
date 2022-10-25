@@ -21,7 +21,7 @@ import type { Power } from '@/powers/power';
 import { random } from '@/utils/random';
 import { Actor } from './actor';
 import { isDamageable, type Damageable } from './damageable';
-import Gun, { Pistol } from './gun';
+import Gun, { Pistol } from './weapons/gun';
 import type { AsciiDrawable } from '@/utils/types';
 import MapEntity, { EntityLayer } from './map-entity';
 import type { StatusEffect } from '@/status-effects/status-effect';

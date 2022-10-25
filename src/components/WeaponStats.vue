@@ -1,6 +1,6 @@
 <script lang="ts">
-import type Gun from '@/entities/gun';
-import { DEFAULT_FLANKING_BONUS } from '@/entities/gun';
+import type Gun from '@/entities/weapons/gun';
+import { DEFAULT_FLANKING_BONUS } from '@/entities/weapons/gun';
 import { defineComponent, type PropType } from 'vue';
 
 export default defineComponent({

@@ -1,5 +1,5 @@
 <script lang="ts">
-import type Gun from '@/entities/gun';
+import type Gun from '@/entities/weapons/gun';
 import { useGame } from '@/stores/game';
 import type { MenuItem } from '@/stores/menu';
 import { defineComponent } from 'vue';

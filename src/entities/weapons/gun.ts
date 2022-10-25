@@ -1,4 +1,4 @@
-import { Item } from './items/item';
+import { Item } from '../items/item';
 
 export const DEFAULT_FLANKING_BONUS = 0.5;
 

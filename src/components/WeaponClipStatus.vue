@@ -1,6 +1,6 @@
 <script lang="ts">
 import { defineComponent, type PropType } from 'vue';
-import type Gun from '@/entities/gun';
+import type Gun from '@/entities/weapons/gun';
 
 export default defineComponent({
   props: {

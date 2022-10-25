@@ -9,7 +9,12 @@ import { debugOptions } from '@/utils/debug-options';
 import Creature from './creature';
 import type { Damageable } from './damageable';
 import { defaultBurn, defaultStopBurning, type Flammable } from './flammable';
-import Gun, { AssaultRifle, Pistol, RailGun, SubMachineGun } from './gun';
+import Gun, {
+  AssaultRifle,
+  Pistol,
+  RailGun,
+  SubMachineGun,
+} from './weapons/gun';
 import type { Item } from './items/item';
 import { ItemInMap } from './items/item-in-map';
 

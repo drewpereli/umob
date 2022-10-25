@@ -1,5 +1,5 @@
 import { isDoor } from '@/entities/door';
-import type Gun from '@/entities/gun';
+import type Gun from '@/entities/weapons/gun';
 import type { Item } from '@/entities/items/item';
 import { NonTargetedPower } from '@/powers/non-targeted-power';
 import type { Power } from '@/powers/power';
