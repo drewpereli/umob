@@ -7,7 +7,7 @@ import {
   fillText,
   drawTerrain,
   fillRect,
-  drawEntity,
+  drawEntityTile,
 } from '@/utils/canvas';
 import { debugOptions } from './debug-options';
 import { coordsEqual } from './map';
@@ -142,7 +142,7 @@ export class View {
 
     tile.entities.forEach((entity) => {
       const ctx = this.ctxs[entity.layer];
-      drawEntity(ctx, position, entity);
+      drawEntityTile(ctx, position, entity, tile);
     });
 
     let color: string | null = null;

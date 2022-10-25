@@ -103,6 +103,9 @@ export const actionHandlers: Partial<
     f: (game) => {
       game.playerUsePower();
     },
+    r: (game) => {
+      game.rotateSelectedPowerAim();
+    },
   },
   [ActionUiState.Inventory]: {
     Escape: (game) => (game.actionUiState = ActionUiState.Default),
