@@ -1,10 +1,6 @@
 import { TargetedPower } from './targeted-power';
 import bresenham from '@/utils/bresnham';
-import { Actor } from '@/entities/actor';
-import { EntityLayer } from '@/entities/map-entity';
-import { isCreature } from '@/entities/creature';
-import { createExplosion } from '@/utils/explosions';
-import type { AsciiDrawable } from '@/utils/types';
+import { ProximityMine } from '@/entities/trap';
 
 export class CreateProximityMine extends TargetedPower {
   range = 5;
@@ -40,33 +36,5 @@ export class CreateProximityMine extends TargetedPower {
     this.game.addMapEntity(mine);
 
     return true;
-  }
-}
-
-export class ProximityMine extends Actor implements AsciiDrawable {
-  blocksMovement = false;
-  blocksView = false;
-
-  shouldRemoveFromGame = false;
-
-  layer = EntityLayer.Object;
-
-  mass = 1;
-
-  char = '◇';
-  color = 'white';
-
-  get canAct() {
-    return !this.shouldRemoveFromGame;
-  }
-
-  _act() {
-    const creatureOnTile = this.tile.entities.some(isCreature);
-
-    if (!creatureOnTile) return;
-
-    createExplosion(this.tile, 5, 20);
-
-    this.shouldRemoveFromGame = true;
   }
 }
