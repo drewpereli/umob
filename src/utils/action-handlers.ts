@@ -1,3 +1,4 @@
+import { isDoor } from '@/entities/door';
 import type Gun from '@/entities/gun';
 import type { Item } from '@/entities/items/item';
 import { NonTargetedPower } from '@/powers/non-targeted-power';
@@ -43,6 +44,19 @@ export const actionHandlers: Partial<
     r: (game) => game.playerReload(),
     e: (game) => (game.actionUiState = ActionUiState.Inventory),
     p: (game) => (game.actionUiState = ActionUiState.PowersList),
+    c: (game) => {
+      const playerFacing = game.player.facing;
+
+      const adjacent = game.map.adjacentTile(game.player.tile, playerFacing);
+
+      if (!adjacent) return;
+
+      const door = adjacent.entities.find(isDoor);
+
+      if (!door?.canClose) return;
+
+      game.playerCloseDoor(door);
+    },
     x: (game) => {
       const playerTile = game.map.tileAt(game.player);
 

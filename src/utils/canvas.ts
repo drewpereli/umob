@@ -1,3 +1,4 @@
+import { isDoor } from '@/entities/door';
 import { isFlammable } from '@/entities/flammable';
 import { isFluid } from '@/entities/fluid';
 import { Gas } from '@/entities/gas';
@@ -178,6 +179,12 @@ export function drawEntityTile(
 
         fillRectPx(ctx, rectStartPx, rectEndPx, color);
       }
+    }
+  } else if (isDoor(entity)) {
+    fillRect(ctx, position, '#9c7406');
+
+    if (!entity.isOpen) {
+      fillText(ctx, '+', position, '#e6c66e');
     }
   } else if (isAsciiDrawable(entity)) {
     fillText(ctx, entity.char, position, entity.color);

@@ -27,6 +27,7 @@ import MapEntity, { EntityLayer } from './map-entity';
 import type { StatusEffect } from '@/status-effects/status-effect';
 import { isTrap } from './traps/trap';
 import type { Item } from './items/item';
+import type { Door } from './door';
 
 export type Covers = Record<Dir, Cover>;
 
@@ -197,6 +198,20 @@ export default abstract class Creature
       this.energy -= this.selectedPower.energyCost;
       this.timeUntilNextAction = this.selectedPower.useTime;
       return true;
+    }
+  }
+
+  openDoor(door: Door) {
+    door.open();
+
+    this.timeUntilNextAction = this.moveTime;
+  }
+
+  closeDoor(door: Door) {
+    if (door.canClose) {
+      door.close();
+
+      this.timeUntilNextAction = this.moveTime;
     }
   }
 

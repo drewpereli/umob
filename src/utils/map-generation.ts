@@ -1,3 +1,4 @@
+import { Door } from '@/entities/door';
 import { Lava } from '@/entities/fluid';
 import { Wall, HalfWall } from '@/entities/terrain';
 import { useGame } from '@/stores/game';
@@ -76,6 +77,42 @@ export function generate(width: number, height: number): Map {
     });
 
     map.push(mapRow);
+  });
+
+  const thresholds = map.flatMap((row, y) => {
+    return row.filter((tile, x) => {
+      if (tile.terrain) return;
+
+      const up = map[y - 1][x];
+      const right = map[y][x + 1];
+      const down = map[y + 1][x];
+      const left = map[y][x - 1];
+
+      if (
+        up.terrain?.type === 'wall' &&
+        down.terrain?.type === 'wall' &&
+        !left.terrain &&
+        !right.terrain
+      ) {
+        return true;
+      }
+
+      if (
+        left.terrain?.type === 'wall' &&
+        right.terrain?.type === 'wall' &&
+        !up.terrain &&
+        !down.terrain
+      ) {
+        return true;
+      }
+
+      return false;
+    });
+  });
+
+  thresholds.forEach((tile) => {
+    const door = new Door(tile);
+    game.addMapEntity(door);
   });
 
   return map;

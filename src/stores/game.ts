@@ -18,6 +18,7 @@ import type MapEntity from '@/entities/map-entity';
 import type { TargetedPower } from '@/powers/targeted-power';
 import { Centrifuge } from '@/entities/centrifuge';
 import { CreateTripWire } from '@/powers/create-trip-wire';
+import { Door, isDoor } from '@/entities/door';
 
 export const useGame = defineStore('game', {
   state: () => ({
@@ -245,9 +246,15 @@ export const useGame = defineStore('game', {
 
       if (!targetTile) return;
 
-      if (!this.creatureCanOccupy(targetTile)) return;
+      const door = targetTile.entities.find(isDoor);
 
-      this.player.move(targetTile);
+      if (door && !door.isOpen) {
+        this.player.openDoor(door);
+      } else if (this.creatureCanOccupy(targetTile)) {
+        this.player.move(targetTile);
+      } else {
+        return;
+      }
 
       this.enemies.forEach((actor) => actor.updateLastSawPlayerIfCanSee());
 
@@ -284,6 +291,11 @@ export const useGame = defineStore('game', {
     },
     playerReload() {
       this.player.reload();
+      this.view.draw();
+      this._tickUntilPlayerCanAct();
+    },
+    playerCloseDoor(door: Door) {
+      this.player.closeDoor(door);
       this.view.draw();
       this._tickUntilPlayerCanAct();
     },
