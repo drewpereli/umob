@@ -55,11 +55,18 @@ export class Player extends Creature implements Flammable {
 
   mass = 100;
 
-  isBurning = false;
   burnCollocatedChance = 0.5;
   burnAdjacentChance = 0.1;
   burningDuration = 0;
   readonly IMPLEMENTS_FLAMMABLE = true;
+
+  get isBurning() {
+    return this.statusEffects.some((effect) => effect.name === 'burning');
+  }
+
+  set isBurning(val: boolean) {
+    //
+  }
 
   receiveDamage(damage: number) {
     super.receiveDamage(damage);
@@ -86,7 +93,6 @@ export class Player extends Creature implements Flammable {
   }
 
   startBurning() {
-    this.isBurning = true;
     this.addStatusEffect(new Burning(this));
   }
 
