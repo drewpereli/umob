@@ -24,7 +24,7 @@ import { isDamageable, type Damageable } from './damageable';
 import { Pistol } from './gun';
 import { BuildCover } from '@/powers/build-cover';
 import type { AsciiDrawable } from '@/utils/types';
-import { EntityLayer } from './map-entity';
+import MapEntity, { EntityLayer } from './map-entity';
 import type { StatusEffect } from '@/status-effects/status-effect';
 
 export type Covers = Record<Dir, Cover>;
@@ -41,6 +41,10 @@ const flankingDirBonusMultipliers: Record<FlankingDir, number> = {
   [FlankingDir.Side]: 1,
   [FlankingDir.Back]: 2,
 };
+
+export function isCreature(entity: MapEntity): entity is Creature {
+  return entity instanceof Creature;
+}
 
 export default abstract class Creature
   extends Actor
