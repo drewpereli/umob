@@ -8,7 +8,6 @@ export type Terrain = MapEntity & {
   readonly type: string;
   readonly moveTimeMultiplier: number | null;
   readonly blocksView: boolean;
-  readonly terrainOnDie?: Terrain;
   readonly cover: Cover;
   readonly char?: string;
   readonly color?: string;
@@ -42,7 +41,6 @@ export class Wall
     if (this.health <= 0) {
       const halfWall = new HalfWall(this.tile);
       useGame().addMapEntity(halfWall);
-      console.log('in here');
       this.shouldRemoveFromGame = true;
     }
   }
