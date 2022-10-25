@@ -1,6 +1,7 @@
 import { TargetedPower } from './targeted-power';
-import { Orientation, TripWire } from '@/entities/traps/trap';
+import { Orientation } from '@/entities/traps/trap';
 import { useGame } from '@/stores/game';
+import { TripWire } from '@/entities/traps/tripwire';
 
 export class CreateTripWire extends TargetedPower {
   range = 5;
