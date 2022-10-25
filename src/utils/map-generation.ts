@@ -1,4 +1,5 @@
-import { Wall, HalfWall, Lava } from '@/entities/terrain';
+import { Lava } from '@/entities/fluid';
+import { Wall, HalfWall } from '@/entities/terrain';
 import { useGame } from '@/stores/game';
 import { Tile } from '@/stores/map';
 import { debugOptions } from './debug-options';

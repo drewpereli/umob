@@ -1,3 +1,4 @@
+import { isFlammable } from './flammable';
 import MapEntity from './map-entity';
 
 export abstract class Actor extends MapEntity {
@@ -15,6 +16,10 @@ export abstract class Actor extends MapEntity {
   tick() {
     if (this.timeUntilNextAction > 0) {
       this.timeUntilNextAction--;
+    }
+
+    if (isFlammable(this) && this.isBurning) {
+      this.burn();
     }
   }
 }

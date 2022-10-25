@@ -83,6 +83,8 @@ export default abstract class Creature
 
   defaultChar = 'd';
 
+  statusEffects: StatusEffect[] = [];
+
   get char() {
     return this.game.directionViewMode
       ? dirChars[this.facing]
@@ -354,5 +356,35 @@ export default abstract class Creature
         this.energy + this.energyRechargePerTick
       );
     }
+
+    this.statusEffects.forEach((effect) => {
+      effect.tick();
+    });
+  }
+
+  addStatusEffect(statusEffect: StatusEffect) {
+    // If the creature already has the status effect, just set its duration to 0
+    const existingStatusEffect = this.statusEffects.find(
+      (effect) => effect.name === statusEffect.name
+    );
+
+    if (existingStatusEffect) {
+      existingStatusEffect.currentDuration = 0;
+    } else {
+      this.statusEffects.push(statusEffect);
+    }
+  }
+
+  removeStatusEffect(statusEffect: StatusEffect) {
+    const effects = this.statusEffects;
+    const idx = effects.indexOf(statusEffect);
+
+    if (idx === -1) {
+      return;
+    }
+
+    effects.splice(idx, 1);
+
+    this.statusEffects = [...effects];
   }
 }

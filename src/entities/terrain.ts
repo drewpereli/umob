@@ -1,8 +1,7 @@
 import { useGame } from '@/stores/game';
 import { Cover } from '@/utils/map';
 import type { AsciiDrawable } from '@/utils/types';
-import { Actor } from './actor';
-import { isDamageable, type Damageable } from './damageable';
+import type { Damageable } from './damageable';
 import MapEntity, { EntityLayer } from './map-entity';
 
 export type Terrain = MapEntity & {
@@ -62,29 +61,6 @@ export class HalfWall extends MapEntity implements Terrain, AsciiDrawable {
   mass = 1000;
   shouldRemoveFromGame = false;
   readonly layer = EntityLayer.Terrain;
-}
-
-export class Lava extends Actor implements Terrain {
-  type = 'lava';
-  char = '~';
-  moveTimeMultiplier = 4;
-  mass = 0;
-  shouldRemoveFromGame = false;
-  cover = Cover.None;
-  canAct = true;
-  blocksMovement = false;
-  blocksView = false;
-  readonly layer: EntityLayer.Terrain = EntityLayer.Terrain;
-
-  _act() {
-    this.tile.entities.forEach((entity) => {
-      if (entity === this) return;
-
-      if (isDamageable(entity)) {
-        entity.receiveDamage(20);
-      }
-    });
-  }
 }
 
 export function isTerrain(entity: MapEntity): entity is Terrain {

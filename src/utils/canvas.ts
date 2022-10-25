@@ -1,11 +1,16 @@
+import { isFlammable } from '@/entities/flammable';
+import { isFluid } from '@/entities/fluid';
+import { Gas } from '@/entities/gas';
 import type MapEntity from '@/entities/map-entity';
 import { BlackHole } from '@/powers/create-black-hole';
-import { FLOOR_TERRAIN_DATA, type TerrainData, type Tile } from '@/stores/map';
-import { scale } from 'chroma-js';
+import { FLOOR_TERRAIN_DATA, type TerrainData } from '@/stores/map';
+import chroma, { scale } from 'chroma-js';
 import { random } from './random';
 import { isAsciiDrawable } from './types';
 
 export const CELL_LENGTH = 28;
+
+const burningPallette = scale(['orange', 'red']);
 
 export function fillRect(
   ctx: CanvasRenderingContext2D,
@@ -40,39 +45,30 @@ export function fillText(
   ctx.fillText(char, (pos.x + 0.5) * CELL_LENGTH, (pos.y + 0.5) * CELL_LENGTH);
 }
 
-export function drawTileMainCanvas({
-  ctx,
-  position,
-  tile,
-  entities,
-  visible,
-}: {
-  ctx: CanvasRenderingContext2D;
-  position: Coords;
-  tile: Tile;
-  entities: MapEntity[];
-  visible: boolean;
-}) {
-  fillRect(ctx, position, 'black');
-
-  const terrainLastSeen = tile.terrainLastSeenByPlayer;
-
-  if (visible) {
-    drawTerrain(ctx, position, tile.terrain);
-
-    entities.forEach((e) => drawEntity(ctx, position, e));
-  } else if (terrainLastSeen) {
-    drawTerrain(ctx, position, terrainLastSeen);
-  }
-}
-
-function drawTerrain(
+export function drawTerrain(
   ctx: CanvasRenderingContext2D,
   position: Coords,
   terrain: TerrainData = FLOOR_TERRAIN_DATA
 ) {
-  if (terrain?.type === 'lava') {
-    const pallette = scale(['#db1e14', '#ff8936']);
+  fillText(ctx, terrain.char as string, position, terrain.color as string);
+}
+
+export function drawEntity(
+  ctx: CanvasRenderingContext2D,
+  position: Coords,
+  entity: MapEntity
+) {
+  if (entity instanceof Gas) {
+    fillRect(ctx, position, entity.color);
+  } else if (isFluid(entity)) {
+    const baseColor = entity.baseColor;
+
+    const darker = chroma(baseColor).darken(0.3);
+    const lighter = chroma(baseColor).brighten(0.3);
+
+    const pallette = scale([darker, lighter]);
+
+    const burning = isFlammable(entity) && entity.isBurning;
 
     // Create a 4 x 4 grid of different colors in the cell
     Array.from({ length: 4 }).forEach((_, y) => {
@@ -80,9 +76,14 @@ function drawTerrain(
       Array.from({ length: 4 }).forEach((_, x) => {
         const offsetX = x / 4;
 
-        const color = pallette(random.float()).css();
+        let chromaColor = pallette(random.float());
 
-        ctx.fillStyle = color;
+        if (burning) {
+          const burningColor = burningPallette(random.float());
+          chromaColor = chromaColor.mix(burningColor, 0.1);
+        }
+
+        ctx.fillStyle = chromaColor.hex();
         const xPx = (position.x + offsetX) * CELL_LENGTH;
         const yPx = (position.y + offsetY) * CELL_LENGTH;
         const length = CELL_LENGTH / 4;
@@ -90,17 +91,7 @@ function drawTerrain(
         ctx.fillRect(xPx, yPx, length, length);
       });
     });
-  } else {
-    fillText(ctx, terrain.char as string, position, terrain.color as string);
-  }
-}
-
-function drawEntity(
-  ctx: CanvasRenderingContext2D,
-  position: Coords,
-  entity: MapEntity
-) {
-  if (entity instanceof BlackHole) {
+  } else if (entity instanceof BlackHole) {
     const pxCoords = positionToPx(position, 'center');
 
     const radius = CELL_LENGTH / 2 - 2;
@@ -112,58 +103,6 @@ function drawEntity(
   } else if (isAsciiDrawable(entity)) {
     fillText(ctx, entity.char, position, entity.color);
   }
-}
-
-export function drawTileVisibilityCanvas({
-  ctx,
-  position,
-  tile,
-  visible,
-}: {
-  ctx: CanvasRenderingContext2D;
-  position: Coords;
-  tile: Tile;
-  visible: boolean;
-}) {
-  let color = 'black';
-
-  if (visible) {
-    color = 'transparent';
-  } else if (tile.terrainLastSeenByPlayer) {
-    color = 'rgba(0,0,0,0.6)';
-  }
-
-  fillRect(ctx, position, color);
-}
-
-export function drawTileUiCanvas({
-  ctx,
-  position,
-  visible,
-  tileIsAimedAt,
-  tileSelected,
-  tileHasDamageableAimedAt,
-}: {
-  ctx: CanvasRenderingContext2D;
-  position: Coords;
-  visible: boolean;
-  tileIsAimedAt: boolean;
-  tileSelected: boolean;
-  tileHasDamageableAimedAt: boolean;
-}) {
-  let color: string | null = null;
-
-  if (tileHasDamageableAimedAt && visible) {
-    color = 'rgba(136,0,0,0.5)';
-  } else if (tileSelected) {
-    color = 'rgba(136,136,0,0.75)';
-  } else if (tileIsAimedAt) {
-    color = 'rgba(85,85,0,0.75)';
-  }
-
-  if (!color) return;
-
-  fillRect(ctx, position, color);
 }
 
 function positionToPx(coords: Coords, positionInCell?: 'center'): Coords {

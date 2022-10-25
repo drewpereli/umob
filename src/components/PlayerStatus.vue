@@ -5,6 +5,7 @@ import EquippedWeapon from './player-status/EquippedWeapon.vue';
 import { useGame } from '@/stores/game';
 import CoverIndicators from './CoverIndicators.vue';
 import WeaponClipStatus from './WeaponClipStatus.vue';
+import StatusEffect from './StatusEffect.vue';
 import EnergyBar from './player-status/EnergyBar.vue';
 
 export default defineComponent({
@@ -14,9 +15,15 @@ export default defineComponent({
     CoverIndicators,
     WeaponClipStatus,
     EnergyBar,
+    StatusEffect,
   },
   setup() {
     return { game: useGame() };
+  },
+  computed: {
+    statusEffects() {
+      return this.game.player.statusEffects;
+    },
   },
 });
 </script>
@@ -28,6 +35,11 @@ export default defineComponent({
     <EquippedWeapon />
     <WeaponClipStatus :gun="game.player.equippedWeapon" />
     <CoverIndicators :covers="game.player.covers" />
+    <StatusEffect
+      v-for="(statusEffect, idx) in statusEffects"
+      :key="idx"
+      :statusEffect="statusEffect"
+    />
   </div>
 </template>
 

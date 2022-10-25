@@ -8,6 +8,8 @@ import { astar, Graph } from '@/utils/astar';
 import { distance, coordsEqual, Dir, Cover, DIRS } from '@/utils/map';
 import { isTerrain, type Terrain } from '@/entities/terrain';
 import type MapEntity from '@/entities/map-entity';
+import { isFluid, type Fluid } from '@/entities/fluid';
+import { isGas, type Gas } from '@/entities/gas';
 
 export const useMap = defineStore('map', {
   state: () => ({
@@ -146,7 +148,19 @@ export class Tile {
 
   terrainLastSeenByPlayer?: TerrainData;
 
-  moveTimeMultiplier: number | null = 1;
+  get moveTimeMultiplier() {
+    const terrainMultiplier = this.terrain
+      ? this.terrain.moveTimeMultiplier
+      : 1;
+
+    if (terrainMultiplier === null) {
+      return null;
+    }
+
+    const fluidMultiplier = this.fluid?.moveTimeMultiplier ?? 1;
+
+    return terrainMultiplier * fluidMultiplier;
+  }
 
   get hasEntityThatBlocksMovement() {
     return this.entities.some((e) => e.blocksMovement);
@@ -180,6 +194,14 @@ export class Tile {
 
   get cover() {
     return this.terrain?.cover ?? Cover.None;
+  }
+
+  get fluid(): Fluid | undefined {
+    return this.entities.find(isFluid);
+  }
+
+  get gas(): Gas | undefined {
+    return this.entities.find(isGas);
   }
 
   addEntity(e: MapEntity) {

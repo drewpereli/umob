@@ -1,8 +1,8 @@
-import { Lava } from '@/entities/fluid';
+import { Water } from '@/entities/fluid';
 import { useMap } from '@/stores/map';
 import { TargetedPower } from './targeted-power';
 
-export class CreateLavaPool extends TargetedPower {
+export class CreateWaterPool extends TargetedPower {
   range = 5;
   energyCost = 10;
   useTime = 2;
@@ -29,7 +29,7 @@ export class CreateLavaPool extends TargetedPower {
 
     const tile = this.game.map.tileAt(closest);
 
-    const pool = new Lava(tile, 7);
+    const pool = new Water(tile, 7);
 
     this.game.addMapEntity(pool);
 
