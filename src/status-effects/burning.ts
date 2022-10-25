@@ -9,12 +9,6 @@ export class Burning extends StatusEffect {
 
   name = 'burning';
 
-  onCreate(): void {
-    if (!this.creature.isBurning) {
-      this.creature.startBurning();
-    }
-  }
-
   onMaxDurationReached(): void {
     this.creature.stopBurning();
     super.onMaxDurationReached();
