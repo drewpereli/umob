@@ -215,6 +215,10 @@ export class Tile {
     return this.entities.filter(isFlammable);
   }
 
+  get creatures() {
+    return this.entities.filter(isCreature);
+  }
+
   addEntity(e: MapEntity) {
     if (isFluid(e) && this.fluid) {
       return;

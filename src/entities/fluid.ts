@@ -217,6 +217,25 @@ export class ToxicWaste extends Fluid {
 
   _act() {
     super._act();
+
+    const map = useMap();
+
     this.tile.flammables.forEach((f) => f.stopBurning());
+
+    const adjacents = map.adjacentTiles(this.tile);
+
+    adjacents.forEach((tile) => {
+      tile.creatures.forEach((creature) => {
+        if (random.float() < 0.1) {
+          creature.receiveRadiation(1);
+        }
+      });
+    });
+
+    this.tile.creatures.forEach((creature) => {
+      if (random.float() < 0.3) {
+        creature.receiveRadiation(1);
+      }
+    });
   }
 }

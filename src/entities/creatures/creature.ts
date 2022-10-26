@@ -632,4 +632,8 @@ export default abstract class Creature
   atRadLevelOrHigher(level: RadLevel) {
     return atRadLevelOrHigher(this.rads, level);
   }
+
+  receiveRadiation(amount: number) {
+    this.rads += amount;
+  }
 }
