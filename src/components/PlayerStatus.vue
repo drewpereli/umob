@@ -7,6 +7,7 @@ import CoverIndicators from './CoverIndicators.vue';
 import WeaponClipStatus from './WeaponClipStatus.vue';
 import StatusEffect from './StatusEffect.vue';
 import EnergyBar from './player-status/EnergyBar.vue';
+import { weaponIsGun } from '@/entities/weapons/gun';
 
 export default defineComponent({
   components: {
@@ -37,6 +38,15 @@ export default defineComponent({
           return aSort - bSort;
         });
     },
+    playerGun() {
+      const equipped = this.game.player.equippedWeapon;
+
+      if (!equipped) return;
+
+      if (!weaponIsGun(equipped)) return;
+
+      return equipped;
+    },
   },
 });
 </script>
@@ -46,7 +56,7 @@ export default defineComponent({
     <HealthBar :actor="game.player" />
     <EnergyBar :actor="game.player" />
     <EquippedWeapon />
-    <WeaponClipStatus :gun="game.player.equippedWeapon" />
+    <WeaponClipStatus v-if="playerGun" :gun="playerGun" />
     <CoverIndicators :covers="game.player.covers" />
     <StatusEffect
       v-for="(statusEffect, idx) in statusEffects"

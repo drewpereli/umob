@@ -41,8 +41,6 @@ export class Player extends Creature implements Flammable {
 
   blocksView = false;
 
-  equippedWeapon = this.inventory[0] as Gun;
-
   health = debugOptions.infiniteHealth ? Infinity : 100;
   maxHealth = debugOptions.infiniteHealth ? Infinity : 100;
 

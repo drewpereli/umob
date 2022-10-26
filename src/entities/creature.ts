@@ -28,7 +28,7 @@ import type { StatusEffect } from '@/status-effects/status-effect';
 import { isTrap } from './traps/trap';
 import type { Item } from './items/item';
 import type { Door } from './door';
-import type { Weapon } from './weapons/weapon';
+import type { Weapon, WeaponData } from './weapons/weapon';
 import { Pipe } from './weapons/melee-weapon';
 
 export type Covers = Record<Dir, Cover>;
@@ -79,13 +79,25 @@ export default abstract class Creature
   accuracyMultiplier = 1;
   evasionMultiplier = 1;
 
+  unarmedAttackData: WeaponData = {
+    damage: 1,
+    accuracy: Infinity,
+    attackTimeMultiplier: 1,
+    knockBack: 0,
+    flankingBonus: 0,
+  };
+
   blocksMovement = true;
 
   facing: Dir = random.arrayElement([Dir.Up, Dir.Right, Dir.Down, Dir.Left]);
   viewAngle: number = 90;
 
   inventory: Item[] = [new Pipe()];
-  equippedWeapon: Weapon = this.inventory[0] as Weapon;
+  equippedWeapon: Weapon | null = null;
+
+  get weaponData() {
+    return this.equippedWeapon ?? this.unarmedAttackData;
+  }
 
   powers: Power[] = [];
   selectedPower: Power | null = null;
@@ -132,7 +144,7 @@ export default abstract class Creature
   }
 
   reload() {
-    if (!weaponIsGun(this.equippedWeapon)) return;
+    if (!this.equippedWeapon || !weaponIsGun(this.equippedWeapon)) return;
 
     if (this.equippedWeapon.amoLoaded === this.equippedWeapon.clipSize) return;
 
@@ -151,38 +163,41 @@ export default abstract class Creature
 
       const willHit = random.float(0, 1) < hitChance;
 
-      let damage = this.equippedWeapon.damage;
+      let damage = this.weaponData.damage;
 
       if (willHit) {
-        if (this.equippedWeapon.knockBack && entity instanceof Creature) {
+        if (this.weaponData.knockBack && entity instanceof Creature) {
           const dirs = dirsBetween(this, entity);
           const dir = random.arrayElement(dirs);
           entity.receiveKnockBack(
-            this.equippedWeapon.damage,
-            this.equippedWeapon.knockBack,
+            this.weaponData.damage,
+            this.weaponData.knockBack,
             dir
           );
         }
 
-        if (entity instanceof Creature && this.equippedWeapon.flankingBonus) {
+        if (entity instanceof Creature && this.weaponData.flankingBonus) {
           const flankingDir = flankingDirBetween(this, entity, entity.facing);
           const bonusMultiplier = flankingDirBonusMultipliers[flankingDir];
 
-          damage +=
-            damage * this.equippedWeapon.flankingBonus * bonusMultiplier;
+          damage += damage * this.weaponData.flankingBonus * bonusMultiplier;
         }
 
         entity.receiveDamage(damage);
       }
 
-      if (idx === 0 && weaponIsGun(this.equippedWeapon)) {
+      if (
+        idx === 0 &&
+        this.equippedWeapon &&
+        weaponIsGun(this.equippedWeapon)
+      ) {
         this.game.animations.addAnimation(
           new BulletAnimation(this, entity, willHit)
         );
       }
     });
 
-    if (weaponIsGun(this.equippedWeapon)) {
+    if (this.equippedWeapon && weaponIsGun(this.equippedWeapon)) {
       this.equippedWeapon.amoLoaded--;
 
       if (entities.length === 0) {
@@ -193,7 +208,7 @@ export default abstract class Creature
     }
 
     this.timeUntilNextAction =
-      this.attackTime * this.equippedWeapon.attackTimeMultiplier;
+      this.attackTime * this.weaponData.attackTimeMultiplier;
   }
 
   useSelectedPower() {
@@ -254,13 +269,12 @@ export default abstract class Creature
 
   get canAttackPlayer() {
     if (!this.canSeePlayer) return false;
-    if (!this.equippedWeapon) return false;
-
     const dist = distance(this, this.game.player);
 
-    const range = weaponIsGun(this.equippedWeapon)
-      ? this.equippedWeapon.range
-      : 1;
+    const range =
+      this.equippedWeapon && weaponIsGun(this.equippedWeapon)
+        ? this.equippedWeapon.range
+        : 1;
 
     if (dist > range) return false;
 
@@ -311,7 +325,7 @@ export default abstract class Creature
 
     const baselineAccuracy =
       this.accuracyMultiplier *
-      this.equippedWeapon.accuracy *
+      this.weaponData.accuracy *
       actor.evasionMultiplier;
 
     return baselineAccuracy * actor.coverMultiplierWhenShotFrom(this);
@@ -389,7 +403,9 @@ export default abstract class Creature
 
   get mustReload() {
     return (
-      weaponIsGun(this.equippedWeapon) && this.equippedWeapon.amoLoaded === 0
+      this.equippedWeapon &&
+      weaponIsGun(this.equippedWeapon) &&
+      this.equippedWeapon.amoLoaded === 0
     );
   }
 
