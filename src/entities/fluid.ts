@@ -189,4 +189,18 @@ function reactFluids(a: Fluid, b: Fluid) {
 
     return;
   }
+
+  if (names.includes('water') && names.includes('oil')) {
+    const oil = fluids.find((f) => f.name === 'oil') as Oil;
+
+    if (!oil.isBurning) return;
+
+    oil.stopBurning();
+
+    const steam = new Steam(oil.tile, Math.round(oil.pressure / 2));
+
+    game.addMapEntity(steam);
+
+    return;
+  }
 }
