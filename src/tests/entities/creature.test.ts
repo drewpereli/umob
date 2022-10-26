@@ -35,7 +35,7 @@ describe('Actor', () => {
     const tile = map.tileAt(coords);
 
     const actor = new TestCreature(tile);
-    actor.accuracyMultiplier = 1;
+    actor.baseAccuracyMultiplier = 1;
     actor.evasionMultiplier = 1;
     actor.equippedWeapon = new TestGun();
 
@@ -67,7 +67,7 @@ describe('Actor', () => {
       const source = createActor({ x: 1, y: 1 });
       const target = createActor({ x: 5, y: 5 });
 
-      source.accuracyMultiplier = 0.75;
+      source.baseAccuracyMultiplier = 0.75;
       (source.equippedWeapon as Gun).accuracy = 0.33;
       target.evasionMultiplier = 0.5;
 
@@ -88,7 +88,7 @@ describe('Actor', () => {
 
       useGame().addMapEntity(wall);
 
-      source.accuracyMultiplier = 0.75;
+      source.baseAccuracyMultiplier = 0.75;
       (source.equippedWeapon as Gun).accuracy = 0.33;
 
       const hitChance = source.hitChanceForDamageable(wall);
@@ -108,7 +108,7 @@ describe('Actor', () => {
 
       game.addMapEntity(new HalfWall(useMap().tileAt({ x: 4, y: 1 })));
 
-      source.accuracyMultiplier = 0.75;
+      source.baseAccuracyMultiplier = 0.75;
       (source.equippedWeapon as Gun).accuracy = 0.33;
 
       const hitChance = source.hitChanceForDamageable(wall);
