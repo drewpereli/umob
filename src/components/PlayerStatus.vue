@@ -55,6 +55,9 @@ export default defineComponent({
   <div class="player-status">
     <HealthBar :actor="game.player" />
     <EnergyBar :actor="game.player" />
+
+    <div>Upgrade points: {{ game.player.upgradePoints }}</div>
+
     <EquippedWeapon />
     <WeaponClipStatus v-if="playerGun" :gun="playerGun" />
     <CoverIndicators :covers="game.player.covers" />

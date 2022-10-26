@@ -13,12 +13,15 @@ import type { Item } from './items/item';
 import { ItemInMap } from './items/item-in-map';
 import { Pipe } from './weapons/melee-weapon';
 import type { Dir } from '@/utils/map';
+import type { Perk } from '@/perks';
 
 export class Player extends Creature implements Flammable {
   defaultChar = '@';
   color = 'yellow';
 
   name = 'you';
+
+  upgradePoints = 1;
 
   inventory: Item[] = [new Pipe()];
 
@@ -61,6 +64,8 @@ export class Player extends Creature implements Flammable {
   burningDuration = 0;
   readonly IMPLEMENTS_FLAMMABLE = true;
 
+  appliedPerkIds: string[] = [];
+
   get isBurning() {
     return this.statusEffects.some((effect) => effect.name === 'burning');
   }
@@ -94,7 +99,7 @@ export class Player extends Creature implements Flammable {
   }
 
   startBurning() {
-    this.addStatusEffect(new Burning(this));
+    this.addStatusEffect(new Burning(this, 20));
   }
 
   burn() {
@@ -152,5 +157,15 @@ export class Player extends Creature implements Flammable {
     return Object.keys(this.powerHotkeys).find(
       (key) => this.powerHotkeys[key] === power
     );
+  }
+
+  applyPerk(perk: Perk) {
+    perk.applyEffect(this);
+    this.appliedPerkIds.push(perk.id);
+    this.upgradePoints--;
+  }
+
+  hasPerk(perk: Perk) {
+    return this.appliedPerkIds.includes(perk.id);
   }
 }

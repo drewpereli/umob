@@ -1,7 +1,7 @@
 import type Creature from '@/entities/creatures/creature';
 
 export abstract class StatusEffect {
-  constructor(public creature: Creature, public maxDuration = Infinity) {
+  constructor(public creature: Creature, public maxDuration: number) {
     this.onCreate?.();
   }
 

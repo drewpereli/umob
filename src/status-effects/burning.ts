@@ -3,8 +3,11 @@ import type { Flammable } from '@/entities/flammable';
 import { StatusEffect } from './status-effect';
 
 export class Burning extends StatusEffect {
-  constructor(public creature: Creature & Flammable) {
-    super(creature);
+  constructor(
+    public creature: Creature & Flammable,
+    public maxDuration: number
+  ) {
+    super(creature, maxDuration);
   }
 
   name = 'burning';
@@ -13,6 +16,4 @@ export class Burning extends StatusEffect {
     this.creature.stopBurning();
     super.onMaxDurationReached();
   }
-
-  maxDuration = 20;
 }

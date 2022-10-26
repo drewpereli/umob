@@ -12,6 +12,7 @@ import InventoryMenu from './InventoryMenu.vue';
 import EntityDescription from './EntityDescription.vue';
 import { useAnimations } from '@/stores/animations';
 import PowersListMenu from './PowersListMenu.vue';
+import PerkMenu from './PerkMenu.vue';
 
 export default defineComponent({
   components: {
@@ -20,6 +21,7 @@ export default defineComponent({
     InventoryMenu,
     EntityDescription,
     PowersListMenu,
+    PerkMenu,
   },
   methods: {
     // Only will apply when this element is focused, i.e. when there's no menu being shown
@@ -66,6 +68,9 @@ export default defineComponent({
     showPowersList() {
       return this.game.metaUiState === MetaUiState.PowersList;
     },
+    showPerksList() {
+      return this.game.metaUiState === MetaUiState.PerksList;
+    },
     examinedEntity() {
       if (this.game.actionUiState !== ActionUiState.Examining) return null;
       if (!this.game.selectedTile) return null;
@@ -95,6 +100,8 @@ export default defineComponent({
     <InventoryMenu v-if="showInventoryMenu" class="menu" @close="closeMenu" />
 
     <PowersListMenu v-if="showPowersList" class="menu" @close="closeMenu" />
+
+    <PerkMenu v-if="showPerksList" @close="closeMenu" />
   </div>
 </template>
 

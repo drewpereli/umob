@@ -5,6 +5,7 @@ export interface MenuItem<T = unknown> {
   label: string;
   model: T;
   description?: string;
+  data?: Record<string, unknown>;
 }
 
 export default defineComponent({
@@ -78,20 +79,24 @@ export default defineComponent({
     ref="menu"
     tabindex="1"
   >
-    <div v-if="title" class="header-container">
-      <h2>{{ title }}</h2>
+    <div class="header-container">
+      <h2 v-if="title">{{ title }}</h2>
+      <slot v-else name="title" />
     </div>
 
     <div class="main-container">
       <div class="items">
-        <div
-          v-for="(item, idx) in items"
-          :key="idx"
-          class="item"
-          :class="{ selected: idx === selectedItemIdx }"
-        >
-          {{ item.label }}
-        </div>
+        <template v-for="(item, idx) in items" :key="idx">
+          <div class="item" :class="{ selected: idx === selectedItemIdx }">
+            <slot
+              name="item"
+              :item="item"
+              :isSelected="idx === selectedItemIdx"
+            >
+              {{ item.label }}
+            </slot>
+          </div>
+        </template>
       </div>
 
       <div v-if="includeDescription" class="description">
@@ -132,6 +137,7 @@ export default defineComponent({
   .item
     padding 0.25rem 0.5rem
     margin-top 1rem
+    color white
 
     &:first-child
       margin-top 0rem

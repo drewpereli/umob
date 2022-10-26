@@ -54,7 +54,7 @@ export function defaultBurn(flammable: Flammable) {
 
     if (willBurn) {
       if (entity instanceof Creature) {
-        entity.addStatusEffect(new Burning(entity));
+        entity.addStatusEffect(new Burning(entity, 20));
       } else if (!entity.isBurning) {
         entity.startBurning();
       }

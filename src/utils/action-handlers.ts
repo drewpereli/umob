@@ -17,6 +17,7 @@ export enum MetaUiState {
   Default = 'default',
   Inventory = 'inventory',
   PowersList = 'powers-list',
+  PerksList = 'perks-list',
 }
 
 type Game = ReturnType<typeof useGame>;
@@ -51,6 +52,7 @@ export const actionHandlers: Partial<
     },
     r: (game) => game.playerReload(),
     p: (game) => (game.metaUiState = MetaUiState.PowersList),
+    u: (game) => (game.metaUiState = MetaUiState.PerksList),
     c: (game) => {
       const playerFacing = game.player.facing;
 
