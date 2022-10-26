@@ -48,8 +48,8 @@ export class Player extends Creature implements Flammable {
   health = debugOptions.infiniteHealth ? Infinity : 100;
   maxHealth = debugOptions.infiniteHealth ? Infinity : 100;
 
-  energy = debugOptions.infiniteHealth ? Infinity : 100;
-  maxEnergy = debugOptions.infiniteHealth ? Infinity : 100;
+  energy = debugOptions.infiniteEnergy ? Infinity : 100;
+  maxEnergy = debugOptions.infiniteEnergy ? Infinity : 100;
 
   viewRange = debugOptions.infiniteViewRange ? Infinity : 10;
   viewAngle = debugOptions.fullViewAngle ? 360 : 90;
