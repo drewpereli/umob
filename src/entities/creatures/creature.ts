@@ -34,6 +34,11 @@ import type { Weapon, WeaponData } from '../weapons/weapon';
 import { Pipe } from '../weapons/melee-weapon';
 import { debugOptions } from '@/utils/debug-options';
 import { TargetingArray } from '@/status-effects/targeting-array';
+import {
+  atRadLevelOrHigher,
+  RadLevel,
+  radLevelFromRads,
+} from '@/utils/radiation';
 
 export type Covers = Record<Dir, Cover>;
 
@@ -82,25 +87,68 @@ export default abstract class Creature
 
   energy = 100;
   maxEnergy = 100;
-  energyRechargePerTick = 0.1;
 
-  moveTime = 2 * TURN;
-  turnTime = TURN;
+  baseEnergyRechargePerTick = 0.1;
+
+  baseMoveTime = 2 * TURN;
   attackTime = 2 * TURN;
   reloadTime = 4 * TURN;
 
   penetrationBlock = 1;
 
-  viewRange = 10;
+  baseViewRange = 10;
+
+  get moveTime() {
+    let moveTime = this.baseMoveTime;
+
+    if (this.atRadLevelOrHigher(RadLevel.Extreme)) {
+      moveTime *= 3;
+    } else if (this.atRadLevelOrHigher(RadLevel.High)) {
+      moveTime *= 2;
+    }
+
+    return moveTime;
+  }
+
+  get turnTime() {
+    return this.moveTime;
+  }
+
+  get energyRechargePerTick() {
+    if (this.atRadLevelOrHigher(RadLevel.Extreme)) {
+      return 0;
+    }
+
+    return this.baseEnergyRechargePerTick;
+  }
+
+  get viewRange() {
+    let range = this.baseViewRange;
+
+    if (this.atRadLevelOrHigher(RadLevel.Low)) {
+      range -= 2;
+    }
+
+    return Math.max(range, 0);
+  }
 
   baseAccuracyMultiplier = 1;
+
+  rads = 0;
+  radsLostPerTick = 1 / TURN;
 
   get accuracyMultiplier() {
     if (this.hasStatusEffect(TargetingArray)) {
       return Infinity;
     }
 
-    return this.baseAccuracyMultiplier;
+    let acc = this.baseAccuracyMultiplier;
+
+    if (this.atRadLevelOrHigher(RadLevel.Medium)) {
+      acc *= 0.5;
+    }
+
+    return acc;
   }
 
   evasionMultiplier = 1;
@@ -147,6 +195,10 @@ export default abstract class Creature
 
   get animationsStore() {
     return useAnimations();
+  }
+
+  get radLevel(): RadLevel {
+    return radLevelFromRads(this.rads);
   }
 
   move(tile: Tile) {
@@ -435,16 +487,26 @@ export default abstract class Creature
   tick() {
     super.tick();
 
-    if (this.energy < this.maxEnergy) {
-      this.energy = Math.min(
-        this.maxEnergy,
-        this.energy + this.energyRechargePerTick
-      );
-    }
+    this.energy = Math.min(
+      this.maxEnergy,
+      this.energy + this.energyRechargePerTick
+    );
+
+    this.rads = Math.max(0, this.rads - this.radsLostPerTick);
 
     this.statusEffects.forEach((effect) => {
       effect.tick();
     });
+
+    if (this.atRadLevelOrHigher(RadLevel.Extreme)) {
+      const damagePerTurn = this.maxHealth * 0.02;
+      const damagePerTick = damagePerTurn / TURN;
+      this.receiveDamage(damagePerTick);
+    } else if (this.atRadLevelOrHigher(RadLevel.High)) {
+      const damagePerTurn = this.maxHealth * 0.02;
+      const damagePerTick = damagePerTurn / TURN;
+      this.receiveDamage(damagePerTick);
+    }
   }
 
   addStatusEffect(statusEffect: StatusEffect) {
@@ -565,5 +627,9 @@ export default abstract class Creature
     if (this.canSeePlayer) {
       this.lastSawPlayerAt = this.game.player.coords;
     }
+  }
+
+  atRadLevelOrHigher(level: RadLevel) {
+    return atRadLevelOrHigher(this.rads, level);
   }
 }

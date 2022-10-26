@@ -19,3 +19,12 @@ half cover reduces it by 25%. Enemies can also take cover.
 
 You can have cover in each of the four cardinal directions. If an enemy shoots you from a direct diagonal, the maximum applicable cover will be applied. 
 So for example, if you have full cover to the North and half cover to the East, and an enemy is directly north-east of you and shoots you, the north full-cover will apply and the hit chance will be reduced by 50%.
+
+## Radiation
+You build up radiation by being near radioactive things, being attacked with certain weapons, etc. You lose a certain number of rads per turn. The effects of radiation depend on 
+how many rads you've accumulated.
+
+* Low (50 rads +): view range reduced by 2 tiles
+* Medium (100 rads +): accuracy reduced by 50%
+* High (200 rads +): move time doubled. Take 1% of your max health as damage per turn
+* Extreme (400 rads +): move time tripled. Energy recharge rate is 0. Take 2% of your max health as damage per turn

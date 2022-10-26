@@ -209,3 +209,14 @@ function reactFluids(a: Fluid, b: Fluid) {
     return;
   }
 }
+
+export class ToxicWaste extends Fluid {
+  name = 'toxic-waste';
+  baseColor = '#00fc04';
+  moveTimeMultiplier = 2;
+
+  _act() {
+    super._act();
+    this.tile.flammables.forEach((f) => f.stopBurning());
+  }
+}

@@ -8,6 +8,7 @@ import WeaponClipStatus from './WeaponClipStatus.vue';
 import StatusEffect from './StatusEffect.vue';
 import EnergyBar from './player-status/EnergyBar.vue';
 import { weaponIsGun } from '@/entities/weapons/gun';
+import RadiationIndicator from './RadiationIndicator.vue';
 
 export default defineComponent({
   components: {
@@ -17,6 +18,7 @@ export default defineComponent({
     WeaponClipStatus,
     EnergyBar,
     StatusEffect,
+    RadiationIndicator,
   },
   setup() {
     return { game: useGame() };
@@ -56,7 +58,12 @@ export default defineComponent({
     <HealthBar :actor="game.player" />
     <EnergyBar :actor="game.player" />
 
+    <RadiationIndicator :rads="game.player.rads" />
+
     <div>Upgrade points: {{ game.player.upgradePoints }}</div>
+
+    <div>View Range: {{ game.player.viewRange }}</div>
+    <div>Accuracy: {{ game.player.accuracyMultiplier }}</div>
 
     <EquippedWeapon />
     <WeaponClipStatus v-if="playerGun" :gun="playerGun" />
@@ -87,4 +94,7 @@ export default defineComponent({
     margin-top 0.5rem
     &:first-child
       margin-top 0
+
+  .rads
+    color lime
 </style>
