@@ -1,4 +1,4 @@
-import { Enemy } from '@/entities/enemy';
+import { isCreature } from '@/entities/creatures/creature';
 import { useCamera } from '@/stores/camera';
 import { useGame } from '@/stores/game';
 import { FLOOR_TERRAIN_DATA, type Tile } from '@/stores/map';
@@ -63,7 +63,7 @@ export class View {
 
     if (debugOptions.showPlayerLastSeen) {
       const lastSeens = this.game.nonPlayerActors.flatMap((actor) => {
-        if (!(actor instanceof Enemy)) return [];
+        if (!isCreature(actor)) return [];
         return actor.lastSawPlayerAt ?? [];
       });
 

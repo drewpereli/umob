@@ -6,19 +6,23 @@ import type { Power } from '@/powers/power';
 import { Burning } from '@/status-effects/burning';
 import type { Tile } from '@/stores/map';
 import { debugOptions } from '@/utils/debug-options';
-import Creature from './creatures/creature';
+import Creature, { CreatureAlignment } from './creatures/creature';
 import type { Damageable } from './damageable';
 import { defaultBurn, defaultStopBurning, type Flammable } from './flammable';
-import type Gun from './weapons/gun';
 import type { Item } from './items/item';
 import { ItemInMap } from './items/item-in-map';
 import { Pipe } from './weapons/melee-weapon';
+import type { Dir } from '@/utils/map';
 
 export class Player extends Creature implements Flammable {
   defaultChar = '@';
   color = 'yellow';
 
+  name = 'you';
+
   inventory: Item[] = [new Pipe()];
+
+  alignment = CreatureAlignment.Ally;
 
   powers: Power[] = [
     new BuildCover(),
@@ -128,5 +132,14 @@ export class Player extends Creature implements Flammable {
       this.pickupItem(itemInMap.item);
       itemInMap.shouldRemoveFromGame = true;
     });
+  }
+
+  updateFacing(dir: Dir) {
+    this.facing = dir;
+  }
+
+  // Called in creature constructor
+  updateLastSawPlayerIfCanSee() {
+    //
   }
 }

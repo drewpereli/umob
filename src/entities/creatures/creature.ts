@@ -7,6 +7,7 @@ import {
 import { useGame } from '@/stores/game';
 import type { Tile } from '@/stores/map';
 import {
+  coordsEqual,
   coordsInViewCone,
   Cover,
   coverMultiplierBetween,
@@ -16,12 +17,13 @@ import {
   distance,
   FlankingDir,
   flankingDirBetween,
+  rotateDir,
 } from '@/utils/map';
 import type { Power } from '@/powers/power';
 import { random } from '@/utils/random';
 import { Actor } from '../actor';
 import { isDamageable, type Damageable } from '../damageable';
-import Gun, { Pistol, weaponIsGun } from '../weapons/gun';
+import { weaponIsGun } from '../weapons/gun';
 import type { AsciiDrawable } from '@/utils/types';
 import MapEntity, { EntityLayer } from '../map-entity';
 import type { StatusEffect } from '@/status-effects/status-effect';
@@ -30,6 +32,7 @@ import type { Item } from '../items/item';
 import type { Door } from '../door';
 import type { Weapon, WeaponData } from '../weapons/weapon';
 import { Pipe } from '../weapons/melee-weapon';
+import { debugOptions } from '@/utils/debug-options';
 
 export type Covers = Record<Dir, Cover>;
 
@@ -46,6 +49,11 @@ const flankingDirBonusMultipliers: Record<FlankingDir, number> = {
   [FlankingDir.Back]: 2,
 };
 
+export enum CreatureAlignment {
+  Ally = 'ally',
+  Enemy = 'enemy',
+}
+
 export function isCreature(entity: MapEntity): entity is Creature {
   return entity instanceof Creature;
 }
@@ -54,14 +62,22 @@ export default abstract class Creature
   extends Actor
   implements Damageable, AsciiDrawable
 {
-  name = 'actor';
+  constructor(tile: Tile) {
+    super(tile);
+    this.updateLastSawPlayerIfCanSee();
+  }
 
   readonly IMPLEMENTS_DAMAGEABLE = true;
+
+  abstract readonly name: string;
+  abstract readonly defaultChar: string;
 
   layer = EntityLayer.Creature;
 
   health = 100;
   maxHealth = 100;
+
+  alignment = CreatureAlignment.Enemy;
 
   energy = 100;
   maxEnergy = 100;
@@ -88,6 +104,7 @@ export default abstract class Creature
   };
 
   blocksMovement = true;
+  blocksView = false;
 
   facing: Dir = random.arrayElement([Dir.Up, Dir.Right, Dir.Down, Dir.Left]);
   viewAngle: number = 90;
@@ -102,9 +119,9 @@ export default abstract class Creature
   powers: Power[] = [];
   selectedPower: Power | null = null;
 
-  defaultChar = 'd';
-
   statusEffects: StatusEffect[] = [];
+
+  lastSawPlayerAt: Coords | null = null;
 
   get char() {
     return this.game.directionViewMode
@@ -112,7 +129,7 @@ export default abstract class Creature
       : this.defaultChar;
   }
 
-  readonly color: string = 'white';
+  abstract readonly color: string;
 
   get game() {
     return useGame();
@@ -129,10 +146,6 @@ export default abstract class Creature
 
     this.timeUntilNextAction =
       this.moveTime * (tile.moveTimeMultiplier as number);
-  }
-
-  updateFacing(dir: Dir) {
-    this.facing = dir;
   }
 
   turn(dir: Dir) {
@@ -448,5 +461,93 @@ export default abstract class Creature
     effects.splice(idx, 1);
 
     this.statusEffects = [...effects];
+  }
+
+  _act() {
+    if (debugOptions.docileEnemies) return;
+
+    if (debugOptions.wanderingEnemies) return this._wander();
+
+    if (this.alignment === CreatureAlignment.Enemy) {
+      this._actHostile();
+    }
+  }
+
+  /**
+   * If gun is empty, reload
+   * else if I can attack the player, attack the player
+   * else if I can see the player, move towards the player
+   * else if I last saw the player somewhere
+   *  If I'm on the tile I last saw them at, turn randomly (look around)
+   *  else, move towards where I last saw them
+   * else wander
+   */
+  _actHostile() {
+    if (this.mustReload) {
+      this.reload();
+    } else if (this.canAttackPlayer) {
+      this.fireWeapon([this.game.player]);
+    } else if (this.canSeePlayer) {
+      this._moveTowards(this.game.player);
+    } else if (this.lastSawPlayerAt) {
+      if (coordsEqual(this, this.lastSawPlayerAt)) {
+        const randomTurnSegmentCount = random.polarity();
+        const dir = rotateDir(this.facing, randomTurnSegmentCount);
+        this.turn(dir);
+      } else {
+        this._moveTowards(this.lastSawPlayerAt);
+      }
+    } else {
+      this._wander();
+    }
+  }
+
+  _moveTowards(coords: Coords) {
+    const coordsPath = this.game.map.pathBetween(this.coords, coords, this);
+
+    const coordsTowardsTarget = coordsPath[0];
+
+    if (!coordsTowardsTarget) return;
+
+    const tile = this.game.map.tileAt(coordsTowardsTarget);
+
+    if (!this.game.creatureCanOccupy(tile)) return;
+
+    this.moveOrTurn(tile);
+  }
+
+  _wander() {
+    const adjacentCoords = [
+      { x: this.x - 1, y: this.y },
+      { x: this.x + 1, y: this.y },
+      { x: this.x, y: this.y - 1 },
+      { x: this.x, y: this.y + 1 },
+    ];
+
+    const tiles = adjacentCoords
+      .map((coords) => this.game.map.tileAt(coords))
+      .filter((tile) => {
+        return tile && this.game.creatureCanOccupy(tile);
+      });
+
+    if (tiles.length === 0) return;
+
+    this.moveOrTurn(random.arrayElement(tiles));
+  }
+
+  updatePosition(tile: Tile) {
+    super.updatePosition(tile);
+    this.updateLastSawPlayerIfCanSee();
+  }
+
+  updateFacing(dir: Dir) {
+    this.facing = dir;
+    this.updateLastSawPlayerIfCanSee();
+  }
+
+  updateLastSawPlayerIfCanSee() {
+    if (this.canSeePlayer) {
+      this.lastSawPlayerAt = this.game.player.coords;
+    }
   }
 }

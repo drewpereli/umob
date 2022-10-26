@@ -1,4 +1,7 @@
-import Creature from '@/entities/creatures/creature';
+import Creature, {
+  CreatureAlignment,
+  isCreature,
+} from '@/entities/creatures/creature';
 import { isDamageable, type Damageable } from '@/entities/damageable';
 import { Player } from '@/entities/player';
 import { ActionUiState } from '@/utils/action-handlers';
@@ -12,7 +15,6 @@ import { useMenu } from './menu';
 import { distance, coordsEqual, coordsInViewCone, Dir } from '@/utils/map';
 import { Wall } from '@/entities/terrain';
 import { View } from '@/utils/view';
-import { Enemy } from '@/entities/enemy';
 import { Actor } from '@/entities/actor';
 import type MapEntity from '@/entities/map-entity';
 import type { TargetedPower } from '@/powers/targeted-power';
@@ -20,6 +22,7 @@ import { Centrifuge } from '@/entities/centrifuge';
 import { CreateTripWire } from '@/powers/create-trip-wire';
 import { Door, isDoor } from '@/entities/door';
 import { weaponIsGun } from '@/entities/weapons/gun';
+import { Rat } from '@/entities/creatures/rat';
 
 export const useGame = defineStore('game', {
   state: () => ({
@@ -52,15 +55,13 @@ export const useGame = defineStore('game', {
         return entity instanceof Actor && !(entity instanceof Player);
       });
     },
-    enemies(state): Enemy[] {
-      return state.mapEntities.filter(
-        (entity): entity is Enemy => entity instanceof Enemy
+    enemies(): Creature[] {
+      return this.creatures.filter(
+        (e) => e.alignment === CreatureAlignment.Enemy
       );
     },
     creatures(state): Creature[] {
-      return state.mapEntities.filter(
-        (entity): entity is Creature => entity instanceof Creature
-      );
+      return state.mapEntities.filter(isCreature);
     },
     entitiesAt() {
       return (coords: Coords): MapEntity[] => {
@@ -233,7 +234,7 @@ export const useGame = defineStore('game', {
           while (!this.creatureCanOccupy(tile))
             tile = this.map.randomFloorTile();
 
-          const enemy = new Enemy(tile);
+          const enemy = new Rat(tile);
           this.mapEntities.push(enemy);
         });
       }

@@ -31,7 +31,11 @@ export const actionHandlers: Partial<
     ArrowDown: (game) => defaultArrowKey(game, Dir.Down),
     ArrowLeft: (game) => defaultArrowKey(game, Dir.Left),
     a: (game) => {
-      if (!weaponIsGun(game.player.equippedWeapon)) return;
+      if (
+        !game.player.equippedWeapon ||
+        !weaponIsGun(game.player.equippedWeapon)
+      )
+        return;
 
       const playerTile = game.map.tileAt(game.player);
 

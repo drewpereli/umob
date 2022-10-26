@@ -21,6 +21,10 @@ class TestCreature extends Creature {
   mass = 100;
 
   blocksView = false;
+
+  defaultChar = '';
+  color = 'white';
+  name = 'test creature';
 }
 
 describe('Actor', () => {
@@ -64,14 +68,14 @@ describe('Actor', () => {
       const target = createActor({ x: 5, y: 5 });
 
       source.accuracyMultiplier = 0.75;
-      source.equippedWeapon.accuracy = 0.33;
+      (source.equippedWeapon as Gun).accuracy = 0.33;
       target.evasionMultiplier = 0.5;
 
       const hitChance = source.hitChanceForDamageable(target);
 
       expect(hitChance).toEqual(
         source.accuracyMultiplier *
-          source.equippedWeapon.accuracy *
+          (source.equippedWeapon as Gun).accuracy *
           target.evasionMultiplier
       );
     });
@@ -85,7 +89,7 @@ describe('Actor', () => {
       useGame().addMapEntity(wall);
 
       source.accuracyMultiplier = 0.75;
-      source.equippedWeapon.accuracy = 0.33;
+      (source.equippedWeapon as Gun).accuracy = 0.33;
 
       const hitChance = source.hitChanceForDamageable(wall);
 
@@ -105,7 +109,7 @@ describe('Actor', () => {
       game.addMapEntity(new HalfWall(useMap().tileAt({ x: 4, y: 1 })));
 
       source.accuracyMultiplier = 0.75;
-      source.equippedWeapon.accuracy = 0.33;
+      (source.equippedWeapon as Gun).accuracy = 0.33;
 
       const hitChance = source.hitChanceForDamageable(wall);
 
