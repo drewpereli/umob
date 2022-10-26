@@ -2,7 +2,7 @@ import { Burning } from '@/status-effects/burning';
 import { useMap } from '@/stores/map';
 import { random } from '@/utils/random';
 import type { Actor } from './actor';
-import Creature from './creatures/creature';
+import Creature, { isCreature } from './creatures/creature';
 
 // Actors that are flammable.
 // If an actor is flammable, and its "isBurning" is true,
@@ -67,14 +67,13 @@ export function defaultBurn(flammable: Flammable) {
     .filter(isFlammable);
 
   adjacentFlammables.forEach((entity) => {
+    // Creatures will only catch fire if standing directly in the flames
+    if (isCreature(entity)) return;
+
     const willBurn = random.float(0, 1) < flammable.burnAdjacentChance;
 
     if (willBurn) {
-      if (entity instanceof Creature) {
-        entity.addStatusEffect(new Burning(entity));
-      } else if (!entity.isBurning) {
-        entity.startBurning();
-      }
+      entity.startBurning();
     }
   });
 }
