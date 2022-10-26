@@ -21,13 +21,15 @@ import type { Power } from '@/powers/power';
 import { random } from '@/utils/random';
 import { Actor } from './actor';
 import { isDamageable, type Damageable } from './damageable';
-import Gun, { Pistol } from './weapons/gun';
+import Gun, { Pistol, weaponIsGun } from './weapons/gun';
 import type { AsciiDrawable } from '@/utils/types';
 import MapEntity, { EntityLayer } from './map-entity';
 import type { StatusEffect } from '@/status-effects/status-effect';
 import { isTrap } from './traps/trap';
 import type { Item } from './items/item';
 import type { Door } from './door';
+import type { Weapon } from './weapons/weapon';
+import { Pipe } from './weapons/melee-weapon';
 
 export type Covers = Record<Dir, Cover>;
 
@@ -82,8 +84,8 @@ export default abstract class Creature
   facing: Dir = random.arrayElement([Dir.Up, Dir.Right, Dir.Down, Dir.Left]);
   viewAngle: number = 90;
 
-  inventory: Item[] = [new Pistol()];
-  equippedWeapon: Gun = this.inventory[0] as Gun;
+  inventory: Item[] = [new Pipe()];
+  equippedWeapon: Weapon = this.inventory[0] as Weapon;
 
   powers: Power[] = [];
   selectedPower: Power | null = null;
@@ -130,6 +132,8 @@ export default abstract class Creature
   }
 
   reload() {
+    if (!weaponIsGun(this.equippedWeapon)) return;
+
     if (this.equippedWeapon.amoLoaded === this.equippedWeapon.clipSize) return;
 
     this.equippedWeapon.amoLoaded = this.equippedWeapon.clipSize;
@@ -171,19 +175,21 @@ export default abstract class Creature
         entity.receiveDamage(damage);
       }
 
-      if (idx === 0) {
+      if (idx === 0 && weaponIsGun(this.equippedWeapon)) {
         this.game.animations.addAnimation(
           new BulletAnimation(this, entity, willHit)
         );
       }
     });
 
-    this.equippedWeapon.amoLoaded--;
+    if (weaponIsGun(this.equippedWeapon)) {
+      this.equippedWeapon.amoLoaded--;
 
-    if (entities.length === 0) {
-      this.game.animations.addAnimation(
-        new BulletAnimation(this, this.game.selectedTile as Coords, false)
-      );
+      if (entities.length === 0) {
+        this.game.animations.addAnimation(
+          new BulletAnimation(this, this.game.selectedTile as Coords, false)
+        );
+      }
     }
 
     this.timeUntilNextAction =
@@ -252,7 +258,11 @@ export default abstract class Creature
 
     const dist = distance(this, this.game.player);
 
-    if (dist > this.equippedWeapon.range) return false;
+    const range = weaponIsGun(this.equippedWeapon)
+      ? this.equippedWeapon.range
+      : 1;
+
+    if (dist > range) return false;
 
     const tilesBetween = this.game.map
       .tilesBetween(this, this.game.player)
@@ -378,7 +388,9 @@ export default abstract class Creature
   }
 
   get mustReload() {
-    return this.equippedWeapon.amoLoaded === 0;
+    return (
+      weaponIsGun(this.equippedWeapon) && this.equippedWeapon.amoLoaded === 0
+    );
   }
 
   tick() {

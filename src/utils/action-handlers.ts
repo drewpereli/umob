@@ -6,6 +6,7 @@ import type { Power } from '@/powers/power';
 import { TargetedPower } from '@/powers/targeted-power';
 import type { useGame } from '@/stores/game';
 import { Dir } from './map';
+import { weaponIsGun } from '@/entities/weapons/gun';
 
 export enum ActionUiState {
   Default = 'default',
@@ -30,6 +31,8 @@ export const actionHandlers: Partial<
     ArrowDown: (game) => defaultArrowKey(game, Dir.Down),
     ArrowLeft: (game) => defaultArrowKey(game, Dir.Left),
     a: (game) => {
+      if (!weaponIsGun(game.player.equippedWeapon)) return;
+
       const playerTile = game.map.tileAt(game.player);
 
       const target = game.map.adjacentTile(playerTile, game.player.facing);

@@ -1,16 +1,14 @@
-import { Item } from '../items/item';
+import { Weapon } from './weapon';
 
-export const DEFAULT_FLANKING_BONUS = 0.5;
+export function weaponIsGun(w: Weapon): w is Gun {
+  return w instanceof Gun;
+}
 
-export default abstract class Gun extends Item {
-  abstract damage: number;
+export default abstract class Gun extends Weapon {
   penetration = 0;
-  attackTimeMultiplier = 1;
   range = Infinity;
   spread: number | null = null;
   accuracy = 0.5;
-  knockBack = 0;
-  flankingBonus = DEFAULT_FLANKING_BONUS;
   abstract clipSize: number;
   abstract amoLoaded: number;
   reloadTimeMultiplier = 1;

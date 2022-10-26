@@ -252,6 +252,8 @@ export const useGame = defineStore('game', {
         this.player.openDoor(door);
       } else if (this.creatureCanOccupy(targetTile)) {
         this.player.move(targetTile);
+      } else if (this.damageablesAt(targetTile)) {
+        this.player.fireWeapon(this.damageablesAt(targetTile));
       } else {
         return;
       }
