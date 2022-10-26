@@ -29,7 +29,6 @@ import MapEntity, { EntityLayer } from '../map-entity';
 import type { StatusEffect } from '@/status-effects/status-effect';
 import { isTrap } from '../traps/trap';
 import type { Item } from '../items/item';
-import type { Door } from '../door';
 import type { Weapon, WeaponData } from '../weapons/weapon';
 import { Pipe } from '../weapons/melee-weapon';
 import { debugOptions } from '@/utils/debug-options';
@@ -39,6 +38,7 @@ import {
   RadLevel,
   radLevelFromRads,
 } from '@/utils/radiation';
+import type { Door } from '../terrain';
 
 export type Covers = Record<Dir, Cover>;
 

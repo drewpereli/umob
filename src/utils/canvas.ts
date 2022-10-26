@@ -1,4 +1,4 @@
-import { isDoor } from '@/entities/door';
+import { isDoor } from '@/entities/terrain';
 import { isFlammable } from '@/entities/flammable';
 import { isFluid } from '@/entities/fluid';
 import { Gas } from '@/entities/gas';
@@ -11,7 +11,7 @@ import { FLOOR_TERRAIN_DATA, Tile, type TerrainData } from '@/stores/map';
 import chroma, { scale } from 'chroma-js';
 import { Dir } from './map';
 import { random } from './random';
-import { isAsciiDrawable } from './types';
+import { isAsciiDrawable, type AsciiDrawable } from './types';
 
 export const CELL_LENGTH = 28;
 
@@ -70,7 +70,19 @@ export function drawTerrain(
   position: Coords,
   terrain: TerrainData = FLOOR_TERRAIN_DATA
 ) {
-  fillText(ctx, terrain.char as string, position, terrain.color as string);
+  drawAsciiDrawable(ctx, position, terrain);
+}
+
+function drawAsciiDrawable(
+  ctx: CanvasRenderingContext2D,
+  position: Coords,
+  drawable: AsciiDrawable
+) {
+  if (drawable.backgroundColor) {
+    fillRect(ctx, position, drawable.backgroundColor);
+  }
+
+  fillText(ctx, drawable.char, position, drawable.color);
 }
 
 export function drawEntityTile(
@@ -180,14 +192,8 @@ export function drawEntityTile(
         fillRectPx(ctx, rectStartPx, rectEndPx, color);
       }
     }
-  } else if (isDoor(entity)) {
-    fillRect(ctx, position, '#9c7406');
-
-    if (!entity.isOpen) {
-      fillText(ctx, '+', position, '#e6c66e');
-    }
   } else if (isAsciiDrawable(entity)) {
-    fillText(ctx, entity.char, position, entity.color);
+    drawAsciiDrawable(ctx, position, entity);
   }
 }
 

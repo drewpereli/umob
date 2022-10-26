@@ -1,6 +1,7 @@
 export interface AsciiDrawable {
   char: string;
   color: string;
+  backgroundColor?: string;
 }
 
 export function isAsciiDrawable(item: unknown): item is AsciiDrawable {

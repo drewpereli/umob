@@ -1,4 +1,4 @@
-import { Door } from '@/entities/door';
+import { Door } from '@/entities/terrain';
 import { Lava } from '@/entities/fluid';
 import { Wall, HalfWall } from '@/entities/terrain';
 import { useGame } from '@/stores/game';

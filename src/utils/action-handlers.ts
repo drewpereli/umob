@@ -1,4 +1,4 @@
-import { isDoor } from '@/entities/door';
+import { isDoor } from '@/entities/terrain';
 import { NonTargetedPower } from '@/powers/non-targeted-power';
 import { TargetedPower } from '@/powers/targeted-power';
 import type { useGame } from '@/stores/game';

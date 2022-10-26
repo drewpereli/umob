@@ -132,7 +132,10 @@ export const useMap = defineStore('map', {
   },
 });
 
-export type TerrainData = Pick<Terrain, 'type' | 'char' | 'color'>;
+export type TerrainData = Pick<
+  Terrain,
+  'type' | 'char' | 'color' | 'backgroundColor'
+>;
 
 export const FLOOR_TERRAIN_DATA: TerrainData = {
   type: 'floor',
@@ -188,6 +191,7 @@ export class Tile {
       type: terrain.type,
       char: terrain.char,
       color: terrain.color,
+      backgroundColor: terrain.backgroundColor,
     };
   }
 

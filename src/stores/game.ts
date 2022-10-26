@@ -19,7 +19,7 @@ import type MapEntity from '@/entities/map-entity';
 import type { TargetedPower } from '@/powers/targeted-power';
 import { Centrifuge } from '@/entities/centrifuge';
 import { CreateTripWire } from '@/powers/create-trip-wire';
-import { Door, isDoor } from '@/entities/door';
+import { Door, isDoor } from '@/entities/terrain';
 import { weaponIsGun } from '@/entities/weapons/gun';
 import { Rat } from '@/entities/creatures/rat';
 
