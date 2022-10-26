@@ -30,12 +30,6 @@ export class TripWire extends Trap {
       this.orientation
     );
 
-    tiles.forEach((tile) => {
-      if (tile === this.tile) return;
-
-      tile.addEntity(this);
-    });
-
     this.tilesOccupied = tiles;
     this.anchorTiles = anchors;
   }

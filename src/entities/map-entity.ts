@@ -16,8 +16,6 @@ export default abstract class MapEntity {
     this.y = tile.y;
     this.tile = tile;
 
-    tile.addEntity(this);
-
     this.tilesOccupied = [tile];
   }
 

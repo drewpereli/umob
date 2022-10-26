@@ -165,13 +165,9 @@ export class Tile {
     return terrainMultiplier * fluidMultiplier;
   }
 
-  get hasEntityThatBlocksMovement() {
-    return this.entities.some((e) => e.blocksMovement);
-  }
+  hasEntityThatBlocksMovement = false;
 
-  get hasEntityThatBlocksView() {
-    return this.entities.some((e) => e.blocksView);
-  }
+  hasEntityThatBlocksView = false;
 
   get terrain() {
     return this.entities.find(isTerrain);
@@ -226,13 +222,13 @@ export class Tile {
 
     this.entities.push(e);
 
-    // if (e.blocksMovement) {
-    //   this.hasEntityThatBlocksMovement = true;
-    // }
+    if (e.blocksMovement) {
+      this.hasEntityThatBlocksMovement = true;
+    }
 
-    // if (e.blocksView) {
-    //   this.hasEntityThatBlocksView = true;
-    // }
+    if (e.blocksView) {
+      this.hasEntityThatBlocksView = true;
+    }
 
     // if (isTerrain(e)) {
     //   this.terrain = e;
@@ -252,16 +248,24 @@ export class Tile {
     //   this.moveTimeMultiplier = 1;
     // }
 
-    // if (e.blocksMovement) {
-    //   this.hasEntityThatBlocksMovement = this.entities.some(
-    //     (entity) => entity.blocksMovement
-    //   );
-    // }
+    if (e.blocksMovement) {
+      this.updateBlocksMovement();
+    }
 
-    // if (e.blocksView) {
-    //   this.hasEntityThatBlocksView = this.entities.some(
-    //     (entity) => entity.blocksView
-    //   );
-    // }
+    if (e.blocksView) {
+      this.updateBlocksView();
+    }
+  }
+
+  updateBlocksMovement() {
+    this.hasEntityThatBlocksMovement = this.entities.some(
+      (entity) => entity.blocksMovement
+    );
+  }
+
+  updateBlocksView() {
+    this.hasEntityThatBlocksView = this.entities.some(
+      (entity) => entity.blocksView
+    );
   }
 }

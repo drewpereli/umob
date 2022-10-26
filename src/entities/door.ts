@@ -41,11 +41,15 @@ export class Door extends MapEntity implements Damageable {
 
   open() {
     this.isOpen = true;
+    this.tile.updateBlocksMovement();
+    this.tile.updateBlocksView();
   }
 
   close() {
     if (this.canClose) {
       this.isOpen = false;
+      this.tile.updateBlocksMovement();
+      this.tile.updateBlocksView();
     }
   }
 

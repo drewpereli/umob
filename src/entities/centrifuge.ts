@@ -13,7 +13,7 @@ import { EntityLayer } from './map-entity';
 export class Centrifuge extends Actor implements AsciiDrawable {
   constructor(tile: Tile) {
     super(tile);
-    this.updateTilesOccupied();
+    this.initializeTilesOccupied();
   }
 
   layer = EntityLayer.Object;
@@ -188,5 +188,12 @@ export class Centrifuge extends Actor implements AsciiDrawable {
       map.tileAt(coords)
     );
     this.tilesOccupied.forEach((t) => t.addEntity(this));
+  }
+
+  initializeTilesOccupied() {
+    const map = useMap();
+    this.tilesOccupied = this.coordsOccupied.map((coords) =>
+      map.tileAt(coords)
+    );
   }
 }

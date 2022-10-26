@@ -234,7 +234,7 @@ export const useGame = defineStore('game', {
             tile = this.map.randomFloorTile();
 
           const enemy = new Rat(tile);
-          this.mapEntities.push(enemy);
+          this.addMapEntity(enemy);
         });
       }
     },
@@ -380,6 +380,7 @@ export const useGame = defineStore('game', {
       }, [] as MapEntity[]);
     },
     addMapEntity(entity: MapEntity) {
+      entity.tilesOccupied.forEach((tile) => tile.addEntity(entity));
       this.mapEntities.push(entity);
     },
     addEndOfTickAction(action: () => unknown) {
