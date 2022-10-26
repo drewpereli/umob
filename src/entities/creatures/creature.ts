@@ -4,7 +4,7 @@ import {
   KnockBackAnimation,
   useAnimations,
 } from '@/stores/animations';
-import { useGame } from '@/stores/game';
+import { TURN, useGame } from '@/stores/game';
 import type { Tile } from '@/stores/map';
 import {
   coordsEqual,
@@ -84,10 +84,10 @@ export default abstract class Creature
   maxEnergy = 100;
   energyRechargePerTick = 0.1;
 
-  moveTime = 2;
-  turnTime = 1;
-  attackTime = 2;
-  reloadTime = 4;
+  moveTime = 2 * TURN;
+  turnTime = TURN;
+  attackTime = 2 * TURN;
+  reloadTime = 4 * TURN;
 
   penetrationBlock = 1;
 

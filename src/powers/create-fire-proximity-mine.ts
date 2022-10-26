@@ -1,11 +1,12 @@
 import { TargetedPower } from './targeted-power';
 import { FireProximityMine } from '@/entities/traps/proximity-mine';
+import { TURN } from '@/stores/game';
 
 export class CreateFireProximityMine extends TargetedPower {
   readonly name = 'create fire proximity mine';
   range = 5;
 
-  useTime = 1;
+  useTime = TURN;
   energyCost = 20;
 
   activate() {

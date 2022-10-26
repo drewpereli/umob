@@ -1,6 +1,6 @@
 import { Actor } from '@/entities/actor';
 import { EntityLayer } from '@/entities/map-entity';
-import { useGame } from '@/stores/game';
+import { TURN, useGame } from '@/stores/game';
 import type { Tile } from '@/stores/map';
 import bresenham from '@/utils/bresenham';
 import { dirsBetween, distance } from '@/utils/map';
@@ -9,7 +9,7 @@ import { TargetedPower } from './targeted-power';
 
 export class CreateBlackHole extends TargetedPower {
   readonly name = 'create black hole';
-  useTime = 2;
+  useTime = 2 * TURN;
   energyCost = 50;
   range = 8;
 

@@ -1,10 +1,11 @@
 import { ExplosionAnimation } from '@/stores/animations';
+import { TURN } from '@/stores/game';
 import { createExplosion } from '@/utils/explosions';
 import { TargetedPower } from './targeted-power';
 
 export class Grenade extends TargetedPower {
   readonly name = 'grenade';
-  useTime = 2;
+  useTime = 2 * TURN;
   energyCost = 20;
   range = 8;
   radius = 3;

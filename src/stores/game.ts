@@ -23,6 +23,8 @@ import { Door, isDoor } from '@/entities/door';
 import { weaponIsGun } from '@/entities/weapons/gun';
 import { Rat } from '@/entities/creatures/rat';
 
+export const TURN = 4; // How many ticks make up a "turn"
+
 export const useGame = defineStore('game', {
   state: () => ({
     player: null as unknown as Player,

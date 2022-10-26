@@ -1,13 +1,13 @@
 import { TargetedPower } from './targeted-power';
 import { Orientation } from '@/entities/traps/trap';
-import { useGame } from '@/stores/game';
+import { TURN, useGame } from '@/stores/game';
 import { TripWire } from '@/entities/traps/tripwire';
 
 export class CreateTripWire extends TargetedPower {
   name = 'create tripwire';
   range = 5;
 
-  useTime = 1;
+  useTime = TURN;
   energyCost = 40;
 
   currentOrientation = Orientation.Horizontal;

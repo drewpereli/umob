@@ -1,8 +1,9 @@
+import { TURN } from '@/stores/game';
 import { NonTargetedPower } from './non-targeted-power';
 
 export class Heal extends NonTargetedPower {
   readonly name = 'heal';
-  useTime = 2;
+  useTime = 2 * TURN;
   energyCost = 10;
 
   activate() {

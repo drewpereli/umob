@@ -1,4 +1,5 @@
 import { Water } from '@/entities/fluid';
+import { TURN } from '@/stores/game';
 import { useMap } from '@/stores/map';
 import { TargetedPower } from './targeted-power';
 
@@ -6,7 +7,7 @@ export class CreateWaterPool extends TargetedPower {
   readonly name = 'create water pool';
   range = 5;
   energyCost = 10;
-  useTime = 2;
+  useTime = 2 * TURN;
 
   // Only allow creating it on floor tiles
   closestValidToSelected() {
