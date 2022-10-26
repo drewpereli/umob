@@ -11,6 +11,8 @@ import type MapEntity from '@/entities/map-entity';
 import { isFluid, type Fluid } from '@/entities/fluid';
 import { isGas, type Gas } from '@/entities/gas';
 import { isItemInMap, type ItemInMap } from '@/entities/items/item-in-map';
+import { isCreature } from '@/entities/creatures/creature';
+import { isFlammable } from '@/entities/flammable';
 
 export const useMap = defineStore('map', {
   state: () => ({
@@ -207,6 +209,10 @@ export class Tile {
 
   get items(): ItemInMap[] {
     return this.entities.filter(isItemInMap);
+  }
+
+  get flammables() {
+    return this.entities.filter(isFlammable);
   }
 
   addEntity(e: MapEntity) {

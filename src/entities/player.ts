@@ -104,6 +104,11 @@ export class Player extends Creature implements Flammable {
 
   stopBurning() {
     defaultStopBurning(this);
+    const burning = this.statusEffects.find((s) => s instanceof Burning);
+
+    if (!burning) return;
+
+    this.removeStatusEffect(burning);
   }
 
   pickupItem(item: Item) {

@@ -132,6 +132,10 @@ export class Water extends Fluid {
   name = 'water';
   baseColor = '#4287f5';
   moveTimeMultiplier = 2;
+
+  _act() {
+    this.tile.flammables.forEach((f) => f.stopBurning());
+  }
 }
 
 export class Oil extends Fluid implements Flammable {
