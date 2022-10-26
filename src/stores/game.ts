@@ -44,15 +44,11 @@ export const useGame = defineStore('game', {
     // if the player is on a conveyor belt when it's "act" is called. It can add an action to the queue
     // that will move the player at the end of the tick. That way, no other conveyor belt will be able to act on the player that tick.
     endOfTickActionQueue: [] as Array<() => unknown>,
+    nonPlayerActors: [] as Actor[], // Was originally computed, but there were performance issues, so this is sor tof a cache
   }),
   getters: {
     allActors(state): Actor[] {
       return [state.player, ...this.nonPlayerActors];
-    },
-    nonPlayerActors(state): Actor[] {
-      return state.mapEntities.filter((entity): entity is Actor => {
-        return entity instanceof Actor && !(entity instanceof Player);
-      });
     },
     enemies(): Creature[] {
       return this.creatures.filter(
@@ -215,7 +211,8 @@ export const useGame = defineStore('game', {
       const player = new Player(tile);
 
       this.player = player;
-      this.addMapEntity(player);
+
+      this.addPlayer(player);
 
       const fov = new PermissiveFov(
         this.map.width,
@@ -379,9 +376,17 @@ export const useGame = defineStore('game', {
         return all;
       }, [] as MapEntity[]);
     },
+    addPlayer(player: Player) {
+      player.tilesOccupied.forEach((tile) => tile.addEntity(player));
+      this.mapEntities.push(player);
+    },
     addMapEntity(entity: MapEntity) {
       entity.tilesOccupied.forEach((tile) => tile.addEntity(entity));
       this.mapEntities.push(entity);
+
+      if (entity instanceof Actor) {
+        this.nonPlayerActors.push(entity);
+      }
     },
     addEndOfTickAction(action: () => unknown) {
       this.endOfTickActionQueue.push(action);
