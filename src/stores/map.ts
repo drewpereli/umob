@@ -216,6 +216,14 @@ export class Tile {
   }
 
   addEntity(e: MapEntity) {
+    if (isFluid(e) && this.fluid) {
+      return;
+    }
+
+    if (isGas(e) && this.gas) {
+      return;
+    }
+
     this.entities.push(e);
 
     // if (e.blocksMovement) {
