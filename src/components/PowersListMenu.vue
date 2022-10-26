@@ -1,42 +1,47 @@
 <script lang="ts">
+import type { Power } from '@/powers/power';
 import { useGame } from '@/stores/game';
 import { defineComponent } from 'vue';
-import UiMenu from './UiMenu.vue';
-
-function computeMenuItems() {
-  const game = useGame();
-  const menu = game.menu;
-
-  const items = game.player.powers.map((power, idx) => {
-    const currHotkey = Object.keys(game.player.powerHotkeys).find(
-      (hotKey) => game.player.powerHotkeys[hotKey] === power
-    );
-
-    return {
-      label: `${power.name} ${currHotkey ? `(${currHotkey})` : ''}`,
-      model: power,
-      data: {
-        hotKey: idx + 1,
-      },
-    };
-  });
-
-  menu.setItems(items);
-}
+import UiMenu, { type MenuItem } from './UiMenu.vue';
 
 export default defineComponent({
   setup() {
     const game = useGame();
-    const menu = game.menu;
-
-    computeMenuItems();
-
-    return { menu, game };
+    return { player: game.player };
   },
   components: { UiMenu },
-  watch: {
-    'game.player.powerHotkeys'() {
-      computeMenuItems();
+  computed: {
+    // eslint-disable-next-line no-undef
+    items(): MenuItem<Power>[] {
+      return this.player.powers.map((power) => {
+        let label = power.name;
+
+        const existingHotKey = this.player.hotKeyForPower(power);
+
+        if (existingHotKey) {
+          label += ` (${existingHotKey})`;
+        }
+
+        return {
+          label,
+          model: power,
+        };
+      });
+    },
+  },
+  methods: {
+    anyKeyDown(key: string, item: MenuItem<Power>) {
+      if (!/\d/.test(key)) return;
+
+      const power = item.model;
+
+      const existingHotKey = this.player.hotKeyForPower(power);
+
+      if (existingHotKey) {
+        delete this.player.powerHotkeys[existingHotKey];
+      }
+
+      this.player.powerHotkeys[key] = power;
     },
   },
 });
@@ -45,8 +50,8 @@ export default defineComponent({
 <template>
   <UiMenu
     title="Powers"
-    :items="menu.items"
-    :selectedItemIdx="menu.selectedItemIdx"
+    :items="items"
     :includeDescription="false"
+    @anyKeyDown="anyKeyDown"
   />
 </template>

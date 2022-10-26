@@ -1,8 +1,5 @@
 import { isDoor } from '@/entities/door';
-import type Gun from '@/entities/weapons/gun';
-import type { Item } from '@/entities/items/item';
 import { NonTargetedPower } from '@/powers/non-targeted-power';
-import type { Power } from '@/powers/power';
 import { TargetedPower } from '@/powers/targeted-power';
 import type { useGame } from '@/stores/game';
 import { Dir } from './map';
@@ -12,9 +9,13 @@ export enum ActionUiState {
   Default = 'default',
   Aiming = 'aiming',
   GameOver = 'game-over',
-  Inventory = 'inventory',
   AimingPower = 'aiming-power',
   Examining = 'examining',
+}
+
+export enum MetaUiState {
+  Default = 'default',
+  Inventory = 'inventory',
   PowersList = 'powers-list',
 }
 
@@ -49,8 +50,7 @@ export const actionHandlers: Partial<
       game.actionUiState = ActionUiState.Aiming;
     },
     r: (game) => game.playerReload(),
-    e: (game) => (game.actionUiState = ActionUiState.Inventory),
-    p: (game) => (game.actionUiState = ActionUiState.PowersList),
+    p: (game) => (game.metaUiState = MetaUiState.PowersList),
     c: (game) => {
       const playerFacing = game.player.facing;
 
@@ -64,6 +64,7 @@ export const actionHandlers: Partial<
 
       game.playerCloseDoor(door);
     },
+    e: (game) => (game.metaUiState = MetaUiState.Inventory),
     x: (game) => {
       const playerTile = game.map.tileAt(game.player);
 
@@ -143,48 +144,6 @@ export const actionHandlers: Partial<
     r: (game) => {
       game.rotateSelectedPowerAim();
     },
-  },
-  [ActionUiState.Inventory]: {
-    Escape: (game) => (game.actionUiState = ActionUiState.Default),
-    ArrowUp: (game) => game.menu.previousItem(),
-    ArrowDown: (game) => game.menu.nextItem(),
-    d: (game) => {
-      const item = game.menu.selectedItem.model as Item;
-      game.player.dropItem(item);
-    },
-    Enter: (game) => {
-      const weapon = game.menu.selectedItem.model as Gun;
-      game.player.equippedWeapon = weapon;
-      game.actionUiState = ActionUiState.Default;
-    },
-  },
-  [ActionUiState.PowersList]: {
-    Escape: (game) => (game.actionUiState = ActionUiState.Default),
-    ArrowUp: (game) => game.menu.previousItem(),
-    ArrowDown: (game) => game.menu.nextItem(),
-    ...Array.from({ length: 10 })
-      .map((_, idx) => idx)
-      .reduce((acc, key) => {
-        acc[key] = (game) => {
-          const powerHotkeys = game.player.powerHotkeys;
-
-          const selectedPower = game.menu.selectedItem.model as Power;
-
-          const currentHotKeyForPower = Object.keys(powerHotkeys).find(
-            (hotKey) => powerHotkeys[hotKey] === selectedPower
-          );
-
-          powerHotkeys[`${key}`] = selectedPower;
-
-          if (currentHotKeyForPower) {
-            delete powerHotkeys[currentHotKeyForPower];
-          }
-
-          game.player.powerHotkeys = { ...powerHotkeys };
-        };
-
-        return acc;
-      }, {} as Record<string, KeyHandler>),
   },
   [ActionUiState.Examining]: {
     ArrowUp: (game) => updateAim(game, Dir.Up),

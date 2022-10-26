@@ -1,15 +1,16 @@
 <script lang="ts">
-import type { MenuItem } from '@/stores/menu';
 import { defineComponent, type PropType } from 'vue';
+
+export interface MenuItem<T = unknown> {
+  label: string;
+  model: T;
+  description?: string;
+}
 
 export default defineComponent({
   props: {
     items: {
       type: Object as PropType<MenuItem[]>,
-      required: true,
-    },
-    selectedItemIdx: {
-      type: Number,
       required: true,
     },
     title: {
@@ -20,16 +21,63 @@ export default defineComponent({
       default: true,
     },
   },
+  data() {
+    return {
+      selectedItemIdx: 0,
+    };
+  },
   computed: {
     selectedItem() {
       return this.items[this.selectedItemIdx];
+    },
+  },
+  methods: {
+    up() {
+      this.selectedItemIdx -= 1;
+
+      if (this.selectedItemIdx < 0)
+        this.selectedItemIdx = this.items.length - 1;
+    },
+    down() {
+      this.selectedItemIdx += 1;
+
+      if (this.selectedItemIdx === this.items.length) this.selectedItemIdx = 0;
+    },
+    close() {
+      this.$emit('close');
+    },
+    enter() {
+      this.$emit('enter', this.selectedItem);
+    },
+    anyKeyDown(e: KeyboardEvent) {
+      this.$emit('anyKeyDown', e.key, this.selectedItem);
+    },
+  },
+  mounted() {
+    (this.$refs.menu as HTMLDivElement).focus();
+  },
+  watch: {
+    items() {
+      if (this.selectedItemIdx > this.items.length - 1) {
+        this.selectedItemIdx = this.items.length - 1;
+      }
     },
   },
 });
 </script>
 
 <template>
-  <div class="ui-menu">
+  <div
+    class="ui-menu"
+    @keydown.stop.up="up"
+    @keydown.stop.down="down"
+    @keydown.stop.escape="close"
+    @keydown.stop.enter="enter"
+    @keydown.stop="anyKeyDown"
+    @keydown.stop.prevent.tab=""
+    ref="menu"
+    tabindex="1"
+  >
     <div v-if="title" class="header-container">
       <h2>{{ title }}</h2>
     </div>
@@ -62,6 +110,10 @@ export default defineComponent({
   min-height 50vh
   border 1px solid gray
   border-radius 4px
+  position absolute
+  left: 50%;
+  transform: translateX(-50%);
+  top 1rem
 
   &:focus
     outline none

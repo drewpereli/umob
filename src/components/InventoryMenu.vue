@@ -1,47 +1,54 @@
 <script lang="ts">
-import type Gun from '@/entities/weapons/gun';
 import { useGame } from '@/stores/game';
-import type { MenuItem } from '@/stores/menu';
 import { defineComponent } from 'vue';
-import UiMenu from './UiMenu.vue';
+import UiMenu, { type MenuItem } from './UiMenu.vue';
 import WeaponStats from './WeaponStats.vue';
-
-function setMenuItems() {
-  const game = useGame();
-  const menu = game.menu;
-
-  const items = game.player.inventory.map((item) => {
-    return { label: item.name, model: item, description: item.description };
-  });
-
-  menu.setItems(items);
-}
+import { itemIsWeapon, Weapon } from '@/entities/weapons/weapon';
 
 export default defineComponent({
   setup() {
     const game = useGame();
-    const menu = game.menu;
-    setMenuItems();
-    return { menu, game };
-  },
-  watch: {
-    'game.player.inventory'() {
-      setMenuItems();
-    },
+    return { player: game.player };
   },
   components: { UiMenu, WeaponStats },
+  computed: {
+    items(): MenuItem<Weapon>[] {
+      return this.player.inventory.filter(itemIsWeapon).map((weapon) => {
+        const label =
+          weapon === this.player.equippedWeapon
+            ? `* ${weapon.name}`
+            : `${weapon.name}`;
+
+        return {
+          label,
+          model: weapon,
+        };
+      });
+    },
+  },
+  methods: {
+    enter(item: MenuItem<Weapon>) {
+      this.player.equippedWeapon = item.model;
+    },
+    anyKeyDown(key: string, item: MenuItem<Weapon>) {
+      if (key === 'd') {
+        this.player.dropItem(item.model);
+      }
+    },
+  },
 });
 </script>
 
 <template>
   <UiMenu
     title="Inventory"
-    :items="menu.items"
-    :selectedItemIdx="menu.selectedItemIdx"
+    :items="items"
+    @enter="enter"
+    @anyKeyDown="anyKeyDown"
   >
     <template
       #selected-item-description="selectedItemSlotProps: {
-        selectedItem: MenuItem<Gun>,
+        selectedItem: MenuItem<Weapon>,
       }"
     >
       <WeaponStats :weapon="selectedItemSlotProps.selectedItem.model" />

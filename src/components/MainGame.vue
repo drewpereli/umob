@@ -1,6 +1,10 @@
 <script lang="ts">
 import { useGame } from '@/stores/game';
-import { actionHandlers, ActionUiState } from '@/utils/action-handlers';
+import {
+  actionHandlers,
+  ActionUiState,
+  MetaUiState,
+} from '@/utils/action-handlers';
 import { defineComponent } from 'vue';
 import GameTiles from './GameTiles.vue';
 import PlayerStatus from './PlayerStatus.vue';
@@ -18,6 +22,7 @@ export default defineComponent({
     PowersListMenu,
   },
   methods: {
+    // Only will apply when this element is focused, i.e. when there's no menu being shown
     async onKey({ key }: KeyboardEvent) {
       if (this.onKeyIsRunning) return;
       if (useAnimations().isRunning) return;
@@ -30,6 +35,13 @@ export default defineComponent({
         await new Promise((res) => setTimeout(res, 0));
         this.onKeyIsRunning = false;
       }
+    },
+    closeMenu() {
+      useGame().metaUiState = MetaUiState.Default;
+      this.focus();
+    },
+    focus() {
+      (this.$refs.mainGame as HTMLElement).focus();
     },
   },
   setup() {
@@ -45,14 +57,14 @@ export default defineComponent({
     };
   },
   mounted() {
-    (this.$refs.mainGame as HTMLElement).focus();
+    this.focus();
   },
   computed: {
     showInventoryMenu() {
-      return this.game.actionUiState === ActionUiState.Inventory;
+      return this.game.metaUiState === MetaUiState.Inventory;
     },
     showPowersList() {
-      return this.game.actionUiState === ActionUiState.PowersList;
+      return this.game.metaUiState === MetaUiState.PowersList;
     },
     examinedEntity() {
       if (this.game.actionUiState !== ActionUiState.Examining) return null;
@@ -80,9 +92,9 @@ export default defineComponent({
 
     <EntityDescription v-if="examinedEntity" :entity="examinedEntity" />
 
-    <InventoryMenu v-if="showInventoryMenu" class="menu" />
+    <InventoryMenu v-if="showInventoryMenu" class="menu" @close="closeMenu" />
 
-    <PowersListMenu v-if="showPowersList" class="menu" />
+    <PowersListMenu v-if="showPowersList" class="menu" @close="closeMenu" />
   </div>
 </template>
 
@@ -93,10 +105,4 @@ export default defineComponent({
 
   &:focus
     outline none
-
-  .menu
-    position absolute
-    left: 50%;
-    transform: translateX(-50%);
-    top 1rem
 </style>

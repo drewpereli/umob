@@ -4,14 +4,13 @@ import Creature, {
 } from '@/entities/creatures/creature';
 import { isDamageable, type Damageable } from '@/entities/damageable';
 import { Player } from '@/entities/player';
-import { ActionUiState } from '@/utils/action-handlers';
+import { ActionUiState, MetaUiState } from '@/utils/action-handlers';
 import { debugOptions } from '@/utils/debug-options';
 import { angle, angularDistance } from '@/utils/math';
 import { PermissiveFov } from 'permissive-fov';
 import { defineStore } from 'pinia';
 import { useAnimations } from './animations';
 import { Tile, useMap } from './map';
-import { useMenu } from './menu';
 import { distance, coordsEqual, coordsInViewCone, Dir } from '@/utils/map';
 import { Wall } from '@/entities/terrain';
 import { View } from '@/utils/view';
@@ -33,8 +32,8 @@ export const useGame = defineStore('game', {
     fovUtil: null as unknown as PermissiveFov,
     selectedTile: null as null | Tile,
     actionUiState: ActionUiState.Default,
+    metaUiState: MetaUiState.Default,
     animations: useAnimations(),
-    menu: useMenu(),
     directionViewMode: false, // Actors chars will be replaced with arrows showing where they're facing
     view: new View(),
     // Sometimes there are actors that want to affect an entity, but only if the entity is

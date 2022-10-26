@@ -142,4 +142,10 @@ export class Player extends Creature implements Flammable {
   updateLastSawPlayerIfCanSee() {
     //
   }
+
+  hotKeyForPower(power: Power) {
+    return Object.keys(this.powerHotkeys).find(
+      (key) => this.powerHotkeys[key] === power
+    );
+  }
 }

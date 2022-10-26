@@ -17,3 +17,7 @@ export abstract class Weapon extends Item implements WeaponData {
   knockBack = 0;
   flankingBonus = DEFAULT_FLANKING_BONUS;
 }
+
+export function itemIsWeapon(item: Item): item is Weapon {
+  return item instanceof Weapon;
+}
