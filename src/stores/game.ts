@@ -324,6 +324,10 @@ export const useGame = defineStore('game', {
       this._tickUntilPlayerCanAct();
     },
     async _tickUntilPlayerCanAct() {
+      this._cullEntities();
+
+      this.view.draw();
+
       if (this.animations.animations.length) {
         await new Promise((res) => setTimeout(res, 0));
         await this.animations.runAnimations();
