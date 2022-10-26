@@ -29,7 +29,7 @@ const perksWithoutIds: Omit<Perk, 'id'>[] = [
     name: 'quick charge',
     description: 'double energy recharge rate',
     applyEffect(player: Player) {
-      player.energyRechargePerTick *= 2;
+      player.baseEnergyRechargePerTick *= 2;
       player.energy = player.maxEnergy;
     },
   },
