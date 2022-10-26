@@ -60,11 +60,9 @@ export class DamageAnimation extends GameAnimation {
 
     const position = this.camera.viewCoordsForAbsCoords(actor);
 
-    for (let i = 0; i < 4; i++) {
-      const color = i % 2 === 1 ? this.actor.color : 'red';
-      fillText(ctx, actor.char, position, color);
-      await new Promise((res) => setTimeout(res, 50));
-    }
+    fillText(ctx, actor.char, position, 'red');
+    await new Promise((res) => setTimeout(res, 50));
+    fillText(ctx, actor.char, position, this.actor.color);
   }
 }
 
