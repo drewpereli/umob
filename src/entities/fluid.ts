@@ -134,6 +134,7 @@ export class Water extends Fluid {
   moveTimeMultiplier = 2;
 
   _act() {
+    super._act();
     this.tile.flammables.forEach((f) => f.stopBurning());
   }
 }
