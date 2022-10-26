@@ -1,4 +1,4 @@
-import type Creature from '@/entities/creature';
+import type Creature from '@/entities/creatures/creature';
 import type { Flammable } from '@/entities/flammable';
 import { StatusEffect } from './status-effect';
 

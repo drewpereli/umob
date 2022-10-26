@@ -2,7 +2,7 @@ import { useGame } from '@/stores/game';
 import type { Tile } from '@/stores/map';
 import { createExplosion } from '@/utils/explosions';
 import { Dir } from '@/utils/map';
-import { isCreature } from '../creature';
+import { isCreature } from '../creatures/creature';
 import { Trap, Orientation } from './trap';
 
 export class TripWire extends Trap {

@@ -1,4 +1,4 @@
-import type Creature from '@/entities/creature';
+import type Creature from '@/entities/creatures/creature';
 import { Power } from './power';
 import bresenham from '../utils/bresenham';
 import { distance } from '../utils/map';

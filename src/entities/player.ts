@@ -6,7 +6,7 @@ import type { Power } from '@/powers/power';
 import { Burning } from '@/status-effects/burning';
 import type { Tile } from '@/stores/map';
 import { debugOptions } from '@/utils/debug-options';
-import Creature from './creature';
+import Creature from './creatures/creature';
 import type { Damageable } from './damageable';
 import { defaultBurn, defaultStopBurning, type Flammable } from './flammable';
 import type Gun from './weapons/gun';

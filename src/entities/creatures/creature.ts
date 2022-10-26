@@ -19,17 +19,17 @@ import {
 } from '@/utils/map';
 import type { Power } from '@/powers/power';
 import { random } from '@/utils/random';
-import { Actor } from './actor';
-import { isDamageable, type Damageable } from './damageable';
-import Gun, { Pistol, weaponIsGun } from './weapons/gun';
+import { Actor } from '../actor';
+import { isDamageable, type Damageable } from '../damageable';
+import Gun, { Pistol, weaponIsGun } from '../weapons/gun';
 import type { AsciiDrawable } from '@/utils/types';
-import MapEntity, { EntityLayer } from './map-entity';
+import MapEntity, { EntityLayer } from '../map-entity';
 import type { StatusEffect } from '@/status-effects/status-effect';
-import { isTrap } from './traps/trap';
-import type { Item } from './items/item';
-import type { Door } from './door';
-import type { Weapon, WeaponData } from './weapons/weapon';
-import { Pipe } from './weapons/melee-weapon';
+import { isTrap } from '../traps/trap';
+import type { Item } from '../items/item';
+import type { Door } from '../door';
+import type { Weapon, WeaponData } from '../weapons/weapon';
+import { Pipe } from '../weapons/melee-weapon';
 
 export type Covers = Record<Dir, Cover>;
 

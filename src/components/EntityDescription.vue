@@ -1,5 +1,5 @@
 <script lang="ts">
-import type Creature from '@/entities/creature';
+import type Creature from '@/entities/creatures/creature';
 import { defineComponent, type PropType } from 'vue';
 import HealthBar from './player-status/HealthBar.vue';
 

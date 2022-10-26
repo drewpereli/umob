@@ -2,7 +2,7 @@ import { Burning } from '@/status-effects/burning';
 import { useMap } from '@/stores/map';
 import { random } from '@/utils/random';
 import type { Actor } from './actor';
-import Creature from './creature';
+import Creature from './creatures/creature';
 
 // Actors that are flammable.
 // If an actor is flammable, and its "isBurning" is true,

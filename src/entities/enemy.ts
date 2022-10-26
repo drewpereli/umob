@@ -2,7 +2,7 @@ import type { Tile } from '@/stores/map';
 import { debugOptions } from '@/utils/debug-options';
 import { coordsEqual, rotateDir, type Dir } from '@/utils/map';
 import { random } from '@/utils/random';
-import Creature from './creature';
+import Creature from './creatures/creature';
 
 enum Mood {
   Hostile = 'hostile',

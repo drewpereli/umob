@@ -1,4 +1,4 @@
-import type Creature from '@/entities/creature';
+import type Creature from '@/entities/creatures/creature';
 
 export abstract class StatusEffect {
   constructor(public creature: Creature) {

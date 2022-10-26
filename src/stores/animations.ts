@@ -1,4 +1,4 @@
-import type Creature from '@/entities/creature';
+import type Creature from '@/entities/creatures/creature';
 import bresenham from '@/utils/bresenham';
 import { CELL_LENGTH, clearRect, fillRect, fillText } from '@/utils/canvas';
 import { polarity, slopeIntercept } from '@/utils/math';

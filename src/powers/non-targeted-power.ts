@@ -1,4 +1,4 @@
-import type Creature from '@/entities/creature';
+import type Creature from '@/entities/creatures/creature';
 import { Power } from './power';
 
 export abstract class NonTargetedPower extends Power {

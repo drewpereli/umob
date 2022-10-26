@@ -1,4 +1,4 @@
-import type { Covers } from '@/entities/creature';
+import type { Covers } from '@/entities/creatures/creature';
 import { angle, angularDistance } from './math';
 
 export enum Dir {

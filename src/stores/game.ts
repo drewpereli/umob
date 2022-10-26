@@ -1,4 +1,4 @@
-import Creature from '@/entities/creature';
+import Creature from '@/entities/creatures/creature';
 import { isDamageable, type Damageable } from '@/entities/damageable';
 import { Player } from '@/entities/player';
 import { ActionUiState } from '@/utils/action-handlers';

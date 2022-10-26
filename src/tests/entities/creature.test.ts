@@ -2,7 +2,7 @@ import { describe, expect, test, beforeEach } from 'vitest';
 import { setActivePinia, createPinia } from 'pinia';
 import { useGame } from '@/stores/game';
 import { Tile, useMap } from '@/stores/map';
-import Creature from '@/entities/creature';
+import Creature from '@/entities/creatures/creature';
 import Gun from '@/entities/weapons/gun';
 import { Wall, HalfWall } from '@/entities/terrain';
 

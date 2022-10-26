@@ -1,7 +1,7 @@
 import bresenham from '@/utils/bresenham';
 import { generate } from '@/utils/map-generation';
 import { defineStore } from 'pinia';
-import type Creature from '@/entities/creature';
+import type Creature from '@/entities/creatures/creature';
 import { debugOptions } from '@/utils/debug-options';
 import { random } from '@/utils/random';
 import { astar, Graph } from '@/utils/astar';
