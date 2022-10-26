@@ -19,6 +19,7 @@ import type { TargetedPower } from '@/powers/targeted-power';
 import { Centrifuge } from '@/entities/centrifuge';
 import { CreateTripWire } from '@/powers/create-trip-wire';
 import { Door, isDoor } from '@/entities/door';
+import { weaponIsGun } from '@/entities/weapons/gun';
 
 export const useGame = defineStore('game', {
   state: () => ({
@@ -134,6 +135,8 @@ export const useGame = defineStore('game', {
 
       const weapon = this.player.equippedWeapon;
 
+      if (!weapon || !weaponIsGun(weapon)) return [];
+
       let penetrationRemaining = weapon.penetration;
 
       const tiles: Tile[] = [];
@@ -158,8 +161,7 @@ export const useGame = defineStore('game', {
       const tilesBetween = this.tilesBetweenPlayerAndSelected;
 
       for (const tile of tilesBetween) {
-        if (distance(this.player, tile) > this.player.equippedWeapon.range)
-          break;
+        if (distance(this.player, tile) > weapon.range) break;
 
         tiles.push(tile);
 
