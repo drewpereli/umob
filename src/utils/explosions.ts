@@ -15,7 +15,7 @@ export function createExplosion(tile: Tile, radius: number, damage: number) {
         entity.trigger();
       }
 
-      if (!isDamageable(entity)) return;
+      if (!isDamageable(entity) || !entity.isCurrentlyDamageable) return;
 
       entity.receiveDamage(damage);
     });
