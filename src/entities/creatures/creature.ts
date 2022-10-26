@@ -33,6 +33,7 @@ import type { Door } from '../door';
 import type { Weapon, WeaponData } from '../weapons/weapon';
 import { Pipe } from '../weapons/melee-weapon';
 import { debugOptions } from '@/utils/debug-options';
+import { TargetingArray } from '@/status-effects/targeting-array';
 
 export type Covers = Record<Dir, Cover>;
 
@@ -81,7 +82,7 @@ export default abstract class Creature
 
   energy = 100;
   maxEnergy = 100;
-  energyRechargePerTick = 1;
+  energyRechargePerTick = 0.1;
 
   moveTime = 2;
   turnTime = 1;
@@ -92,7 +93,16 @@ export default abstract class Creature
 
   viewRange = 10;
 
-  accuracyMultiplier = 1;
+  baseAccuracyMultiplier = 1;
+
+  get accuracyMultiplier() {
+    if (this.hasStatusEffect(TargetingArray)) {
+      return Infinity;
+    }
+
+    return this.baseAccuracyMultiplier;
+  }
+
   evasionMultiplier = 1;
 
   unarmedAttackData: WeaponData = {
@@ -461,6 +471,12 @@ export default abstract class Creature
     effects.splice(idx, 1);
 
     this.statusEffects = [...effects];
+  }
+
+  // Pass the actual status effect class
+  // i.e. hasStatusEffect(TargetingArray)
+  hasStatusEffect(statusEffect: Function) {
+    return this.statusEffects.some((e) => e instanceof statusEffect);
   }
 
   _act() {

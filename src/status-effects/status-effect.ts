@@ -1,7 +1,7 @@
 import type Creature from '@/entities/creatures/creature';
 
 export abstract class StatusEffect {
-  constructor(public creature: Creature) {
+  constructor(public creature: Creature, public maxDuration = Infinity) {
     this.onCreate?.();
   }
 
@@ -20,7 +20,6 @@ export abstract class StatusEffect {
     this.creature.removeStatusEffect(this);
   }
 
-  maxDuration = Infinity;
   currentDuration = 0;
 
   // Called in the creature's "tick" function
