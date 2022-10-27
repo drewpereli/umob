@@ -1,5 +1,6 @@
 import { ExplosionAnimation } from '@/stores/animations';
 import { TURN } from '@/stores/game';
+import type { Tile } from '@/stores/map';
 import { createExplosion } from '@/utils/explosions';
 import { TargetedPower } from './targeted-power';
 
@@ -10,6 +11,8 @@ export class Grenade extends TargetedPower {
   range = 8;
   radius = 3;
 
+  canTargetMovementBlocker = true;
+
   tilesAimedAt() {
     const closest = this.closestValidToSelected();
 
@@ -19,10 +22,7 @@ export class Grenade extends TargetedPower {
   }
 
   activate() {
-    const closest = this.closestValidToSelected();
-    if (!closest) return;
-
-    const tile = this.game.map.tileAt(closest);
+    const tile = this.closestValidToSelected() as Tile;
 
     createExplosion(tile, this.radius, 5);
 
@@ -31,7 +31,7 @@ export class Grenade extends TargetedPower {
     });
 
     this.game.animations.addAnimation(
-      new ExplosionAnimation(closest, this.radius)
+      new ExplosionAnimation(tile, this.radius)
     );
 
     return true;

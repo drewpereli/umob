@@ -291,7 +291,7 @@ export default abstract class Creature
     if (!this.selectedPower) return;
     if (this.selectedPower.energyCost > this.energy) return;
 
-    if (this.selectedPower.activate()) {
+    if (this.selectedPower.activateIfPossible()) {
       this.energy -= this.selectedPower.energyCost;
       this.timeUntilNextAction = this.selectedPower.useTime;
       return true;

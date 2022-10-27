@@ -1,6 +1,7 @@
 import { TargetedPower } from './targeted-power';
 import { ProximityMine } from '@/entities/traps/proximity-mine';
 import { TURN } from '@/stores/game';
+import type { Tile } from '@/stores/map';
 
 export class CreateProximityMine extends TargetedPower {
   readonly name = 'create proximity mine';
@@ -9,16 +10,11 @@ export class CreateProximityMine extends TargetedPower {
   useTime = TURN;
   energyCost = 20;
 
+  canTargetMovementBlocker = true;
+
   activate() {
-    const closest = this.closestValidToSelected();
-
-    if (!closest) return;
-
-    const tile = this.game.map.tileAt(closest);
-
+    const tile = this.closestValidToSelected() as Tile;
     const mine = new ProximityMine(tile);
     this.game.addMapEntity(mine);
-
-    return true;
   }
 }

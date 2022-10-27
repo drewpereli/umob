@@ -127,11 +127,7 @@ export const useGame = defineStore('game', {
       if (!this.selectedTile) return [];
 
       if (this.actionUiState === ActionUiState.AimingPower) {
-        const coords = (
-          this.player.selectedPower as TargetedPower
-        )?.tilesAimedAt();
-
-        return coords?.map((coord) => this.map.tileAt(coord)) ?? [];
+        return (this.player.selectedPower as TargetedPower).tilesAimedAt();
       }
 
       if (this.actionUiState !== ActionUiState.Aiming) return [];
@@ -151,7 +147,7 @@ export const useGame = defineStore('game', {
 
       const weapon = this.player.equippedWeapon;
 
-      if (!this.selectedTile || !weaponIsGun(weapon)) return [];
+      if (!this.selectedTile || !weapon || !weaponIsGun(weapon)) return [];
 
       return damageablesAimedAt(this.player.tile, this.selectedTile, weapon);
     },

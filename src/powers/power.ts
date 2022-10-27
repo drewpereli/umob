@@ -8,5 +8,6 @@ export abstract class Power {
   game = useGame();
 
   // Return true if activation successful
-  abstract activate(): boolean | undefined;
+  abstract activateIfPossible(): boolean;
+  abstract activate(): void;
 }

@@ -13,34 +13,11 @@ export class CreateBlackHole extends TargetedPower {
   energyCost = 50;
   range = 8;
 
+  canTargetMovementBlocker = false;
+
   activate() {
-    const closest = this.closestValidToSelected();
-
-    if (!closest) return;
-
-    const tile = this.game.map.tileAt(closest);
-
+    const tile = this.closestValidToSelected() as Tile;
     this.game.addMapEntity(new BlackHole(tile));
-
-    return true;
-  }
-
-  // Don't allow creating a black hole on a tile with an entity that blocks movement (i.e. creature, wall, etc)
-  // If the closest selected has such an entity, find the next closest that doesn't have one
-  closestValidToSelected() {
-    const closest = super.closestValidToSelected();
-
-    if (!closest) return;
-
-    const line = bresenham(this.game.player, closest);
-
-    return line.reverse().find((coords) => {
-      const entities = this.game.entitiesAt(coords);
-
-      const nonBlocking = !entities.some((entity) => entity.blocksMovement);
-
-      return nonBlocking;
-    });
   }
 }
 

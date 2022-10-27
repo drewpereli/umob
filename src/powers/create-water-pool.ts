@@ -1,6 +1,6 @@
 import { Water } from '@/entities/fluid';
 import { TURN } from '@/stores/game';
-import { useMap } from '@/stores/map';
+import type { Tile } from '@/stores/map';
 import { TargetedPower } from './targeted-power';
 
 export class CreateWaterPool extends TargetedPower {
@@ -9,15 +9,13 @@ export class CreateWaterPool extends TargetedPower {
   energyCost = 10;
   useTime = 2 * TURN;
 
+  canTargetMovementBlocker = true;
+
   // Only allow creating it on floor tiles
   closestValidToSelected() {
     const closest = super.closestValidToSelected();
 
-    if (!closest) return;
-
-    const tile = useMap().tileAt(closest);
-
-    if (tile.terrain) {
+    if (!closest || closest.terrain) {
       return;
     }
 
@@ -25,16 +23,10 @@ export class CreateWaterPool extends TargetedPower {
   }
 
   activate() {
-    const closest = this.closestValidToSelected();
-
-    if (!closest) return;
-
-    const tile = this.game.map.tileAt(closest);
+    const tile = this.closestValidToSelected() as Tile;
 
     const pool = new Water(tile, 7);
 
     this.game.addMapEntity(pool);
-
-    return true;
   }
 }

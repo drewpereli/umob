@@ -8,24 +8,11 @@ export class BuildCover extends TargetedPower {
   energyCost = 30;
   range = 2;
 
-  tilesAimedAt() {
-    const closest = this.closestValidToSelected();
-
-    if (!closest) return [];
-
-    if (this.game.coordsBlocksMovement(closest)) return [];
-
-    return [closest];
-  }
+  canTargetMovementBlocker = false;
 
   activate() {
-    const closest = this.closestValidToSelected();
-    if (!closest) return;
+    const tile = this.tilesAimedAt()[0];
 
-    const tile = this.game.map.tileAt(closest);
-
-    useGame().addMapEntity(new HalfWall(tile));
-
-    return true;
+    this.game.addMapEntity(new HalfWall(tile));
   }
 }
