@@ -338,13 +338,14 @@ export const useGame = defineStore('game', {
       this.currTime++;
     },
     _cullEntities() {
-      // this.mapEntities = this.mapEntities.filter(
-      //   (entity) => !entity.shouldRemoveFromGame
-      // );
-
       this.mapEntities = this.mapEntities.reduce((all, entity) => {
         if (entity.shouldRemoveFromGame) {
           entity.tilesOccupied.forEach((t) => t.removeEntity(entity));
+
+          if (entity instanceof Actor) {
+            const idx = this.nonPlayerActors.indexOf(entity);
+            this.nonPlayerActors.splice(idx, 1);
+          }
         } else {
           all.push(entity);
         }
