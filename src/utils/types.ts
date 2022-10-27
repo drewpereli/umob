@@ -2,6 +2,7 @@ export interface AsciiDrawable {
   char: string;
   color: string;
   backgroundColor?: string;
+  rotateChar?: number;
 }
 
 export function isAsciiDrawable(item: unknown): item is AsciiDrawable {

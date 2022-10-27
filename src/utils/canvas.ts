@@ -82,7 +82,26 @@ function drawAsciiDrawable(
     fillRect(ctx, position, drawable.backgroundColor);
   }
 
+  const rotate = (drawable.rotateChar ?? 0) % 360;
+
+  // console.log(rotate);
+  if (rotate) {
+    ctx.save();
+
+    const center = positionToPx(position, 'center');
+
+    ctx.translate(center.x, center.y);
+
+    ctx.rotate((rotate * Math.PI) / 180);
+
+    ctx.translate(-center.x, -center.y);
+  }
+
   fillText(ctx, drawable.char, position, drawable.color);
+
+  if (rotate) {
+    ctx.restore();
+  }
 }
 
 export function drawEntityTile(
