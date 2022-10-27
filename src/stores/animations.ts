@@ -1,6 +1,12 @@
 import type Creature from '@/entities/creatures/creature';
 import bresenham from '@/utils/bresenham';
-import { CELL_LENGTH, clearRect, fillRect, fillText } from '@/utils/canvas';
+import {
+  CELL_LENGTH,
+  clearRect,
+  drawAsciiDrawable,
+  fillRect,
+  fillText,
+} from '@/utils/canvas';
 import { polarity, slopeIntercept } from '@/utils/math';
 import { random } from '@/utils/random';
 import { defineStore } from 'pinia';
@@ -60,9 +66,9 @@ export class DamageAnimation extends GameAnimation {
 
     const position = this.camera.viewCoordsForAbsCoords(actor);
 
-    fillText(ctx, actor.char, position, 'red');
+    drawAsciiDrawable(ctx, position, actor, 'red');
     await new Promise((res) => setTimeout(res, 50));
-    fillText(ctx, actor.char, position, this.actor.color);
+    drawAsciiDrawable(ctx, position, actor);
   }
 }
 

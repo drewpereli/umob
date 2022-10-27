@@ -90,10 +90,11 @@ export function drawTerrain(
   drawAsciiDrawable(ctx, position, terrain);
 }
 
-function drawAsciiDrawable(
+export function drawAsciiDrawable(
   ctx: CanvasRenderingContext2D,
   position: Coords,
-  drawable: AsciiDrawable
+  drawable: AsciiDrawable,
+  colorOverride?: string // Used for animations
 ) {
   if (drawable.backgroundColor) {
     fillRect(ctx, position, drawable.backgroundColor);
@@ -114,7 +115,7 @@ function drawAsciiDrawable(
     ctx.translate(-center.x, -center.y);
   }
 
-  fillText(ctx, drawable.char, position, drawable.color);
+  fillText(ctx, drawable.char, position, colorOverride ?? drawable.color);
 
   if (rotate) {
     ctx.restore();
