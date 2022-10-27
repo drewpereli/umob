@@ -1,4 +1,5 @@
 import { useGame } from '@/stores/game';
+import type { Tile } from '@/stores/map';
 import { Cover } from '@/utils/map';
 import type { AsciiDrawable } from '@/utils/types';
 import type { Damageable } from './damageable';
@@ -72,6 +73,10 @@ export class Door
   extends MapEntity
   implements Terrain, Damageable, Interactable
 {
+  constructor(tile: Tile, public isLocked = false) {
+    super(tile);
+  }
+
   type = 'door';
   moveTimeMultiplier = 1;
 
@@ -118,6 +123,7 @@ export class Door
   }
 
   open() {
+    if (this.isLocked) return;
     this.isOpen = true;
     this.tile.updateBlocksMovement();
     this.tile.updateBlocksView();
@@ -131,12 +137,16 @@ export class Door
     }
   }
 
+  unlock() {
+    this.isLocked = false;
+  }
+
   onInteract() {
     this.open();
   }
 
   get isCurrentlyInteractable() {
-    return !this.isOpen;
+    return !this.isOpen && !this.isLocked;
   }
 
   get canClose() {
