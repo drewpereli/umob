@@ -141,7 +141,8 @@ export const useGame = defineStore('game', {
     damageablesAimedAt(): (Damageable & Coords)[] {
       if (this.actionUiState === ActionUiState.AimingPower) {
         return (
-          (this.player.selectedPower as TargetedPower)?.actorsAimedAt() ?? []
+          (this.player.selectedPower as TargetedPower)?.damageablesAimedAt() ??
+          []
         );
       }
 

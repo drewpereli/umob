@@ -3,6 +3,8 @@ import { Power } from './power';
 import bresenham from '../utils/bresenham';
 import { distance } from '../utils/map';
 import type { Tile } from '@/stores/map';
+import type { Damageable } from '@/entities/damageable';
+import type MapEntity from '@/entities/map-entity';
 
 export abstract class TargetedPower extends Power {
   abstract range: number;
@@ -14,14 +16,8 @@ export abstract class TargetedPower extends Power {
     return closest ? [closest] : [];
   }
 
-  actorsAimedAt() {
-    if (!this.canTargetMovementBlocker) return [];
-
-    return this.tilesAimedAt().flatMap((tile) => {
-      const actor = this.game.creatureAt(tile);
-
-      return actor ? [actor] : [];
-    });
+  damageablesAimedAt(): (MapEntity & Damageable)[] {
+    return this.tilesAimedAt().flatMap((tile) => this.game.damageablesAt(tile));
   }
 
   closestValidToSelected(): Tile | undefined {

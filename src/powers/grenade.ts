@@ -26,7 +26,7 @@ export class Grenade extends TargetedPower {
 
     createExplosion(tile, this.radius, 5);
 
-    this.actorsAimedAt().forEach((actor) => {
+    this.damageablesAimedAt().forEach((actor) => {
       actor.receiveDamage(5);
     });
 
