@@ -19,9 +19,10 @@ import type MapEntity from '@/entities/map-entity';
 import type { TargetedPower } from '@/powers/targeted-power';
 import { Centrifuge } from '@/entities/centrifuge';
 import { CreateTripWire } from '@/powers/create-trip-wire';
-import { Door, isDoor } from '@/entities/terrain';
+import type { Door } from '@/entities/terrain';
 import { weaponIsGun } from '@/entities/weapons/gun';
 import { Rat } from '@/entities/creatures/rat';
+import { isInteractable } from '@/entities/interactable';
 
 export const TURN = 4; // How many ticks make up a "turn"
 
@@ -247,10 +248,10 @@ export const useGame = defineStore('game', {
 
       if (!targetTile) return;
 
-      const door = targetTile.entities.find(isDoor);
+      const interactableEntity = targetTile.entities.find(isInteractable);
 
-      if (door && !door.isOpen) {
-        this.player.openDoor(door);
+      if (interactableEntity && interactableEntity.isCurrentlyInteractable) {
+        this.player.interact(interactableEntity);
       } else if (this.creatureCanOccupy(targetTile)) {
         this.player.move(targetTile);
       } else if (this.damageablesAt(targetTile)) {

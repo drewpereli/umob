@@ -39,6 +39,7 @@ import {
   radLevelFromRads,
 } from '@/utils/radiation';
 import type { Door } from '../terrain';
+import type { Interactable } from '../interactable';
 
 export type Covers = Record<Dir, Cover>;
 
@@ -297,9 +298,10 @@ export default abstract class Creature
     }
   }
 
-  openDoor(door: Door) {
-    door.open();
+  interact(entity: Interactable) {
+    if (!entity.isCurrentlyInteractable) return;
 
+    entity.onInteract();
     this.timeUntilNextAction = this.moveTime;
   }
 

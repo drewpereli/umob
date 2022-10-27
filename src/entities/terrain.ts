@@ -2,6 +2,7 @@ import { useGame } from '@/stores/game';
 import { Cover } from '@/utils/map';
 import type { AsciiDrawable } from '@/utils/types';
 import type { Damageable } from './damageable';
+import type { Interactable } from './interactable';
 import MapEntity, { EntityLayer } from './map-entity';
 
 export type Terrain = MapEntity &
@@ -67,7 +68,10 @@ export function isDoor(e: MapEntity): e is Door {
   return e instanceof Door;
 }
 
-export class Door extends MapEntity implements Terrain, Damageable {
+export class Door
+  extends MapEntity
+  implements Terrain, Damageable, Interactable
+{
   type = 'door';
   moveTimeMultiplier = 1;
 
@@ -99,6 +103,7 @@ export class Door extends MapEntity implements Terrain, Damageable {
   backgroundColor = '#9c7406';
 
   readonly IMPLEMENTS_DAMAGEABLE = true;
+  readonly IMPLEMENTS_INTERACTABLE = true;
 
   penetrationBlock = 1;
 
@@ -124,6 +129,14 @@ export class Door extends MapEntity implements Terrain, Damageable {
       this.tile.updateBlocksMovement();
       this.tile.updateBlocksView();
     }
+  }
+
+  onInteract() {
+    this.open();
+  }
+
+  get isCurrentlyInteractable() {
+    return !this.isOpen;
   }
 
   get canClose() {
