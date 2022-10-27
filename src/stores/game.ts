@@ -20,7 +20,11 @@ import type { TargetedPower } from '@/powers/targeted-power';
 import { Centrifuge } from '@/entities/centrifuge';
 import { CreateTripWire } from '@/powers/create-trip-wire';
 import type { Door } from '@/entities/terrain';
-import { weaponIsGun } from '@/entities/weapons/gun';
+import {
+  damageablesAimedAt,
+  tilesAimedAt,
+  weaponIsGun,
+} from '@/entities/weapons/gun';
 import { Rat } from '@/entities/creatures/rat';
 import { canInteractWithFrom, isInteractable } from '@/entities/interactable';
 
@@ -136,44 +140,7 @@ export const useGame = defineStore('game', {
 
       if (!weapon || !weaponIsGun(weapon)) return [];
 
-      let penetrationRemaining = weapon.penetration;
-
-      const tiles: Tile[] = [];
-
-      const spread = weapon.spread;
-
-      if (spread) {
-        const tilesInRadius = this.map
-          .tilesInRadius(this.player, weapon.range)
-          .filter((tile) => !coordsEqual(tile, this.player));
-
-        const aimAngle = angle(this.player, this.selectedTile);
-
-        return tilesInRadius.filter((t) => {
-          const tileAngle = angle(this.player, t);
-          const diff = angularDistance(aimAngle, tileAngle);
-
-          return diff <= spread;
-        });
-      }
-
-      const tilesBetween = this.tilesBetweenPlayerAndSelected;
-
-      for (const tile of tilesBetween) {
-        if (distance(this.player, tile) > weapon.range) break;
-
-        tiles.push(tile);
-
-        const damageables = this.damageablesAt(tile);
-
-        damageables.forEach((d) => {
-          penetrationRemaining -= d.penetrationBlock;
-        });
-
-        if (penetrationRemaining < 0) break;
-      }
-
-      return tiles;
+      return tilesAimedAt(this.player.tile, this.selectedTile, weapon);
     },
     damageablesAimedAt(): (Damageable & Coords)[] {
       if (this.actionUiState === ActionUiState.AimingPower) {
@@ -182,9 +149,11 @@ export const useGame = defineStore('game', {
         );
       }
 
-      return this.tilesAimedAt.flatMap((tile): (Damageable & Coords)[] => {
-        return this.damageablesAt(tile);
-      });
+      const weapon = this.player.equippedWeapon;
+
+      if (!this.selectedTile || !weaponIsGun(weapon)) return [];
+
+      return damageablesAimedAt(this.player.tile, this.selectedTile, weapon);
     },
     coordsVisible() {
       return (coords: Coords) => {

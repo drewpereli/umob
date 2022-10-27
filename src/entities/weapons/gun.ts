@@ -1,3 +1,9 @@
+import { useGame } from '@/stores/game';
+import { Tile, useMap } from '@/stores/map';
+import { coordsEqual, distance } from '@/utils/map';
+import { angle, angularDistance } from '@/utils/math';
+import type { Damageable } from '../damageable';
+import type MapEntity from '../map-entity';
 import { Weapon } from './weapon';
 
 export function weaponIsGun(w: Weapon): w is Gun {
@@ -71,4 +77,88 @@ export class RailGun extends Gun {
   description =
     'Electromagnetic force to accelerate a metal slug to high speeds. Knocks back enemies.';
   reloadTimeMultiplier = 2;
+}
+
+export function tilesAimedAt(
+  aimingFrom: Tile,
+  aimingTo: Tile,
+  weapon: Gun
+): Tile[] {
+  if (weapon.spread) {
+    return tilesAimedAtSpread(
+      aimingFrom,
+      aimingTo,
+      weapon.range,
+      weapon.spread
+    );
+  }
+
+  const game = useGame();
+  const map = game.map;
+
+  const tilesBetween = map.tilesBetween(aimingFrom, aimingTo).slice(1);
+
+  const tiles: Tile[] = [];
+
+  let penetrationRemaining = weapon.penetration;
+
+  for (const tile of tilesBetween) {
+    if (distance(aimingFrom, tile) > weapon.range) break;
+
+    tiles.push(tile);
+
+    const damageables = game.damageablesAt(tile);
+
+    damageables.forEach((d) => {
+      penetrationRemaining -= d.penetrationBlock;
+    });
+
+    if (penetrationRemaining < 0) break;
+  }
+
+  return tiles;
+}
+
+function tilesAimedAtSpread(
+  aimingFrom: Tile,
+  aimingTo: Tile,
+  range: number,
+  spread: number
+): Tile[] {
+  const map = useMap();
+
+  const tilesInRadius = map
+    .tilesInRadius(aimingFrom, range)
+    .filter((tile) => !coordsEqual(tile, aimingFrom));
+
+  const aimAngle = angle(aimingFrom, aimingTo);
+
+  return tilesInRadius.filter((t) => {
+    const tileAngle = angle(aimingFrom, t);
+    const diff = angularDistance(aimAngle, tileAngle);
+
+    return diff <= spread;
+  });
+}
+
+export function damageablesAimedAt(
+  aimingFrom: Tile,
+  aimingTo: Tile,
+  weapon: Gun
+): (MapEntity & Damageable)[] {
+  const tiles = tilesAimedAt(aimingFrom, aimingTo, weapon);
+
+  const game = useGame();
+
+  const damageables = tiles.flatMap((tile) => {
+    return game.damageablesAt(tile);
+  });
+
+  if (weapon.spread) {
+    return damageables;
+  }
+
+  return damageables.filter((d) => {
+    return d.penetrationBlock || coordsEqual(d, aimingTo);
+  });
 }
