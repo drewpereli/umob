@@ -1,4 +1,4 @@
-import { isDoor } from '@/entities/terrain';
+import { ButtonWall, isDoor } from '@/entities/terrain';
 import { isFlammable } from '@/entities/flammable';
 import { isFluid } from '@/entities/fluid';
 import { Gas } from '@/entities/gas';
@@ -9,7 +9,7 @@ import { TripWire } from '@/entities/traps/tripwire';
 import { BlackHole } from '@/powers/create-black-hole';
 import { FLOOR_TERRAIN_DATA, Tile, type TerrainData } from '@/stores/map';
 import chroma, { scale } from 'chroma-js';
-import { Dir } from './map';
+import { addCoords, Dir } from './map';
 import { random } from './random';
 import { isAsciiDrawable, type AsciiDrawable } from './types';
 
@@ -61,8 +61,25 @@ export function fillText(
   pos: Coords,
   color: string
 ) {
+  fillTextPx(
+    ctx,
+    char,
+    {
+      x: (pos.x + 0.5) * CELL_LENGTH,
+      y: (pos.y + 0.5) * CELL_LENGTH,
+    },
+    color
+  );
+}
+
+export function fillTextPx(
+  ctx: CanvasRenderingContext2D,
+  char: string,
+  pos: Coords,
+  color: string
+) {
   ctx.fillStyle = color;
-  ctx.fillText(char, (pos.x + 0.5) * CELL_LENGTH, (pos.y + 0.5) * CELL_LENGTH);
+  ctx.fillText(char, pos.x, pos.y);
 }
 
 export function drawTerrain(
@@ -211,6 +228,8 @@ export function drawEntityTile(
         fillRectPx(ctx, rectStartPx, rectEndPx, color);
       }
     }
+  } else if (entity instanceof ButtonWall) {
+    drawButtonWall(ctx, position, entity);
   } else if (isAsciiDrawable(entity)) {
     drawAsciiDrawable(ctx, position, entity);
   }
@@ -237,4 +256,32 @@ function fillCirclePxPosition(
   ctx.beginPath();
   ctx.arc(pxCoords.x, pxCoords.y, pxRadius, 0, 2 * Math.PI);
   ctx.fill();
+}
+
+function drawButtonWall(
+  ctx: CanvasRenderingContext2D,
+  position: Coords,
+  entity: ButtonWall<any>
+) {
+  drawAsciiDrawable(ctx, position, entity);
+
+  const center = positionToPx(position, 'center');
+  // The char we're using isn't naturally centered, so we have to initially offset the pos to center it
+  center.y -= CELL_LENGTH / 8;
+
+  // Offset the char from the center based on the button facing dir
+  const offsetAmount = CELL_LENGTH / 2 - 4;
+
+  const coordOffsets = {
+    [Dir.Up]: { y: -offsetAmount },
+    [Dir.Right]: { x: offsetAmount },
+    [Dir.Down]: { y: offsetAmount },
+    [Dir.Left]: { x: -offsetAmount },
+  };
+
+  const coordOffset = coordOffsets[entity.facing];
+
+  const offsetPositionPx = addCoords(center, coordOffset);
+
+  fillTextPx(ctx, '■', offsetPositionPx, '#6ba9fa');
 }

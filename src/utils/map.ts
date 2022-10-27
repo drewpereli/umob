@@ -136,3 +136,10 @@ export function flankingDirBetween(
 export function angleFromDir(dir: Dir): number {
   return dirAngleOffsets[dir];
 }
+
+export function addCoords(c1: Coords, c2: Partial<Coords>): Coords {
+  return {
+    x: c1.x + (c2?.x ?? 0),
+    y: c1.y + (c2?.y ?? 0),
+  };
+}

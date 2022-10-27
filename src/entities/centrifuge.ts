@@ -11,8 +11,15 @@ import type MapEntity from './map-entity';
 import { EntityLayer } from './map-entity';
 
 export class Centrifuge extends Actor implements AsciiDrawable {
-  constructor(tile: Tile) {
+  constructor(tile: Tile, public isOn = true) {
     super(tile);
+
+    if (isOn) {
+      this.angleChangePerTick = this.maxAngleChangePerTick;
+    } else {
+      this.angleChangePerTick = 0;
+    }
+
     this.initializeTilesOccupied();
   }
 
@@ -32,7 +39,8 @@ export class Centrifuge extends Actor implements AsciiDrawable {
   char = '+';
   color = '#eee';
 
-  angleChangePerTick = random.int(10, 45);
+  maxAngleChangePerTick = random.int(10, 45);
+  angleChangePerTick;
 
   damageWhenCantPush = 10;
 
@@ -41,6 +49,17 @@ export class Centrifuge extends Actor implements AsciiDrawable {
   maxPushableMass = 1000;
 
   _act() {
+    if (this.isOn) {
+      this.angleChangePerTick = Math.min(
+        this.maxAngleChangePerTick,
+        this.angleChangePerTick + 0.5
+      );
+    } else {
+      this.angleChangePerTick = Math.max(0, this.angleChangePerTick - 0.5);
+    }
+
+    if (this.angleChangePerTick === 0) return;
+
     const game = useGame();
 
     // Any actors in the way will be pushed at this angle.
@@ -195,5 +214,13 @@ export class Centrifuge extends Actor implements AsciiDrawable {
     this.tilesOccupied = this.coordsOccupied.map((coords) =>
       map.tileAt(coords)
     );
+  }
+
+  toggleOnOff() {
+    this.isOn = !this.isOn;
+  }
+
+  turnOff() {
+    this.isOn = false;
   }
 }

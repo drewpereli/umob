@@ -1,7 +1,9 @@
 import { useGame } from '@/stores/game';
 import type { Tile } from '@/stores/map';
-import { Cover } from '@/utils/map';
+import { Cover, Dir } from '@/utils/map';
 import type { AsciiDrawable } from '@/utils/types';
+import type { Centrifuge } from './centrifuge';
+import { Controller } from './controller/controller';
 import type { Damageable } from './damageable';
 import type { Interactable } from './interactable';
 import MapEntity, { EntityLayer } from './map-entity';
@@ -156,4 +158,58 @@ export class Door
   shouldRemoveFromGame = false;
 
   mass = 50;
+}
+
+export abstract class ButtonWall<T extends MapEntity>
+  extends Controller<T>
+  implements Terrain, Damageable, Interactable
+{
+  constructor(tile: Tile, public controls: T, public facing: Dir) {
+    super(tile, controls);
+    this.interactableFromDir = facing;
+  }
+
+  type = 'wall-with-button';
+  char = '#';
+  color = 'white';
+  shouldRemoveFromGame = false;
+  blocksMovement = true;
+  moveTimeMultiplier = null;
+  penetrationBlock = 2;
+  blocksView = true;
+  mass = 2000;
+  cover = Cover.Full;
+
+  readonly layer = EntityLayer.Terrain;
+
+  readonly IMPLEMENTS_DAMAGEABLE = true;
+
+  health = 100;
+
+  receiveDamage(damage: number) {
+    this.health -= damage;
+
+    if (this.health <= 0) {
+      const halfWall = new HalfWall(this.tile);
+      useGame().addMapEntity(halfWall);
+      this.shouldRemoveFromGame = true;
+    }
+  }
+
+  isCurrentlyDamageable = true;
+
+  readonly IMPLEMENTS_INTERACTABLE = true;
+  abstract onInteract(): unknown;
+  isCurrentlyInteractable = true;
+  interactableFromDir;
+}
+
+export class CentrifugeButtonWall extends ButtonWall<Centrifuge> {
+  onInteract() {
+    this.controls.toggleOnOff();
+  }
+
+  onDestroy() {
+    this.controls.turnOff();
+  }
 }
