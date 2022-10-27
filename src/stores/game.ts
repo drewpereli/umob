@@ -22,7 +22,7 @@ import { CreateTripWire } from '@/powers/create-trip-wire';
 import type { Door } from '@/entities/terrain';
 import { weaponIsGun } from '@/entities/weapons/gun';
 import { Rat } from '@/entities/creatures/rat';
-import { isInteractable } from '@/entities/interactable';
+import { canInteractWithFrom, isInteractable } from '@/entities/interactable';
 
 export const TURN = 4; // How many ticks make up a "turn"
 
@@ -250,7 +250,11 @@ export const useGame = defineStore('game', {
 
       const interactableEntity = targetTile.entities.find(isInteractable);
 
-      if (interactableEntity && interactableEntity.isCurrentlyInteractable) {
+      if (
+        interactableEntity &&
+        interactableEntity.isCurrentlyInteractable &&
+        canInteractWithFrom(interactableEntity, this.player)
+      ) {
         this.player.interact(interactableEntity);
       } else if (this.creatureCanOccupy(targetTile)) {
         this.player.move(targetTile);
