@@ -12,12 +12,16 @@ import { defaultBurn, defaultStopBurning, type Flammable } from './flammable';
 import type { Item } from './items/item';
 import { ItemInMap } from './items/item-in-map';
 import { Pipe } from './weapons/melee-weapon';
-import type { Dir } from '@/utils/map';
+import { angleFromDir, type Dir } from '@/utils/map';
 import type { Perk } from '@/perks';
 
 export class Player extends Creature implements Flammable {
   defaultChar = '@';
   color = 'yellow';
+
+  get rotateChar() {
+    return angleFromDir(this.facing) + 90;
+  }
 
   name = 'you';
 

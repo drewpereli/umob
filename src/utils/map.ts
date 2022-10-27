@@ -22,6 +22,13 @@ export enum FlankingDir {
   Back = 'back',
 }
 
+const dirAngleOffsets = {
+  [Dir.Up]: -90,
+  [Dir.Right]: 0,
+  [Dir.Down]: 90,
+  [Dir.Left]: 180,
+};
+
 const coverEvasionMultipliers: Record<Cover, number> = {
   [Cover.None]: 1,
   [Cover.Half]: 0.75,
@@ -87,14 +94,7 @@ export function coordsInViewCone(
   viewAngle: number,
   sourceFacing: Dir
 ) {
-  const dirAngleOffset = {
-    [Dir.Up]: -90,
-    [Dir.Right]: 0,
-    [Dir.Down]: 90,
-    [Dir.Left]: 180,
-  };
-
-  const angleCurrentlyFacing = dirAngleOffset[sourceFacing];
+  const angleCurrentlyFacing = angleFromDir(sourceFacing);
 
   const targetAngle = angle(source, target);
 
@@ -131,4 +131,8 @@ export function flankingDirBetween(
     return FlankingDir.Side;
 
   return FlankingDir.Front;
+}
+
+export function angleFromDir(dir: Dir): number {
+  return dirAngleOffsets[dir];
 }
