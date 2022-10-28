@@ -1,6 +1,9 @@
+import type Creature from '@/entities/creatures/creature';
 import { useGame } from '@/stores/game';
 
 export abstract class Power {
+  constructor(public owner: Creature) {}
+
   abstract readonly name: string;
   abstract useTime: number;
   abstract energyCost: number;

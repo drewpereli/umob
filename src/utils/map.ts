@@ -94,6 +94,8 @@ export function coordsInViewCone(
   viewAngle: number,
   sourceFacing: Dir
 ) {
+  if (viewAngle >= 360) return true;
+
   const angleCurrentlyFacing = angleFromDir(sourceFacing);
 
   const targetAngle = angle(source, target);

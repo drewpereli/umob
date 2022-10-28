@@ -15,6 +15,7 @@ import { Pipe } from './weapons/melee-weapon';
 import { angleFromDir, type Dir } from '@/utils/map';
 import type { Perk } from '@/perks';
 import { DamageType } from './weapons/weapon';
+import { SummonAutoTurret } from '@/powers/summon-auto-turret';
 
 export class Player extends Creature implements Flammable {
   constructor(tile: Tile, public alignment = CreatureAlignment.WithPlayer) {
@@ -35,9 +36,10 @@ export class Player extends Creature implements Flammable {
   inventory: Item[] = [new Pipe()];
 
   powers: Power[] = [
-    new BuildCover(),
-    new CreateBlackHole(),
-    new Grenade(),
+    new SummonAutoTurret(this),
+    new BuildCover(this),
+    new CreateBlackHole(this),
+    new Grenade(this),
     new Heal(this),
   ];
 
