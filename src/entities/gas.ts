@@ -34,7 +34,7 @@ export abstract class Gas extends Actor {
     if (this.pressure > 0) {
       this._maybeExpand();
     } else {
-      this.shouldRemoveFromGame = true;
+      this.markForRemoval();
     }
   }
 

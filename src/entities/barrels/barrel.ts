@@ -30,7 +30,7 @@ export abstract class Barrel
     if (damage > 0) {
       this.isCurrentlyDamageable = false;
       this.onDestroy();
-      this.shouldRemoveFromGame = true;
+      this.markForRemoval();
     }
   }
 }

@@ -1,3 +1,4 @@
+import { useGame } from '@/stores/game';
 import type { Tile } from '@/stores/map';
 
 export enum EntityLayer {
@@ -45,5 +46,10 @@ export default abstract class MapEntity {
     this.tile = tile;
     tile.addEntity(this);
     this.tilesOccupied = [tile];
+  }
+
+  markForRemoval() {
+    this.shouldRemoveFromGame = true;
+    useGame().markEntityForRemoval(this);
   }
 }

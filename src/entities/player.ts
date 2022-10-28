@@ -57,7 +57,7 @@ export class Player extends Creature implements Flammable {
 
   blocksView = false;
 
-  health = debugOptions.infiniteHealth ? Infinity : 100;
+  _health = debugOptions.infiniteHealth ? Infinity : 100;
   maxHealth = debugOptions.infiniteHealth ? Infinity : 100;
 
   energy = debugOptions.infiniteEnergy ? Infinity : 100;
@@ -149,7 +149,7 @@ export class Player extends Creature implements Flammable {
 
     tile.items.forEach((itemInMap) => {
       this.pickupItem(itemInMap.item);
-      itemInMap.shouldRemoveFromGame = true;
+      itemInMap.markForRemoval();
     });
   }
 

@@ -152,7 +152,7 @@ export class Oil extends Fluid implements Flammable {
       this.burningDuration += 1;
 
       if (this.burningDuration >= this.maxBurningDuration) {
-        this.shouldRemoveFromGame = true;
+        this.markForRemoval();
       }
     }
   }
@@ -167,7 +167,7 @@ export class Oil extends Fluid implements Flammable {
 
   stopBurning() {
     defaultStopBurning(this);
-    this.shouldRemoveFromGame = true;
+    this.markForRemoval();
   }
 }
 
@@ -181,7 +181,7 @@ function reactFluids(a: Fluid, b: Fluid) {
   if (names.includes('water') && names.includes('lava')) {
     fluids.forEach((f) => {
       f.reactedThisTick = true;
-      f.shouldRemoveFromGame = true;
+      f.markForRemoval();
 
       const steam = new Steam(f.tile, f.pressure);
 

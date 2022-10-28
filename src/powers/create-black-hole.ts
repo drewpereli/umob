@@ -77,9 +77,11 @@ export class BlackHole extends Actor {
 
   tick(): void {
     this.ticksBeforeDeath--;
+
+    if (this.ticksBeforeDeath <= 0) {
+      this.markForRemoval();
+    }
   }
 
-  get shouldRemoveFromGame() {
-    return this.ticksBeforeDeath <= 0;
-  }
+  shouldRemoveFromGame = false;
 }

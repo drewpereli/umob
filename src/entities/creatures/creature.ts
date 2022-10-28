@@ -205,6 +205,8 @@ export default abstract class Creature
     return this.isDead;
   }
 
+  set shouldRemoveFromGame(_: boolean) {}
+
   updatePosition(tile: Tile) {
     super.updatePosition(tile);
     this.updateLastSawEnemy();
@@ -706,7 +708,20 @@ export default abstract class Creature
   /* #endregion */
 
   /* #region  General State */
-  health = 100;
+  _health = 100;
+
+  get health() {
+    return this._health;
+  }
+
+  set health(val: number) {
+    this._health = val;
+
+    if (val <= 0) {
+      this.markForRemoval();
+    }
+  }
+
   energy = 100;
 
   facing: Dir = random.arrayElement([Dir.Up, Dir.Right, Dir.Down, Dir.Left]);

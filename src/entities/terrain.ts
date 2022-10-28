@@ -43,7 +43,7 @@ export class Wall extends MapEntity implements Terrain, Damageable {
     if (this.health <= 0) {
       const halfWall = new HalfWall(this.tile);
       useGame().addMapEntity(halfWall);
-      this.shouldRemoveFromGame = true;
+      this.markForRemoval();
     }
   }
 
@@ -120,7 +120,7 @@ export class Door
     this.health -= damage;
 
     if (this.health <= 0) {
-      this.shouldRemoveFromGame = true;
+      this.markForRemoval();
     }
   }
 
@@ -192,7 +192,7 @@ export abstract class ButtonWall<T extends MapEntity>
     if (this.health <= 0) {
       const halfWall = new HalfWall(this.tile);
       useGame().addMapEntity(halfWall);
-      this.shouldRemoveFromGame = true;
+      this.markForRemoval();
     }
   }
 

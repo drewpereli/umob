@@ -57,6 +57,7 @@ export const useGame = defineStore('game', {
       [CreatureAlignment.WithPlayer]: [],
       [CreatureAlignment.AgainstPlayer]: [],
     } as Record<CreatureAlignment, Creature[]>,
+    entitiesToCull: [] as MapEntity[],
   }),
   getters: {
     allActors(state): Actor[] {
@@ -344,26 +345,21 @@ export const useGame = defineStore('game', {
       this.currTime++;
     },
     _cullEntities() {
-      this.mapEntities = this.mapEntities.reduce((all, entity) => {
-        if (entity.shouldRemoveFromGame) {
-          entity.tilesOccupied.forEach((t) => t.removeEntity(entity));
+      this.entitiesToCull.forEach((entity) => {
+        entity.tilesOccupied.forEach((t) => t.removeEntity(entity));
 
-          if (entity instanceof Actor) {
-            removeElement(this.nonPlayerActors, entity);
+        if (entity instanceof Actor) {
+          removeElement(this.nonPlayerActors, entity);
 
-            if (isCreature(entity)) {
-              removeElement(
-                this.creaturesByAlignment[entity.alignment],
-                entity
-              );
-            }
+          if (isCreature(entity)) {
+            removeElement(this.creaturesByAlignment[entity.alignment], entity);
           }
-        } else {
-          all.push(entity);
         }
 
-        return all;
-      }, [] as MapEntity[]);
+        removeElement(this.mapEntities, entity);
+      });
+
+      this.entitiesToCull = [];
     },
     addPlayer(player: Player) {
       player.tilesOccupied.forEach((tile) => tile.addEntity(player));
@@ -384,6 +380,9 @@ export const useGame = defineStore('game', {
     },
     addEndOfTickAction(action: () => unknown) {
       this.endOfTickActionQueue.push(action);
+    },
+    markEntityForRemoval(entity: MapEntity) {
+      this.entitiesToCull.push(entity);
     },
   },
 });

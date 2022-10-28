@@ -38,7 +38,7 @@ export abstract class Terminal<T extends MapEntity>
 
     if (this.health === 0) {
       this.onDestroy?.();
-      this.shouldRemoveFromGame = true;
+      this.markForRemoval();
     }
   }
 

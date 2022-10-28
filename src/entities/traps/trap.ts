@@ -39,7 +39,7 @@ export abstract class Trap extends Actor {
   trigger() {
     this.triggered = true;
     this.onTrigger();
-    this.shouldRemoveFromGame = true;
+    this.markForRemoval();
   }
 
   abstract onTrigger(): void;
