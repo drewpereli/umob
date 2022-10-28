@@ -29,7 +29,7 @@ import MapEntity, { EntityLayer } from '../map-entity';
 import type { StatusEffect } from '@/status-effects/status-effect';
 import { isTrap } from '../traps/trap';
 import type { Item } from '../items/item';
-import type { Weapon, WeaponData } from '../weapons/weapon';
+import { DamageType, type Weapon, type WeaponData } from '../weapons/weapon';
 import { Pipe } from '../weapons/melee-weapon';
 import { debugOptions } from '@/utils/debug-options';
 import { TargetingArray } from '@/status-effects/targeting-array';
@@ -71,6 +71,22 @@ enum AiState {
   Idle = 'idle',
 }
 
+export enum Resistance {
+  VeryVulnerable = 'very-vulnerable',
+  Vulnerable = 'vulnerable',
+  None = 'none',
+  Resistant = 'resistant',
+  Immune = 'immune',
+}
+
+const resistanceMultipliers: Record<Resistance, number> = {
+  [Resistance.VeryVulnerable]: 2,
+  [Resistance.Vulnerable]: 1.5,
+  [Resistance.None]: 1,
+  [Resistance.Resistant]: 0.5,
+  [Resistance.Immune]: 0,
+};
+
 export default abstract class Creature
   extends Actor
   implements Damageable, AsciiDrawable
@@ -81,7 +97,11 @@ export default abstract class Creature
   }
 
   /* #region  Damageable */
-  receiveDamage(damage: number) {
+  receiveDamage(damage: number, type: DamageType) {
+    damage *= this.resistanceMultiplierForDamageType(type);
+
+    if (damage <= 0) return;
+
     this.health = Math.max(this.health - damage, 0);
 
     if (this.game.coordsVisible(this)) {
@@ -122,11 +142,11 @@ export default abstract class Creature
     }
 
     if (additionalActorDamaged) {
-      additionalActorDamaged.receiveDamage(damage * 0.25);
+      additionalActorDamaged.receiveDamage(damage * 0.25, DamageType.Physical);
     }
 
     if (hitWall) {
-      this.receiveDamage(damage * 0.25);
+      this.receiveDamage(damage * 0.25, DamageType.Physical);
     }
 
     this.game.animations.addAnimation(
@@ -206,6 +226,13 @@ export default abstract class Creature
   baseAccuracyMultiplier = 1;
 
   viewAngle: number = 90;
+
+  resistances: Partial<Record<DamageType, Resistance>> = {};
+
+  resistanceMultiplierForDamageType(type: DamageType) {
+    const resistance = this.resistances[type] ?? Resistance.None;
+    return resistanceMultipliers[resistance];
+  }
   /* #endregion */
 
   /* #region  Computed Attributes */
@@ -282,6 +309,7 @@ export default abstract class Creature
     attackTimeMultiplier: 1,
     knockBack: 0,
     flankingBonus: 0,
+    damageType: DamageType.Physical,
   };
 
   get weaponData() {
@@ -327,6 +355,8 @@ export default abstract class Creature
   }
 
   receiveRadiation(amount: number) {
+    amount *= this.resistanceMultiplierForDamageType(DamageType.Radiation);
+
     this.rads += amount;
   }
 
@@ -505,7 +535,7 @@ export default abstract class Creature
           damage += damage * weaponData.flankingBonus * bonusMultiplier;
         }
 
-        entity.receiveDamage(damage);
+        entity.receiveDamage(damage, weaponData.damageType);
 
         hit.push(entity);
       }
@@ -726,11 +756,11 @@ export default abstract class Creature
     if (this.atRadLevelOrHigher(RadLevel.Extreme)) {
       const damagePerTurn = this.maxHealth * 0.02;
       const damagePerTick = damagePerTurn / TURN;
-      this.receiveDamage(damagePerTick);
+      this.receiveDamage(damagePerTick, DamageType.Radiation);
     } else if (this.atRadLevelOrHigher(RadLevel.High)) {
       const damagePerTurn = this.maxHealth * 0.02;
       const damagePerTick = damagePerTurn / TURN;
-      this.receiveDamage(damagePerTick);
+      this.receiveDamage(damagePerTick, DamageType.Radiation);
     }
 
     this.timeSpentInAiState++;

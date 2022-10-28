@@ -1,7 +1,8 @@
 import type MapEntity from './map-entity';
+import type { DamageType } from './weapons/weapon';
 
 export type Damageable = MapEntity & {
-  receiveDamage: (damage: number) => unknown;
+  receiveDamage: (damage: number, type: DamageType) => unknown;
   isCurrentlyDamageable: boolean;
   evasionMultiplier?: number; // Represents the entities evade ability. The hit chance will be multiplied by this. So low evasion multiplier corresponds to high evasion. If it's undefined, the entity cannot evade at all, and will always be hit if targeted
   penetrationBlock: number; // How much bullet penetration the entity blocks. If it's 0, you can shoot over the entity

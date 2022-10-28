@@ -14,6 +14,7 @@ import { ItemInMap } from './items/item-in-map';
 import { Pipe } from './weapons/melee-weapon';
 import { angleFromDir, type Dir } from '@/utils/map';
 import type { Perk } from '@/perks';
+import { DamageType } from './weapons/weapon';
 
 export class Player extends Creature implements Flammable {
   constructor(tile: Tile, public alignment = CreatureAlignment.WithPlayer) {
@@ -80,8 +81,8 @@ export class Player extends Creature implements Flammable {
     //
   }
 
-  receiveDamage(damage: number) {
-    super.receiveDamage(damage);
+  receiveDamage(damage: number, type: DamageType) {
+    super.receiveDamage(damage, type);
 
     if (this.health <= 0) {
       this.game.onPlayerDie();
@@ -110,7 +111,7 @@ export class Player extends Creature implements Flammable {
 
   burn() {
     defaultBurn(this);
-    this.receiveDamage(1);
+    this.receiveDamage(1, DamageType.Heat);
   }
 
   stopBurning() {
