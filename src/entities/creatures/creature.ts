@@ -21,9 +21,9 @@ import {
 } from '@/utils/map';
 import type { Power } from '@/powers/power';
 import { random } from '@/utils/random';
-import { Actor } from '../actor';
-import { isDamageable, type Damageable } from '../damageable';
-import { weaponIsGun } from '../weapons/gun';
+import { Actor, actorCache } from '../actor';
+import type { Damageable } from '../damageable';
+import Gun, { damageablesAimedAt, weaponIsGun } from '../weapons/gun';
 import type { AsciiDrawable } from '@/utils/types';
 import MapEntity, { EntityLayer } from '../map-entity';
 import type { StatusEffect } from '@/status-effects/status-effect';
@@ -57,21 +57,27 @@ const flankingDirBonusMultipliers: Record<FlankingDir, number> = {
 };
 
 export enum CreatureAlignment {
-  Ally = 'ally',
-  Enemy = 'enemy',
+  WithPlayer = 'with-layer',
+  AgainstPlayer = 'against-player',
 }
 
 export function isCreature(entity: MapEntity): entity is Creature {
   return entity instanceof Creature;
 }
 
+enum AiState {
+  Engaging = 'engaging',
+  Searching = 'searching',
+  Idle = 'idle',
+}
+
 export default abstract class Creature
   extends Actor
   implements Damageable, AsciiDrawable
 {
-  constructor(tile: Tile) {
+  constructor(tile: Tile, public alignment = CreatureAlignment.AgainstPlayer) {
     super(tile);
-    this.updateLastSawPlayerIfCanSee();
+    this.updateLastSawEnemy();
   }
 
   readonly IMPLEMENTS_DAMAGEABLE = true;
@@ -83,8 +89,6 @@ export default abstract class Creature
 
   health = 100;
   maxHealth = 100;
-
-  alignment = CreatureAlignment.Enemy;
 
   energy = 100;
   maxEnergy = 100;
@@ -180,7 +184,10 @@ export default abstract class Creature
 
   statusEffects: StatusEffect[] = [];
 
-  lastSawPlayerAt: Coords | null = null;
+  aiState = AiState.Idle;
+  timeSpentInAiState = 0;
+
+  lastSawEnemyAt: Coords | null = null;
 
   get char() {
     return this.game.directionViewMode
@@ -230,61 +237,80 @@ export default abstract class Creature
       this.reloadTime * this.equippedWeapon.reloadTimeMultiplier;
   }
 
-  fireWeapon(entities: (Damageable & Coords)[]) {
+  attackTile(tile: Tile) {
     if (!this.canAct) return;
-    if (this.mustReload) return;
 
-    entities.forEach((entity, idx) => {
+    if (this.equippedWeapon && weaponIsGun(this.equippedWeapon)) {
+      if (this.mustReload) return;
+
+      this._fireEquippedGun(tile);
+    } else {
+      this._meleeAttackTile(tile);
+    }
+  }
+
+  // Assumes the tile is in range
+  _fireEquippedGun(tile: Tile) {
+    const gun = this.equippedWeapon as Gun;
+
+    const damageables = damageablesAimedAt(this.tile, tile, gun);
+
+    const hit = this._attemptAttackAttackableDamageables(damageables);
+
+    this.game.animations.addAnimation(
+      new BulletAnimation(this, tile, hit.length > 0)
+    );
+
+    gun.amoLoaded--;
+  }
+
+  // Assumes the tile is in range
+  _meleeAttackTile(tile: Tile) {
+    this._attemptAttackAttackableDamageables(tile.damageables);
+  }
+
+  // Assumes we can act
+  // Assumes we don't have to reload
+  // Assumes we can attack "damageables"
+  // Process damage/knockback on damageables
+  // Updates timeUntilNextAction
+  // Returns the damageables we hit
+  _attemptAttackAttackableDamageables(damageables: Damageable[]) {
+    const weaponData = this.weaponData;
+
+    const hit: Damageable[] = [];
+
+    damageables.forEach((entity) => {
       const hitChance = this.hitChanceForDamageable(entity);
 
       const willHit = random.float(0, 1) < hitChance;
 
-      let damage = this.weaponData.damage;
+      let damage = weaponData.damage;
 
       if (willHit) {
-        if (this.weaponData.knockBack && entity instanceof Creature) {
+        if (weaponData.knockBack && entity instanceof Creature) {
           const dirs = dirsBetween(this, entity);
           const dir = random.arrayElement(dirs);
-          entity.receiveKnockBack(
-            this.weaponData.damage,
-            this.weaponData.knockBack,
-            dir
-          );
+          entity.receiveKnockBack(weaponData.damage, weaponData.knockBack, dir);
         }
 
-        if (entity instanceof Creature && this.weaponData.flankingBonus) {
+        if (entity instanceof Creature && weaponData.flankingBonus) {
           const flankingDir = flankingDirBetween(this, entity, entity.facing);
           const bonusMultiplier = flankingDirBonusMultipliers[flankingDir];
 
-          damage += damage * this.weaponData.flankingBonus * bonusMultiplier;
+          damage += damage * weaponData.flankingBonus * bonusMultiplier;
         }
 
         entity.receiveDamage(damage);
-      }
 
-      if (
-        idx === 0 &&
-        this.equippedWeapon &&
-        weaponIsGun(this.equippedWeapon)
-      ) {
-        this.game.animations.addAnimation(
-          new BulletAnimation(this, entity, willHit)
-        );
+        hit.push(entity);
       }
     });
 
-    if (this.equippedWeapon && weaponIsGun(this.equippedWeapon)) {
-      this.equippedWeapon.amoLoaded--;
-
-      if (entities.length === 0) {
-        this.game.animations.addAnimation(
-          new BulletAnimation(this, this.game.selectedTile as Coords, false)
-        );
-      }
-    }
-
     this.timeUntilNextAction =
-      this.attackTime * this.weaponData.attackTimeMultiplier;
+      this.attackTime * weaponData.attackTimeMultiplier;
+
+    return hit;
   }
 
   useSelectedPower() {
@@ -344,40 +370,63 @@ export default abstract class Creature
     }
   }
 
-  get canAttackPlayer() {
-    if (!this.canSeePlayer) return false;
-    const dist = distance(this, this.game.player);
+  @actorCache('act')
+  get attackableEnemies() {
+    const enemies = this.enemiesSeen;
 
-    const range =
+    const gun =
       this.equippedWeapon && weaponIsGun(this.equippedWeapon)
-        ? this.equippedWeapon.range
-        : 1;
+        ? this.equippedWeapon
+        : null;
 
-    if (dist > range) return false;
+    const range = gun?.range ?? 1;
 
-    const tilesBetween = this.game.map
-      .tilesBetween(this, this.game.player)
-      .slice(1, -1);
-
-    const aimIsBlocked = tilesBetween.some((tile) =>
-      tile.entities.some((e) => isDamageable(e) && e.penetrationBlock > 0)
+    const enemiesInRange = enemies.filter(
+      (enemy) => distance(this, enemy) <= range
     );
 
-    return !aimIsBlocked;
+    if (!gun) {
+      return enemiesInRange;
+    }
+
+    return enemiesInRange.filter((enemy) => {
+      const damageablesAimedAtIfAimingAtEnemy = damageablesAimedAt(
+        this.tile,
+        enemy.tile,
+        gun
+      );
+
+      return damageablesAimedAtIfAimingAtEnemy.includes(enemy);
+    });
   }
 
-  get canSeePlayer() {
-    if (distance(this, this.game.player) > this.viewRange) return false;
+  @actorCache('tick')
+  get enemiesSeen() {
+    // const tiles = this.game.map.tilesInRadius(this, this.viewRange);
 
-    if (!coordsInViewCone(this, this.game.player, this.viewAngle, this.facing))
-      return false;
+    // const enemies: Creature[] = tiles.flatMap((tile) => {
+    //   return tile.creatures.filter(
+    //     (c) => c.alignment === this.oppositeAlignment
+    //   );
+    // });
 
-    // See if view is blocked by a wall
-    const tilesBetween = this.game.map.tilesBetween(this, this.game.player);
+    const enemies = this.oppositeAlignedCreatures;
 
-    if (tilesBetween.some((tile) => tile.hasEntityThatBlocksView)) return false;
+    // const enemies: Creature[] = [this.game.player];
 
-    return true;
+    return enemies.filter((enemy) => {
+      if (distance(this, enemy) > this.viewRange) return false;
+
+      if (!coordsInViewCone(this, enemy, this.viewAngle, this.facing))
+        return false;
+
+      const tilesBetween = this.game.map.tilesBetween(this, this.game.player);
+
+      if (tilesBetween.some((tile) => tile.hasEntityThatBlocksView))
+        return false;
+
+      return true;
+    });
   }
 
   get covers(): Record<Dir, Cover> {
@@ -509,6 +558,8 @@ export default abstract class Creature
       const damagePerTick = damagePerTurn / TURN;
       this.receiveDamage(damagePerTick);
     }
+
+    this.timeSpentInAiState++;
   }
 
   addStatusEffect(statusEffect: StatusEffect) {
@@ -548,39 +599,56 @@ export default abstract class Creature
 
     if (debugOptions.wanderingEnemies) return this._wander();
 
-    if (this.alignment === CreatureAlignment.Enemy) {
-      this._actHostile();
-    }
+    this._updateAiStateIfNeeded();
+
+    this._aiStateActions[this.aiState]();
   }
 
-  /**
-   * If gun is empty, reload
-   * else if I can attack the player, attack the player
-   * else if I can see the player, move towards the player
-   * else if I last saw the player somewhere
-   *  If I'm on the tile I last saw them at, turn randomly (look around)
-   *  else, move towards where I last saw them
-   * else wander
-   */
-  _actHostile() {
-    if (this.mustReload) {
-      this.reload();
-    } else if (this.canAttackPlayer) {
-      this.fireWeapon([this.game.player]);
-    } else if (this.canSeePlayer) {
-      this._moveTowards(this.game.player);
-    } else if (this.lastSawPlayerAt) {
-      if (coordsEqual(this, this.lastSawPlayerAt)) {
+  _updateAiStateIfNeeded() {
+    const visibleEnemy = this.enemiesSeen[0];
+
+    if (visibleEnemy) {
+      this.setAiState(AiState.Engaging);
+      return;
+    }
+
+    if (this.lastSawEnemyAt) {
+      this.setAiState(AiState.Searching);
+
+      if (this.timeSpentInAiState > 10 * TURN) {
+        this.setAiState(AiState.Idle);
+      }
+
+      return;
+    }
+
+    this.setAiState(AiState.Idle);
+  }
+
+  _aiStateActions: Record<AiState, () => void> = {
+    [AiState.Engaging]: () => {
+      const attackableEnemy = this.attackableEnemies[0];
+      const visibleEnemy = this.enemiesSeen[0];
+
+      if (this.mustReload) {
+        this.reload();
+      } else if (attackableEnemy) {
+        this.attackTile(attackableEnemy.tile);
+      } else if (visibleEnemy) {
+        this._moveTowards(visibleEnemy);
+      }
+    },
+    [AiState.Searching]: () => {
+      if (coordsEqual(this.lastSawEnemyAt as Coords, this)) {
         const randomTurnSegmentCount = random.polarity();
         const dir = rotateDir(this.facing, randomTurnSegmentCount);
         this.turn(dir);
       } else {
-        this._moveTowards(this.lastSawPlayerAt);
+        this._moveTowards(this.lastSawEnemyAt as Coords);
       }
-    } else {
-      this._wander();
-    }
-  }
+    },
+    [AiState.Idle]: () => {},
+  };
 
   _moveTowards(coords: Coords) {
     const coordsPath = this.game.map.pathBetween(this.coords, coords, this);
@@ -617,17 +685,18 @@ export default abstract class Creature
 
   updatePosition(tile: Tile) {
     super.updatePosition(tile);
-    this.updateLastSawPlayerIfCanSee();
+    this.updateLastSawEnemy();
   }
 
   updateFacing(dir: Dir) {
     this.facing = dir;
-    this.updateLastSawPlayerIfCanSee();
+    this.updateLastSawEnemy();
   }
 
-  updateLastSawPlayerIfCanSee() {
-    if (this.canSeePlayer) {
-      this.lastSawPlayerAt = this.game.player.coords;
+  updateLastSawEnemy() {
+    const enemy = this.enemiesSeen[0];
+    if (enemy) {
+      this.lastSawEnemyAt = enemy.coords;
     }
   }
 
@@ -637,5 +706,31 @@ export default abstract class Creature
 
   receiveRadiation(amount: number) {
     this.rads += amount;
+  }
+
+  setAiState(newState: AiState) {
+    if (newState === this.aiState) return;
+
+    const oldState = this.aiState;
+
+    if (oldState === AiState.Searching && newState === AiState.Idle) {
+      this.lastSawEnemyAt = null;
+    }
+
+    this.aiState = newState;
+
+    console.log(`Updating state to ${newState}`);
+
+    this.timeSpentInAiState = 0;
+  }
+
+  get oppositeAlignment() {
+    return this.alignment === CreatureAlignment.AgainstPlayer
+      ? CreatureAlignment.WithPlayer
+      : CreatureAlignment.AgainstPlayer;
+  }
+
+  get oppositeAlignedCreatures(): Creature[] {
+    return this.game.creaturesByAlignment[this.oppositeAlignment];
   }
 }

@@ -64,7 +64,7 @@ export class View {
     if (debugOptions.showPlayerLastSeen) {
       const lastSeens = this.game.nonPlayerActors.flatMap((actor) => {
         if (!isCreature(actor)) return [];
-        return actor.lastSawPlayerAt ?? [];
+        return actor.lastSawEnemyAt ?? [];
       });
 
       lastSeens.forEach((coords) => {

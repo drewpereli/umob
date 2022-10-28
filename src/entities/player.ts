@@ -16,6 +16,10 @@ import { angleFromDir, type Dir } from '@/utils/map';
 import type { Perk } from '@/perks';
 
 export class Player extends Creature implements Flammable {
+  constructor(tile: Tile, public alignment = CreatureAlignment.WithPlayer) {
+    super(tile);
+  }
+
   defaultChar = '@';
   color = 'yellow';
 
@@ -28,8 +32,6 @@ export class Player extends Creature implements Flammable {
   upgradePoints = 1;
 
   inventory: Item[] = [new Pipe()];
-
-  alignment = CreatureAlignment.Ally;
 
   powers: Power[] = [
     new BuildCover(),
@@ -153,7 +155,7 @@ export class Player extends Creature implements Flammable {
   }
 
   // Called in creature constructor
-  updateLastSawPlayerIfCanSee() {
+  updateLastSawEnemy() {
     //
   }
 
@@ -171,5 +173,10 @@ export class Player extends Creature implements Flammable {
 
   hasPerk(perk: Perk) {
     return this.appliedPerkIds.includes(perk.id);
+  }
+
+  get visibleTiles() {
+    throw new Error('Use game.visibleTiles');
+    return [];
   }
 }

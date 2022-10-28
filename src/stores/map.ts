@@ -12,7 +12,9 @@ import { isFluid, type Fluid } from '@/entities/fluid';
 import { isGas, type Gas } from '@/entities/gas';
 import { isItemInMap, type ItemInMap } from '@/entities/items/item-in-map';
 import { isCreature } from '@/entities/creatures/creature';
-import { isFlammable } from '@/entities/flammable';
+import { isFlammable, type Flammable } from '@/entities/flammable';
+import { isDamageable, type Damageable } from '@/entities/damageable';
+import { removeElement } from '@/utils/array';
 
 export const useMap = defineStore('map', {
   state: () => ({
@@ -199,33 +201,37 @@ export class Tile {
     return this.terrain?.cover ?? Cover.None;
   }
 
-  get fluid(): Fluid | undefined {
-    return this.entities.find(isFluid);
-  }
+  fluid?: Fluid;
 
-  get gas(): Gas | undefined {
-    return this.entities.find(isGas);
-  }
+  gas?: Gas;
 
-  get items(): ItemInMap[] {
-    return this.entities.filter(isItemInMap);
-  }
-
-  get flammables() {
-    return this.entities.filter(isFlammable);
-  }
-
-  get creatures() {
-    return this.entities.filter(isCreature);
-  }
+  items: ItemInMap[] = [];
+  flammables: Flammable[] = [];
+  creatures: Creature[] = [];
+  damageables: Damageable[] = [];
 
   addEntity(e: MapEntity) {
-    if (isFluid(e) && this.fluid) {
-      return;
+    if (isFluid(e)) {
+      if (this.fluid) return;
+      this.fluid = e;
     }
 
-    if (isGas(e) && this.gas) {
-      return;
+    if (isGas(e)) {
+      if (this.gas) return;
+      this.gas = e;
+    }
+
+    if (isItemInMap(e)) {
+      this.items.push(e);
+    }
+    if (isFlammable(e)) {
+      this.flammables.push(e);
+    }
+    if (isCreature(e)) {
+      this.creatures.push(e);
+    }
+    if (isDamageable(e)) {
+      this.damageables.push(e);
     }
 
     this.entities.push(e);
@@ -245,16 +251,29 @@ export class Tile {
   }
 
   removeEntity(e: MapEntity) {
-    const idx = this.entities.indexOf(e);
-
-    if (idx === -1) return;
-
-    this.entities.splice(idx, 1);
+    removeElement(this.entities, e);
 
     // if (e === this.terrain) {
     //   this.terrain === undefined;
     //   this.moveTimeMultiplier = 1;
     // }
+
+    if (isFluid(e)) this.fluid = undefined;
+
+    if (isGas(e)) this.gas = undefined;
+
+    if (isItemInMap(e)) {
+      removeElement(this.items, e);
+    }
+    if (isFlammable(e)) {
+      removeElement(this.flammables, e);
+    }
+    if (isCreature(e)) {
+      removeElement(this.creatures, e);
+    }
+    if (isDamageable(e)) {
+      removeElement(this.damageables, e);
+    }
 
     if (e.blocksMovement) {
       this.updateBlocksMovement();

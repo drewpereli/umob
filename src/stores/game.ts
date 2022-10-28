@@ -11,7 +11,7 @@ import { PermissiveFov } from 'permissive-fov';
 import { defineStore } from 'pinia';
 import { useAnimations } from './animations';
 import { Tile, useMap } from './map';
-import { distance, coordsEqual, coordsInViewCone, Dir } from '@/utils/map';
+import { coordsEqual, coordsInViewCone, type Dir } from '@/utils/map';
 import { Wall } from '@/entities/terrain';
 import { View } from '@/utils/view';
 import { Actor } from '@/entities/actor';
@@ -27,6 +27,7 @@ import {
 } from '@/entities/weapons/gun';
 import { Rat } from '@/entities/creatures/rat';
 import { canInteractWithFrom, isInteractable } from '@/entities/interactable';
+import { removeElement } from '@/utils/array';
 
 export const TURN = 4; // How many ticks make up a "turn"
 
@@ -52,6 +53,10 @@ export const useGame = defineStore('game', {
     // that will move the player at the end of the tick. That way, no other conveyor belt will be able to act on the player that tick.
     endOfTickActionQueue: [] as Array<() => unknown>,
     nonPlayerActors: [] as Actor[], // Was originally computed, but there were performance issues, so this is sor tof a cache
+    creaturesByAlignment: {
+      [CreatureAlignment.WithPlayer]: [],
+      [CreatureAlignment.AgainstPlayer]: [],
+    } as Record<CreatureAlignment, Creature[]>,
   }),
   getters: {
     allActors(state): Actor[] {
@@ -59,7 +64,7 @@ export const useGame = defineStore('game', {
     },
     enemies(): Creature[] {
       return this.creatures.filter(
-        (e) => e.alignment === CreatureAlignment.Enemy
+        (e) => e.alignment === CreatureAlignment.AgainstPlayer
       );
     },
     creatures(state): Creature[] {
@@ -175,14 +180,6 @@ export const useGame = defineStore('game', {
     initialize() {
       this.map.generate();
 
-      const tile = this.map.randomFloorTile();
-
-      const player = new Player(tile);
-
-      this.player = player;
-
-      this.addPlayer(player);
-
       const fov = new PermissiveFov(
         this.map.width,
         this.map.height,
@@ -191,6 +188,14 @@ export const useGame = defineStore('game', {
       );
 
       this.fovUtil = fov;
+
+      const tile = this.map.randomFloorTile();
+
+      const player = new Player(tile);
+
+      this.player = player;
+
+      this.addPlayer(player);
 
       if (debugOptions.extraEnemies) {
         Array.from({ length: debugOptions.extraEnemies }).forEach(() => {
@@ -224,13 +229,17 @@ export const useGame = defineStore('game', {
         this.player.interact(interactableEntity);
       } else if (this.creatureCanOccupy(targetTile)) {
         this.player.move(targetTile);
-      } else if (this.damageablesAt(targetTile)) {
-        this.player.fireWeapon(this.damageablesAt(targetTile));
+      } else if (
+        this.damageablesAt(targetTile) &&
+        (!this.player.equippedWeapon ||
+          !weaponIsGun(this.player.equippedWeapon))
+      ) {
+        this.player.attackTile(targetTile);
       } else {
         return;
       }
 
-      this.enemies.forEach((actor) => actor.updateLastSawPlayerIfCanSee());
+      this.enemies.forEach((actor) => actor.updateLastSawEnemy());
 
       this.view.draw();
 
@@ -242,7 +251,7 @@ export const useGame = defineStore('game', {
       this._tickUntilPlayerCanAct();
     },
     playerFireWeapon() {
-      this.player.fireWeapon(this.damageablesAimedAt);
+      this.player.attackTile(this.selectedTile as Tile);
       this.view.draw();
       this._tickUntilPlayerCanAct();
     },
@@ -340,8 +349,14 @@ export const useGame = defineStore('game', {
           entity.tilesOccupied.forEach((t) => t.removeEntity(entity));
 
           if (entity instanceof Actor) {
-            const idx = this.nonPlayerActors.indexOf(entity);
-            this.nonPlayerActors.splice(idx, 1);
+            removeElement(this.nonPlayerActors, entity);
+
+            if (isCreature(entity)) {
+              removeElement(
+                this.creaturesByAlignment[entity.alignment],
+                entity
+              );
+            }
           }
         } else {
           all.push(entity);
@@ -353,6 +368,7 @@ export const useGame = defineStore('game', {
     addPlayer(player: Player) {
       player.tilesOccupied.forEach((tile) => tile.addEntity(player));
       this.mapEntities.push(player);
+      this.creaturesByAlignment[CreatureAlignment.WithPlayer].push(player);
     },
     addMapEntity(entity: MapEntity) {
       entity.tilesOccupied.forEach((tile) => tile.addEntity(entity));
@@ -360,6 +376,10 @@ export const useGame = defineStore('game', {
 
       if (entity instanceof Actor) {
         this.nonPlayerActors.push(entity);
+
+        if (isCreature(entity)) {
+          this.creaturesByAlignment[entity.alignment].push(entity);
+        }
       }
     },
     addEndOfTickAction(action: () => unknown) {
