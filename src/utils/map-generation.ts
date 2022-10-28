@@ -13,7 +13,7 @@ import { CentrifugeTerminal } from '@/entities/controller/centrifuge-terminal';
 
 type Map = Tile[][];
 
-export function generate(
+export function generateTilesAndWalls(
   width: number,
   height: number
 ): { map: Map; rooms: Room[] } {

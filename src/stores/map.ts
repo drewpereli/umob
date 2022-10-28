@@ -1,5 +1,5 @@
 import bresenham from '@/utils/bresenham';
-import { addRooms, generate } from '@/utils/map-generation';
+import { addRooms, generateTilesAndWalls } from '@/utils/map-generation';
 import { defineStore } from 'pinia';
 import type Creature from '@/entities/creatures/creature';
 import { debugOptions } from '@/utils/debug-options';
@@ -128,7 +128,7 @@ export const useMap = defineStore('map', {
   },
   actions: {
     generate() {
-      const { map, rooms } = generate(this.width, this.height);
+      const { map, rooms } = generateTilesAndWalls(this.width, this.height);
       this.tiles = map;
       addRooms(map, rooms);
     },
