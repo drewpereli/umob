@@ -18,3 +18,7 @@ export function minBy<T>(arr: T[], by: (item: T) => number): T {
 
   return minEl;
 }
+
+export function last<T>(arr: T[]): T {
+  return arr[arr.length - 1];
+}
