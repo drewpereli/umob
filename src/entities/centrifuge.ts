@@ -1,4 +1,4 @@
-import { useGame } from '@/stores/game';
+import { TURN, useGame } from '@/stores/game';
 import { useMap, type Tile } from '@/stores/map';
 import bresenham from '@/utils/bresenham';
 import { coordsEqual } from '@/utils/map';
@@ -9,9 +9,10 @@ import { Actor } from './actor';
 import { isDamageable } from './damageable';
 import type MapEntity from './map-entity';
 import { EntityLayer } from './map-entity';
+import { DamageType } from './weapons/weapon';
 
 export class Centrifuge extends Actor implements AsciiDrawable {
-  constructor(tile: Tile, public isOn = true) {
+  constructor(tile: Tile, public isOn = true, public length = 4.5) {
     super(tile);
 
     if (isOn) {
@@ -34,12 +35,10 @@ export class Centrifuge extends Actor implements AsciiDrawable {
 
   currAngle = random.int(0, 359);
 
-  length = 4.5;
-
   char = '+';
   color = '#eee';
 
-  maxAngleChangePerTick = random.int(10, 45);
+  maxAngleChangePerTick = random.int(10, 45) / TURN;
   angleChangePerTick;
 
   damageWhenCantPush = 10;
@@ -102,7 +101,7 @@ export class Centrifuge extends Actor implements AsciiDrawable {
         const tile = game.map.tileAt(moveTo);
         e.updatePosition(tile);
       } else if (isDamageable(e)) {
-        e.receiveDamage(this.damageWhenCantPush);
+        e.receiveDamage(this.damageWhenCantPush, DamageType.Physical);
       }
     });
 

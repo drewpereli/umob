@@ -1,14 +1,22 @@
-import { Door } from '@/entities/terrain';
-import { Lava } from '@/entities/fluid';
+import { Door, isDoor } from '@/entities/terrain';
+import { Lava, ToxicWaste } from '@/entities/fluid';
 import { Wall, HalfWall } from '@/entities/terrain';
 import { useGame } from '@/stores/game';
 import { Tile } from '@/stores/map';
 import { debugOptions } from './debug-options';
 import { random } from './random';
+import { Centrifuge } from '@/entities/centrifuge';
+import { ItemInMap } from '@/entities/items/item-in-map';
+import { ShotGun } from '@/entities/weapons/gun';
+import { Dir } from './map';
+import { CentrifugeTerminal } from '@/entities/controller/centrifuge-terminal';
 
 type Map = Tile[][];
 
-export function generate(width: number, height: number): Map {
+export function generate(
+  width: number,
+  height: number
+): { map: Map; rooms: Room[] } {
   const game = useGame();
 
   if (debugOptions.emptyMap) {
@@ -53,10 +61,12 @@ export function generate(width: number, height: number): Map {
       randOpen.forEach((tile) => game.addMapEntity(new Lava(tile)));
     }
 
-    return map;
+    setAdjacentTiles(map);
+
+    return { map, rooms: [] };
   }
 
-  const tileArr = generateLevel({ x: width, y: height }).tiles;
+  const { tiles: tileArr, rooms } = generateLevel({ x: width, y: height });
 
   const map: Map = [];
 
@@ -115,7 +125,16 @@ export function generate(width: number, height: number): Map {
     game.addMapEntity(door);
   });
 
-  return map;
+  setAdjacentTiles(map);
+
+  return { map, rooms };
+}
+
+export function addRooms(map: Map, rooms: Room[]) {
+  rooms.forEach((room) => {
+    const g = new RadPoolRoom(room, map);
+    g.generate();
+  });
 }
 
 export function generateEmpty(width: number, height: number): Map {
@@ -146,6 +165,29 @@ export function generateEmpty(width: number, height: number): Map {
   });
 }
 
+export function setAdjacentTiles(map: Map) {
+  map.forEach((row, y) => {
+    row.forEach((tile, x) => {
+      const adjacent: Tile[] = [
+        map[y - 1]?.[x],
+        map[y + 1]?.[x],
+        map[y]?.[x - 1],
+        map[y]?.[x + 1],
+      ].filter((t) => !!t);
+
+      tile.adjacentTiles = adjacent;
+    });
+  });
+}
+
+interface Room {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+  neighbors?: Room[];
+}
+
 // generate a random level with rooms
 // mapSize = level size {x, y}
 // maxRooms = max number of rooms to generate (number). note: under some conditions the result will have less rooms than max rooms, for example if we run out of places to place rooms in.
@@ -157,18 +199,10 @@ export function generateEmpty(width: number, height: number): Map {
 // NOTE: made for a project on http://5mbg.com/.
 function generateLevel(
   mapSize: Coords,
-  maxRooms = 12,
-  minRoomSize = 4,
-  maxRoomSize = 14
+  maxRooms = 8,
+  minRoomSize = 8,
+  maxRoomSize = 20
 ) {
-  interface Room {
-    x: number;
-    y: number;
-    w: number;
-    h: number;
-    neighbors?: Room[];
-  }
-
   // create empty grid of walls (1 == wall)
   const ret: number[][] = [];
   for (let i = 0; i < mapSize.x; ++i) {
@@ -456,6 +490,139 @@ function generateLevel(
   // start building rooms
   growMap(room);
 
+  const rooms: Room[] = allRooms.map((room) => {
+    return {
+      x: room.y,
+      y: room.x,
+      w: room.h,
+      h: room.w,
+    };
+  });
+
   // return grid
-  return { tiles: ret, rooms: allRooms, doors: allDoors };
+  return { tiles: ret, rooms, doors: allDoors };
+}
+
+type CornerType = 'tl' | 'tr' | 'bl' | 'br';
+
+interface Corner {
+  tile: Tile;
+  type: CornerType;
+}
+
+abstract class RoomGenerator {
+  constructor(public room: Room, public map: Map) {
+    this.w = this.room.w;
+    this.h = this.room.h;
+  }
+
+  w;
+  h;
+
+  abstract generate(): void;
+
+  get tiles(): Tile[][] {
+    return this.map.slice(this.room.y, this.room.y + this.room.h).map((row) => {
+      return row.slice(this.room.x, this.room.x + this.room.w);
+    });
+  }
+
+  get tilesFlat() {
+    return this.tiles.flat();
+  }
+
+  get centerTile() {
+    const centerCoords = {
+      x: Math.round(this.room.w / 2),
+      y: Math.round(this.room.h / 2),
+    };
+
+    const centerTile = this.tiles[centerCoords.y][centerCoords.x];
+
+    return centerTile;
+  }
+
+  get corners(): Corner[] {
+    return [
+      { tile: this.tiles[0][0], type: 'tl' },
+      { tile: this.tiles[0][this.w - 1], type: 'tr' },
+      { tile: this.tiles[this.h - 1][0], type: 'bl' },
+      { tile: this.tiles[this.h - 1][this.w - 1], type: 'br' },
+    ];
+  }
+
+  get tilesNextToDoors(): Tile[] {
+    return this.tiles.flatMap((row) => {
+      return row.filter((tile) => {
+        return this.game.map
+          .adjacentTiles(tile)
+          .some((adj) => adj.entities.some((ent) => isDoor(ent)));
+      });
+    });
+  }
+
+  get game() {
+    return useGame();
+  }
+}
+
+class CentrifugeRoom extends RoomGenerator {
+  generate() {
+    const minDimension = Math.min(this.room.w, this.room.h);
+
+    const centrifugeLength = Math.round(minDimension / 2) - 1.5;
+
+    const centrifuge = new Centrifuge(this.centerTile, true, centrifugeLength);
+
+    this.game.addMapEntity(centrifuge);
+
+    const cornersNotNextToDoor = this.corners.filter((corner) => {
+      return !this.tilesNextToDoors.includes(corner.tile);
+    });
+
+    if (cornersNotNextToDoor.length === 0) {
+      return;
+    }
+
+    const corner = random.arrayElement(cornersNotNextToDoor);
+
+    const possibleDirsFromCornerType: Record<CornerType, Dir[]> = {
+      tl: [Dir.Right, Dir.Down],
+      tr: [Dir.Left, Dir.Down],
+      bl: [Dir.Up, Dir.Right],
+      br: [Dir.Up, Dir.Left],
+    };
+
+    const terminalFacing = random.arrayElement(
+      possibleDirsFromCornerType[corner.type]
+    );
+
+    const controller = new CentrifugeTerminal(
+      corner.tile,
+      centrifuge,
+      terminalFacing
+    );
+
+    this.game.addMapEntity(controller);
+  }
+}
+
+class RadPoolRoom extends RoomGenerator {
+  generate() {
+    const tileCount = random.int(1, 4);
+    const tiles = random.arrayElements(this.tilesFlat, tileCount);
+
+    Array.from({ length: tileCount }).forEach(() => {
+      const tilesWithoutFluid = this.tilesFlat.filter((tile) => !tile.fluid);
+
+      if (tilesWithoutFluid.length === 0) return;
+
+      const tile = random.arrayElement(tilesWithoutFluid);
+
+      const pressure = random.int(3, 6);
+      const waste = new ToxicWaste(tile, pressure);
+
+      this.game.addMapEntity(waste);
+    });
+  }
 }

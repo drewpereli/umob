@@ -94,13 +94,9 @@ export abstract class Fluid extends Actor {
 
   // Returns fluids on adjacent tiles
   get otherFluidsTouching(): Fluid[] {
-    const map = useMap();
-
-    return map.adjacentTiles(this.tile).flatMap((tile) => {
-      return tile.entities.filter(
-        (entity) => isFluid(entity) && entity !== this
-      ) as Fluid[];
-    });
+    return this.tile.adjacentTiles
+      .filter((tile) => tile.fluid)
+      .map((tile) => tile.fluid as Fluid);
   }
 }
 

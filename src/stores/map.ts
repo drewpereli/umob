@@ -1,5 +1,5 @@
 import bresenham from '@/utils/bresenham';
-import { generate } from '@/utils/map-generation';
+import { addRooms, generate } from '@/utils/map-generation';
 import { defineStore } from 'pinia';
 import type Creature from '@/entities/creatures/creature';
 import { debugOptions } from '@/utils/debug-options';
@@ -48,9 +48,8 @@ export const useMap = defineStore('map', {
     },
     adjacentTiles() {
       return (coords: Coords): Tile[] => {
-        return DIRS.map((dir) => this.adjacentTile(coords, dir)).filter(
-          (t): t is Tile => !!t
-        );
+        const tile = coords instanceof Tile ? coords : this.tileAt(coords);
+        return tile.adjacentTiles;
       };
     },
     pathBetween() {
@@ -129,7 +128,9 @@ export const useMap = defineStore('map', {
   },
   actions: {
     generate() {
-      this.tiles = generate(this.width, this.height);
+      const { map, rooms } = generate(this.width, this.height);
+      this.tiles = map;
+      addRooms(map, rooms);
     },
   },
 });
@@ -153,6 +154,8 @@ export class Tile {
 
   readonly x;
   readonly y;
+
+  adjacentTiles: Tile[] = [];
 
   terrainLastSeenByPlayer?: TerrainData;
 
