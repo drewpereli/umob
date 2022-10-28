@@ -11,7 +11,12 @@ import { PermissiveFov } from 'permissive-fov';
 import { defineStore } from 'pinia';
 import { useAnimations } from './animations';
 import { Tile, useMap } from './map';
-import { coordsEqual, coordsInViewCone, type Dir } from '@/utils/map';
+import {
+  coordsEqual,
+  coordsInViewCone,
+  rotateDir,
+  type Dir,
+} from '@/utils/map';
 import { Wall } from '@/entities/terrain';
 import { View } from '@/utils/view';
 import { Actor } from '@/entities/actor';
@@ -115,6 +120,15 @@ export const useGame = defineStore('game', {
           visibleTiles.push(tile);
         }
       );
+
+      const facing = this.player.facing;
+      const dirsToTheSide = [rotateDir(facing, 1), rotateDir(facing, -1)];
+
+      const tilesToTheSide = dirsToTheSide
+        .map((dir) => this.map.adjacentTile(this.player.tile, dir))
+        .filter((t): t is Tile => !!t);
+
+      visibleTiles.push(...tilesToTheSide);
 
       visibleTiles.forEach((tile) => tile.onPlayerSees());
 
