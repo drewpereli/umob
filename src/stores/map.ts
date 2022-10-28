@@ -15,6 +15,7 @@ import { isCreature } from '@/entities/creatures/creature';
 import { isFlammable, type Flammable } from '@/entities/flammable';
 import { isDamageable, type Damageable } from '@/entities/damageable';
 import { removeElement } from '@/utils/array';
+import { useGame } from './game';
 
 export const useMap = defineStore('map', {
   state: () => ({
@@ -53,29 +54,26 @@ export const useMap = defineStore('map', {
       };
     },
     pathBetween() {
-      return (from: Coords, to: Coords, actor: Creature): Coords[] => {
+      return (
+        from: Coords,
+        to: Coords,
+        valueForTile?: (tile: Tile) => number
+      ): Coords[] => {
         const matrix = this.tiles.map((row) => {
           return row.map((tile) => {
-            if (tile.hasEntityThatBlocksView || tile.terrain?.type === 'lava')
-              return 0;
-            return 1;
+            if (tile.hasEntityThatBlocksMovement) return 0;
+            return valueForTile?.(tile) ?? 1;
           });
         });
 
-        actor.game.creatures.forEach((creature) => {
-          if (coordsEqual(creature, to)) {
-            matrix[creature.y][creature.x] = 1;
-          } else {
-            matrix[creature.y][creature.x] = 0;
-          }
-        });
+        matrix[to.y][to.x] = 1; // Set "to" tile to moveable, so we can move towards enemies and stuff
 
         const graph = new Graph(matrix);
 
         const start = graph.grid[from.y][from.x];
         const end = graph.grid[to.y][to.x];
 
-        return astar.search(graph, start, end);
+        return astar.search(graph, start, end, { closest: true });
       };
     },
     randomFloorTile() {

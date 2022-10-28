@@ -40,6 +40,7 @@ import {
 } from '@/utils/radiation';
 import type { Door } from '../terrain';
 import type { Interactable } from '../interactable';
+import { Lava } from '../fluid';
 
 export type Covers = Record<Dir, Cover>;
 
@@ -65,7 +66,7 @@ export function isCreature(entity: MapEntity): entity is Creature {
   return entity instanceof Creature;
 }
 
-enum AiState {
+export enum AiState {
   Engaging = 'engaging',
   Searching = 'searching',
   Idle = 'idle',
@@ -453,32 +454,42 @@ export default abstract class Creature
   }
 
   _moveTowards(coords: Coords) {
-    const coordsPath = this.game.map.pathBetween(this.coords, coords, this);
+    const coordsPath = this.game.map.pathBetween(
+      this.coords,
+      coords,
+      this._pathfindingValueForTile
+    );
 
     const coordsTowardsTarget = coordsPath[0];
 
-    if (!coordsTowardsTarget) return;
+    let tileToMoveTo: Tile | null = null;
 
-    const tile = this.game.map.tileAt(coordsTowardsTarget);
+    if (coordsTowardsTarget) {
+      const tile = this.game.map.tileAt(coordsTowardsTarget);
 
-    if (!this.game.creatureCanOccupy(tile)) return;
+      if (this.game.creatureCanOccupy(tile)) {
+        tileToMoveTo = tile;
+      }
+    }
 
-    this.moveOrTurn(tile);
+    if (tileToMoveTo) {
+      this.moveOrTurn(tileToMoveTo);
+    } else {
+      // If we can turn towards the tile, do that
+      const dirTowards = dirsBetween(this.coords, coords);
+
+      if (dirTowards.includes(this.facing)) {
+        return;
+      }
+
+      this.turn(random.arrayElement(dirTowards));
+    }
   }
 
   _wander() {
-    const adjacentCoords = [
-      { x: this.x - 1, y: this.y },
-      { x: this.x + 1, y: this.y },
-      { x: this.x, y: this.y - 1 },
-      { x: this.x, y: this.y + 1 },
-    ];
-
-    const tiles = adjacentCoords
-      .map((coords) => this.game.map.tileAt(coords))
-      .filter((tile) => {
-        return tile && this.game.creatureCanOccupy(tile);
-      });
+    const tiles = this.tile.adjacentTiles.filter((tile) => {
+      return this.game.creatureCanOccupy(tile);
+    });
 
     if (tiles.length === 0) return;
 
@@ -560,8 +571,6 @@ export default abstract class Creature
 
     this.aiState = newState;
 
-    console.log(`Updating state to ${newState}`);
-
     this.timeSpentInAiState = 0;
   }
 
@@ -627,6 +636,20 @@ export default abstract class Creature
     },
     [AiState.Idle]: () => {},
   };
+
+  // Used for pathfinding.
+  // Runs on each tile to generate the matrix for pathfinding
+  // Should return 0 if the entity will not move to that tile
+  // 1 or greater if the entity will/can.
+  // Pathfinding will already prevent walking to tiles with movement blocking entities, so we don't have to worry about that here
+  // This is more for AI, i.e. walking into lava, fire, etc
+  get _pathfindingValueForTile() {
+    return (tile: Tile) => {
+      if (tile.fluid instanceof Lava) return 0;
+      if (tile.flammables.some((f) => f.isBurning)) return 0;
+      return 1;
+    };
+  }
   /* #endregion */
 
   /* #region  Actions */
@@ -708,7 +731,7 @@ export default abstract class Creature
   /* #endregion */
 
   /* #region  General State */
-  _health = 100;
+  _health = this.maxHealth;
 
   get health() {
     return this._health;

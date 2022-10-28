@@ -28,9 +28,21 @@ function manhattan(pos0: Coords, pos1: Coords) {
 }
 
 export const astar = {
-  search: function (graph: Graph, start: GridNode, end: GridNode) {
+  search: function (
+    graph: Graph,
+    start: GridNode,
+    end: GridNode,
+    options?: { closest?: boolean }
+  ) {
     graph.cleanDirty();
+
+    options ??= {};
+
+    const closest = options.closest ?? false;
+
     const openHeap = getHeap();
+
+    let closestNode: GridNode = start;
 
     start.h = manhattan(start, end);
     graph.markDirty(start);
@@ -74,6 +86,18 @@ export const astar = {
           neighbor.f = neighbor.g + neighbor.h;
           graph.markDirty(neighbor);
 
+          if (closest) {
+            // If the neighbour is closer than the current closestNode or if it's equally close but has
+            // a cheaper path than the current closest node then it becomes the closest node
+            if (
+              neighbor.h < (closestNode.h as number) ||
+              (neighbor.h === closestNode.h &&
+                neighbor.g < (closestNode.g as number))
+            ) {
+              closestNode = neighbor;
+            }
+          }
+
           if (!beenVisited) {
             // Pushing to heap will put it in proper place based on the 'f' value.
             openHeap.push(neighbor);
@@ -83,6 +107,10 @@ export const astar = {
           }
         }
       }
+    }
+
+    if (closest) {
+      return pathTo(closestNode);
     }
 
     // No result was found - empty array signifies failure to find path.
