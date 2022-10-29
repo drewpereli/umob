@@ -1,5 +1,5 @@
 import type { Covers } from '@/entities/creatures/creature';
-import { angle, angularDistance } from './math';
+import { angle, angularDistance, polarToCartesian } from './math';
 
 export enum Dir {
   Up = 'up',
@@ -144,4 +144,9 @@ export function addCoords(c1: Coords, c2: Partial<Coords>): Coords {
     x: c1.x + (c2?.x ?? 0),
     y: c1.y + (c2?.y ?? 0),
   };
+}
+
+export function addPolarToCartesian(c1: Coords, c2: PolarCoords): Coords {
+  const c2Cartesian = polarToCartesian(c2, 0);
+  return addCoords(c1, c2Cartesian);
 }

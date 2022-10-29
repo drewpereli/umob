@@ -7,6 +7,7 @@ import {
 import { TURN, useGame } from '@/stores/game';
 import type { Tile } from '@/stores/map';
 import {
+  addPolarToCartesian,
   coordsEqual,
   coordsInViewCone,
   Cover,
@@ -41,6 +42,9 @@ import {
 import type { Door } from '../terrain';
 import type { Interactable } from '../interactable';
 import { Lava } from '../fluid';
+import { angle } from '@/utils/math';
+import bresenham from '@/utils/bresenham';
+import { last } from '@/utils/array';
 
 export type Covers = Record<Dir, Cover>;
 
@@ -111,36 +115,41 @@ export default abstract class Creature
     }
   }
 
-  receiveKnockBack(damage: number, amount: number, dir: Dir) {
-    let toCoords: Coords = this;
+  receiveKnockBack(damage: number, amount: number, from: Coords) {
+    const dir = random.arrayElement(dirsBetween(from, this));
+
+    const target = addPolarToCartesian(this, {
+      r: amount,
+      t: angle(from, this),
+    });
+
+    const coordsToMoveThrough = bresenham(this, target).slice(1);
+
     let additionalActorDamaged: Creature | null = null;
     let hitWall = false;
 
     const tilesMovedThrough: Tile[] = [];
 
-    for (let i = 0; i < amount; i++) {
-      const next = this.game.map.adjacentTile(toCoords, dir);
+    for (const coords of coordsToMoveThrough) {
+      const tile = this.game.map.tileAt(coords);
 
-      if (!next) {
-        break;
+      if (this.game.creatureCanOccupy(tile)) {
+        tilesMovedThrough.push(tile);
+        continue;
       }
 
-      const actor = this.game.creatureAt(next);
+      const actor = this.game.creatureAt(tile);
 
       if (actor) {
         additionalActorDamaged = actor;
-        break;
-      }
-
-      if (next.hasEntityThatBlocksMovement) {
+      } else {
         hitWall = true;
-        break;
       }
 
-      tilesMovedThrough.push(next);
-
-      toCoords = next;
+      break;
     }
+
+    const toTile = last(tilesMovedThrough);
 
     if (additionalActorDamaged) {
       additionalActorDamaged.receiveDamage(damage * 0.25, DamageType.Physical);
@@ -150,27 +159,27 @@ export default abstract class Creature
       this.receiveDamage(damage * 0.25, DamageType.Physical);
     }
 
-    this.game.animations.addAnimation(
-      new KnockBackAnimation(
-        this,
-        this.coords,
-        toCoords,
-        !!(hitWall || additionalActorDamaged)
-      )
-    );
+    if (toTile) {
+      this.game.animations.addAnimation(
+        new KnockBackAnimation(
+          this,
+          this.coords,
+          toTile,
+          !!(hitWall || additionalActorDamaged)
+        )
+      );
 
-    // Trigger any traps in tiles moved through
-    tilesMovedThrough.forEach((tile) => {
-      tile.entities.forEach((entity) => {
-        if (isTrap(entity)) {
-          entity.trigger();
-        }
+      // Trigger any traps in tiles moved through
+      tilesMovedThrough.forEach((tile) => {
+        tile.entities.forEach((entity) => {
+          if (isTrap(entity)) {
+            entity.trigger();
+          }
+        });
       });
-    });
 
-    const tile = this.game.map.tileAt(toCoords);
-
-    this.updatePosition(tile);
+      this.updatePosition(toTile);
+    }
   }
 
   get isCurrentlyDamageable() {
@@ -536,9 +545,11 @@ export default abstract class Creature
 
       if (willHit) {
         if (weaponData.knockBack && entity instanceof Creature) {
-          const dirs = dirsBetween(this, entity);
-          const dir = random.arrayElement(dirs);
-          entity.receiveKnockBack(weaponData.damage, weaponData.knockBack, dir);
+          entity.receiveKnockBack(
+            weaponData.damage,
+            weaponData.knockBack,
+            this
+          );
         }
 
         if (entity instanceof Creature && weaponData.flankingBonus) {

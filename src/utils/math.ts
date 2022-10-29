@@ -32,9 +32,18 @@ export function cartesianToPolar(coords: Coords): PolarCoords {
   return { t, r };
 }
 
-export function polarToCartesian(coords: PolarCoords): Coords {
-  const x = round(coords.r * Math.cos((coords.t * Math.PI) / 180), 4);
-  const y = round(coords.r * Math.sin((coords.t * Math.PI) / 180), 4);
+export function polarToCartesian(
+  coords: PolarCoords,
+  roundToPlaces = 4
+): Coords {
+  const x = round(
+    coords.r * Math.cos((coords.t * Math.PI) / 180),
+    roundToPlaces
+  );
+  const y = round(
+    coords.r * Math.sin((coords.t * Math.PI) / 180),
+    roundToPlaces
+  );
 
   return { x, y };
 }
