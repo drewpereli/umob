@@ -116,8 +116,6 @@ export default abstract class Creature
   }
 
   receiveKnockBack(damage: number, amount: number, from: Coords) {
-    const dir = random.arrayElement(dirsBetween(from, this));
-
     const target = addPolarToCartesian(this, {
       r: amount,
       t: angle(from, this),
@@ -749,11 +747,21 @@ export default abstract class Creature
   }
 
   set health(val: number) {
+    if (val > this.maxHealth) {
+      val = this.maxHealth;
+    } else if (val < 0) {
+      val = 0;
+    }
+
     this._health = val;
 
     if (val <= 0) {
       this.markForRemoval();
     }
+  }
+
+  changeHealth(amount: number) {
+    this.health = this.health + amount;
   }
 
   energy = 100;
@@ -805,11 +813,11 @@ export default abstract class Creature
     if (this.atRadLevelOrHigher(RadLevel.Extreme)) {
       const damagePerTurn = this.maxHealth * 0.02;
       const damagePerTick = damagePerTurn / TURN;
-      this.receiveDamage(damagePerTick, DamageType.Radiation);
+      this.changeHealth(-damagePerTick);
     } else if (this.atRadLevelOrHigher(RadLevel.High)) {
       const damagePerTurn = this.maxHealth * 0.02;
       const damagePerTick = damagePerTurn / TURN;
-      this.receiveDamage(damagePerTick, DamageType.Radiation);
+      this.changeHealth(-damagePerTick);
     }
 
     this.timeSpentInAiState++;
