@@ -23,7 +23,7 @@ import {
 import type { Power } from '@/powers/power';
 import { random } from '@/utils/random';
 import { Actor, actorCache } from '../actor';
-import type { Damageable } from '../damageable';
+import { damageRoll, type Damageable } from '../damageable';
 import Gun, { damageablesAimedAt, weaponIsGun } from '../weapons/gun';
 import type { AsciiDrawable } from '@/utils/types';
 import MapEntity, { EntityLayer } from '../map-entity';
@@ -184,7 +184,7 @@ export default abstract class Creature
     return this.health > 0;
   }
 
-  evasionMultiplier = 1;
+  evasion = 8;
 
   penetrationBlock = 1;
 
@@ -233,7 +233,7 @@ export default abstract class Creature
 
   baseViewRange = 10;
 
-  baseAccuracyMultiplier = 1;
+  baseAccuracy = 8;
 
   viewAngle: number = 90;
 
@@ -280,18 +280,18 @@ export default abstract class Creature
     return Math.max(range, 0);
   }
 
-  get accuracyMultiplier() {
+  get accuracy() {
     if (this.hasStatusEffect(TargetingArray)) {
       return Infinity;
     }
 
-    let acc = this.baseAccuracyMultiplier;
+    let acc = this.baseAccuracy + this.weaponData.accuracyBonus;
 
     if (this.atRadLevelOrHigher(RadLevel.Medium)) {
-      acc *= 0.5;
+      acc -= 2;
     }
 
-    return acc;
+    return Math.max(acc, 1);
   }
 
   get covers(): Record<Dir, Cover> {
@@ -315,7 +315,7 @@ export default abstract class Creature
 
   unarmedAttackData: WeaponData = {
     damage: 1,
-    accuracy: Infinity,
+    accuracyBonus: Infinity,
     attackTimeMultiplier: 1,
     knockBack: 0,
     flankingBonus: 0,
@@ -332,23 +332,6 @@ export default abstract class Creature
       weaponIsGun(this.equippedWeapon) &&
       this.equippedWeapon.amoLoaded === 0
     );
-  }
-
-  // The chance that a shot fired from this actor at "damageable" will hit
-  // Returns a number between 0 and 1 inclusive
-  hitChanceForDamageable(damageable: Damageable & Coords) {
-    if (damageable.evasionMultiplier === undefined) {
-      return 1;
-    }
-
-    const actor: Creature = damageable as Creature;
-
-    const baselineAccuracy =
-      this.accuracyMultiplier *
-      this.weaponData.accuracy *
-      actor.evasionMultiplier;
-
-    return baselineAccuracy * actor.coverMultiplierWhenShotFrom(this);
   }
   /* #endregion */
 
@@ -535,9 +518,14 @@ export default abstract class Creature
     const hit: Damageable[] = [];
 
     damageables.forEach((entity) => {
-      const hitChance = this.hitChanceForDamageable(entity);
+      let evasion;
+      if (isCreature(entity)) {
+        evasion = entity.evasion * entity.coverMultiplierWhenShotFrom(this);
+      } else {
+        evasion = entity.evasion;
+      }
 
-      const willHit = random.float(0, 1) < hitChance;
+      const willHit = damageRoll(this.accuracy, evasion);
 
       let damage = weaponData.damage;
 

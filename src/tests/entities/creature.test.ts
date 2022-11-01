@@ -9,7 +9,7 @@ import { Wall, HalfWall } from '@/entities/terrain';
 class TestGun extends Gun {
   name = 'test gun';
   damage = 0;
-  accuracy = 1;
+  accuracyBonus = 1;
   description = '';
   clipSize = 10;
   amoLoaded = 10;
@@ -35,8 +35,8 @@ describe('Actor', () => {
     const tile = map.tileAt(coords);
 
     const actor = new TestCreature(tile);
-    actor.baseAccuracyMultiplier = 1;
-    actor.evasionMultiplier = 1;
+    actor.baseAccuracy = 1;
+    actor.evasion = 1;
     actor.equippedWeapon = new TestGun();
 
     game.mapEntities.push(actor);
@@ -67,16 +67,16 @@ describe('Actor', () => {
       const source = createActor({ x: 1, y: 1 });
       const target = createActor({ x: 5, y: 5 });
 
-      source.baseAccuracyMultiplier = 0.75;
-      (source.equippedWeapon as Gun).accuracy = 0.33;
-      target.evasionMultiplier = 0.5;
+      source.baseAccuracy = 0.75;
+      (source.equippedWeapon as Gun).accuracyBonus = 0.33;
+      target.evasion = 0.5;
 
       const hitChance = source.hitChanceForDamageable(target);
 
       expect(hitChance).toEqual(
         source.accuracyMultiplier *
-          (source.equippedWeapon as Gun).accuracy *
-          target.evasionMultiplier
+          (source.equippedWeapon as Gun).accuracyBonus *
+          target.evasion
       );
     });
 
@@ -88,8 +88,8 @@ describe('Actor', () => {
 
       useGame().addMapEntity(wall);
 
-      source.baseAccuracyMultiplier = 0.75;
-      (source.equippedWeapon as Gun).accuracy = 0.33;
+      source.baseAccuracy = 0.75;
+      (source.equippedWeapon as Gun).accuracyBonus = 0.33;
 
       const hitChance = source.hitChanceForDamageable(wall);
 
@@ -108,8 +108,8 @@ describe('Actor', () => {
 
       game.addMapEntity(new HalfWall(useMap().tileAt({ x: 4, y: 1 })));
 
-      source.baseAccuracyMultiplier = 0.75;
-      (source.equippedWeapon as Gun).accuracy = 0.33;
+      source.baseAccuracy = 0.75;
+      (source.equippedWeapon as Gun).accuracyBonus = 0.33;
 
       const hitChance = source.hitChanceForDamageable(wall);
 

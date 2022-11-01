@@ -14,7 +14,7 @@ export default abstract class Gun extends Weapon {
   penetration = 0;
   range = Infinity;
   spread: number | null = null;
-  accuracy = 0.5;
+  accuracyBonus = 0;
   abstract clipSize: number;
   abstract amoLoaded: number;
   reloadTimeMultiplier = 1;
@@ -32,6 +32,7 @@ export class ShotGun extends Gun {
   clipSize = 4;
   amoLoaded = 4;
   description = "It's your basic shotgun. It shoots enemies in a cone.";
+  accuracyBonus = -2;
 }
 
 export class Pistol extends Gun {
@@ -42,6 +43,7 @@ export class Pistol extends Gun {
   clipSize = 16;
   amoLoaded = 16;
   description = 'Not a lot of damage';
+  accuracyBonus = 1;
 }
 
 export class AssaultRifle extends Gun {
@@ -54,6 +56,7 @@ export class AssaultRifle extends Gun {
   amoLoaded = 24;
   description = 'High damage and range. Can shoot through multiple enemies.';
   reloadTimeMultiplier = 2;
+  accuracyBonus = 2;
 }
 
 export class SubMachineGun extends Gun {
@@ -65,6 +68,7 @@ export class SubMachineGun extends Gun {
   clipSize = 50;
   amoLoaded = 50;
   description = 'Low damage and range, but shoots really fast.';
+  accuracyBonus = -1;
 }
 
 export class RailGun extends Gun {

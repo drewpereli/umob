@@ -5,7 +5,7 @@ import Creature, { Resistance } from './creature';
 
 class AutoTurretGun extends Gun {
   range = 10;
-  accuracy = 1;
+  accuracyBonus = 1;
   clipSize = Infinity;
   amoLoaded = Infinity;
   damage = 10;

@@ -4,7 +4,7 @@ export const DEFAULT_FLANKING_BONUS = 0.5;
 
 export interface WeaponData {
   damage: number;
-  accuracy: number;
+  accuracyBonus: number;
   attackTimeMultiplier: number;
   knockBack: number;
   flankingBonus: number;
@@ -13,7 +13,7 @@ export interface WeaponData {
 
 export abstract class Weapon extends Item implements WeaponData {
   abstract damage: number;
-  abstract accuracy: number;
+  abstract accuracyBonus: number;
   attackTimeMultiplier = 1;
   knockBack = 0;
   flankingBonus = DEFAULT_FLANKING_BONUS;

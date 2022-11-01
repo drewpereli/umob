@@ -91,10 +91,12 @@ export class Player extends Creature implements Flammable {
     }
   }
 
-  hitChanceForDamageable(damageable: Damageable & Coords) {
-    if (debugOptions.infiniteAccuracy) return 1;
+  get accuracy() {
+    if (debugOptions.infiniteAccuracy) {
+      return Infinity;
+    }
 
-    return super.hitChanceForDamageable(damageable);
+    return super.accuracy;
   }
 
   _act() {

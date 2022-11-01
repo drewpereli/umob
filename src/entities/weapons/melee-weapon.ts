@@ -3,7 +3,7 @@ import { Weapon } from './weapon';
 export default abstract class MeleeWeapon extends Weapon {
   char = '}';
   color = '#32CD32';
-  accuracy = Infinity;
+  accuracyBonus = Infinity;
 }
 
 export class Pipe extends MeleeWeapon {

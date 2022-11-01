@@ -31,8 +31,8 @@ const dirAngleOffsets = {
 
 const coverEvasionMultipliers: Record<Cover, number> = {
   [Cover.None]: 1,
-  [Cover.Half]: 0.75,
-  [Cover.Full]: 0.5,
+  [Cover.Half]: 1.5,
+  [Cover.Full]: 2,
 };
 
 export function coordsEqual(c1: Coords, c2: Coords) {
