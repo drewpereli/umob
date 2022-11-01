@@ -16,6 +16,9 @@ import { angleFromDir, type Dir } from '@/utils/map';
 import type { Perk } from '@/perks';
 import { DamageType } from './weapons/weapon';
 import { SummonAutoTurret } from '@/powers/summon-auto-turret';
+import { AssaultRifle } from './weapons/gun';
+
+const r = new AssaultRifle();
 
 export class Player extends Creature implements Flammable {
   constructor(tile: Tile, public alignment = CreatureAlignment.WithPlayer) {
@@ -31,9 +34,14 @@ export class Player extends Creature implements Flammable {
 
   name = 'you';
 
+  get messageDescriptor() {
+    return 'you';
+  }
+
   upgradePoints = 1;
 
-  inventory: Item[] = [new Pipe()];
+  inventory: Item[] = [r];
+  equippedWeapon = r;
 
   powers: Power[] = [
     new SummonAutoTurret(this),

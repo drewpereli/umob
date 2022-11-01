@@ -1,5 +1,6 @@
 import { useGame } from '@/stores/game';
 import type { Tile } from '@/stores/map';
+import { useMessages } from '@/stores/messages';
 
 export enum EntityLayer {
   Terrain = 'terrain',
@@ -31,6 +32,10 @@ export default abstract class MapEntity {
 
   get coords(): Coords {
     return { x: this.x, y: this.y };
+  }
+
+  get messagesStore() {
+    return useMessages();
   }
 
   abstract shouldRemoveFromGame: boolean;

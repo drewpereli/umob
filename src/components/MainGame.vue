@@ -13,6 +13,7 @@ import EntityDescription from './EntityDescription.vue';
 import { useAnimations } from '@/stores/animations';
 import PowersListMenu from './PowersListMenu.vue';
 import PerkMenu from './PerkMenu.vue';
+import GameMessages from './GameMessages.vue';
 
 export default defineComponent({
   components: {
@@ -22,6 +23,7 @@ export default defineComponent({
     EntityDescription,
     PowersListMenu,
     PerkMenu,
+    GameMessages,
   },
   methods: {
     // Only will apply when this element is focused, i.e. when there's no menu being shown
@@ -96,6 +98,8 @@ export default defineComponent({
     <GameTiles />
 
     <EntityDescription v-if="examinedEntity" :entity="examinedEntity" />
+
+    <GameMessages v-else />
 
     <InventoryMenu v-if="showInventoryMenu" class="menu" @close="closeMenu" />
 

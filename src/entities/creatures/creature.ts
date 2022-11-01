@@ -191,8 +191,9 @@ export default abstract class Creature
   readonly IMPLEMENTS_DAMAGEABLE = true;
   /* #endregion */
 
-  /* #region  AsciiDrawable */
+  /* #region UI and AsciiDrawable */
   abstract readonly name: string;
+
   abstract readonly defaultChar: string;
 
   get char() {
@@ -202,6 +203,10 @@ export default abstract class Creature
   }
 
   abstract readonly color: string;
+
+  get messageDescriptor() {
+    return `the ${this.name}`;
+  }
   /* #endregion */
 
   /* #region  MapEntity */
@@ -499,6 +504,43 @@ export default abstract class Creature
     );
 
     gun.amoLoaded--;
+
+    // const damageablesDescription = damageables.length > 1 ? 'the ';
+
+    let damageablesDescription;
+
+    if (damageables.length === 1) {
+      const damageable = damageables[0];
+
+      if (isCreature(damageable)) {
+        damageablesDescription = damageable.messageDescriptor;
+      } else {
+        damageablesDescription = 'something';
+      }
+    } else {
+      if (damageables.every(isCreature)) {
+        damageablesDescription = 'the creatures';
+      } else {
+        damageablesDescription = 'the somethings';
+      }
+    }
+
+    let hitDescription;
+    if (damageables.length == 1) {
+      hitDescription = hit.length === 0 ? 'and missed' : 'and hit';
+    } else {
+      if (damageables.length === hit.length) {
+        hitDescription = 'and hit all of them';
+      } else if (hit.length === 0) {
+        hitDescription = 'and missed all of them';
+      } else {
+        hitDescription = 'and hit some of them';
+      }
+    }
+
+    this.messagesStore.addMessage({
+      content: `${this.messageDescriptor} shot at ${damageablesDescription} ${hitDescription}`,
+    });
   }
 
   // Assumes the tile is in range
