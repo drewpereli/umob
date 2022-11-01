@@ -1,4 +1,4 @@
-import { Door, isDoor } from '@/entities/terrain';
+import { Door, ElevatorDown, isDoor } from '@/entities/terrain';
 import { Lava, ToxicWaste } from '@/entities/fluid';
 import { Wall, HalfWall } from '@/entities/terrain';
 import { useGame } from '@/stores/game';
@@ -10,6 +10,7 @@ import { ShotGun } from '@/entities/weapons/gun';
 import { Dir } from './map';
 import { CentrifugeTerminal } from '@/entities/controller/centrifuge-terminal';
 import { Tile } from '@/tile';
+import { useMap } from '@/stores/map';
 
 type Map = Tile[][];
 
@@ -131,6 +132,7 @@ export function generateTilesAndWalls(
 }
 
 export function addRooms(map: Map, rooms: Room[]) {
+  return;
   rooms.forEach((room) => {
     const g = new RadPoolRoom(room, map);
     g.generate();
@@ -178,6 +180,20 @@ export function setAdjacentTiles(map: Map) {
       tile.adjacentTiles = adjacent;
     });
   });
+}
+
+export function addElevatorDown() {
+  const map = useMap();
+
+  const tile = map.randomFloorTile();
+
+  console.log(tile.id);
+
+  const elevatorDown = new ElevatorDown(tile);
+
+  const game = useGame();
+
+  game.addMapEntity(elevatorDown);
 }
 
 interface Room {

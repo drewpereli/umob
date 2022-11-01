@@ -1,5 +1,9 @@
 import bresenham from '@/utils/bresenham';
-import { addRooms, generateTilesAndWalls } from '@/utils/map-generation';
+import {
+  addElevatorDown,
+  addRooms,
+  generateTilesAndWalls,
+} from '@/utils/map-generation';
 import { defineStore } from 'pinia';
 import { debugOptions } from '@/utils/debug-options';
 import { random } from '@/utils/random';
@@ -119,6 +123,7 @@ export const useMap = defineStore('map', {
       const { map, rooms } = generateTilesAndWalls(this.width, this.height);
       this.tiles = map;
       addRooms(map, rooms);
+      addElevatorDown();
     },
   },
 });

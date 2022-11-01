@@ -1,4 +1,4 @@
-import { isDoor } from '@/entities/terrain';
+import { ElevatorDown, isDoor } from '@/entities/terrain';
 import { NonTargetedPower } from '@/powers/non-targeted-power';
 import { TargetedPower } from '@/powers/targeted-power';
 import type { useGame } from '@/stores/game';
@@ -116,6 +116,13 @@ export const actionHandlers: Partial<
       game.playerWait();
     },
     d: (game) => game.toggleDirectionViewMode(),
+    '>': (game) => {
+      const playerTile = game.player.tile;
+
+      if (playerTile.terrain instanceof ElevatorDown) {
+        game.playerElevatorDown();
+      }
+    },
   },
   [ActionUiState.Aiming]: {
     ArrowUp: (game) => updateAim(game, Dir.Up),

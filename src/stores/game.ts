@@ -64,6 +64,7 @@ export const useGame = defineStore('game', {
       [CreatureAlignment.AgainstPlayer]: [],
     } as Record<CreatureAlignment, Creature[]>,
     entitiesToCull: [] as MapEntity[],
+    mapLevel: 1,
   }),
   getters: {
     allActors(state): Actor[] {
@@ -211,7 +212,7 @@ export const useGame = defineStore('game', {
 
       this.player = player;
 
-      this.addPlayer(player);
+      this.addPlayer(player, true);
 
       if (debugOptions.extraEnemies) {
         Array.from({ length: debugOptions.extraEnemies }).forEach(() => {
@@ -318,6 +319,30 @@ export const useGame = defineStore('game', {
       this.player.wait();
       this._tickUntilPlayerCanAct();
     },
+    playerElevatorDown() {
+      this.mapEntities = [];
+      this.endOfTickActionQueue = [];
+      this.nonPlayerActors = [];
+      this.entitiesToCull = [];
+      this.creaturesByAlignment = {
+        [CreatureAlignment.WithPlayer]: [],
+        [CreatureAlignment.AgainstPlayer]: [],
+      };
+
+      this.selectedTile = null;
+
+      this.map.generate();
+
+      const tile = this.map.randomFloorTile();
+
+      this.player.updatePosition(tile);
+
+      this.addPlayer(this.player);
+
+      this.mapLevel++;
+
+      this.view.draw();
+    },
     async _tickUntilPlayerCanAct() {
       this._cullEntities();
 
@@ -376,8 +401,11 @@ export const useGame = defineStore('game', {
 
       this.entitiesToCull = [];
     },
-    addPlayer(player: Player) {
-      player.tilesOccupied.forEach((tile) => tile.addEntity(player));
+    addPlayer(player: Player, setTilesOccupied = false) {
+      if (setTilesOccupied) {
+        player.tilesOccupied.forEach((tile) => tile.addEntity(player));
+      }
+
       this.mapEntities.push(player);
       this.creaturesByAlignment[CreatureAlignment.WithPlayer].push(player);
     },

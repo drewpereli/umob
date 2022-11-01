@@ -93,6 +93,8 @@ export default defineComponent({
       <PlayerStatus />
 
       <div>Curr time: {{ game.currTime }}</div>
+
+      <div>Curr level: {{ game.mapLevel }}</div>
     </div>
 
     <GameTiles />

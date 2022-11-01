@@ -213,3 +213,16 @@ export class CentrifugeButtonWall extends ButtonWall<Centrifuge> {
     this.controls.turnOff();
   }
 }
+
+export class ElevatorDown extends MapEntity implements Terrain {
+  type = 'elevator-down';
+  char = '>';
+  color = 'purple';
+  blocksView = false;
+  blocksMovement = false;
+  mass = Infinity;
+  shouldRemoveFromGame = false;
+  readonly layer = EntityLayer.Terrain;
+  cover = Cover.Half;
+  moveTimeMultiplier = 1;
+}
