@@ -1,7 +1,7 @@
 import { Actor } from '@/entities/actor';
 import { EntityLayer } from '@/entities/map-entity';
 import { TURN, useGame } from '@/stores/game';
-import type { Tile } from '@/stores/map';
+import type { Tile } from '@/tile';
 import bresenham from '@/utils/bresenham';
 import { dirsBetween, distance } from '@/utils/map';
 import { random } from '@/utils/random';

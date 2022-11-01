@@ -1,7 +1,7 @@
 import { isCreature } from '@/entities/creatures/creature';
 import { useCamera } from '@/stores/camera';
 import { useGame } from '@/stores/game';
-import { FLOOR_TERRAIN_DATA, type Tile } from '@/stores/map';
+import { type Tile, FLOOR_TERRAIN_DATA } from '@/tile';
 import {
   CELL_LENGTH,
   fillText,

@@ -1,4 +1,4 @@
-import type { Tile } from '@/stores/map';
+import type { Tile } from '@/tile';
 import type { AsciiDrawable } from '@/utils/types';
 import MapEntity, { EntityLayer } from '../map-entity';
 import type { Item } from './item';

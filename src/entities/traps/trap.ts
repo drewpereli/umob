@@ -1,4 +1,4 @@
-import type { Tile } from '@/stores/map';
+import type { Tile } from '@/tile';
 import { Actor } from '../actor';
 import { isCreature } from '../creatures/creature';
 import MapEntity, { EntityLayer } from '../map-entity';

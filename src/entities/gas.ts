@@ -1,5 +1,5 @@
 import { useGame } from '@/stores/game';
-import type { Tile } from '@/stores/map';
+import type { Tile } from '@/tile';
 import { random } from '@/utils/random';
 import { Actor } from './actor';
 import MapEntity, { EntityLayer } from './map-entity';

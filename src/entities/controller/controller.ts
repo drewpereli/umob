@@ -1,4 +1,4 @@
-import type { Tile } from '@/stores/map';
+import type { Tile } from '@/tile';
 import MapEntity from '../map-entity';
 
 export abstract class Controller<T extends MapEntity> extends MapEntity {

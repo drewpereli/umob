@@ -1,6 +1,7 @@
 import { Lava } from '@/entities/fluid';
 import { TURN } from '@/stores/game';
-import { Tile, useMap } from '@/stores/map';
+import { useMap } from '@/stores/map';
+import type { Tile } from '@/tile';
 import { TargetedPower } from './targeted-power';
 
 export class CreateLavaPool extends TargetedPower {

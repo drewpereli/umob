@@ -1,6 +1,6 @@
 import { ExplosionAnimation } from '@/stores/animations';
 import { TURN } from '@/stores/game';
-import type { Tile } from '@/stores/map';
+import type { Tile } from '@/tile';
 import { createExplosion } from '@/utils/explosions';
 import { TargetedPower } from './targeted-power';
 
@@ -25,10 +25,6 @@ export class Grenade extends TargetedPower {
     const tile = this.closestValidToSelected() as Tile;
 
     createExplosion(tile, this.radius, 5);
-
-    this.damageablesAimedAt().forEach((actor) => {
-      actor.receiveDamage(5);
-    });
 
     this.game.animations.addAnimation(
       new ExplosionAnimation(tile, this.radius)

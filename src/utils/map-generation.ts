@@ -2,7 +2,6 @@ import { Door, isDoor } from '@/entities/terrain';
 import { Lava, ToxicWaste } from '@/entities/fluid';
 import { Wall, HalfWall } from '@/entities/terrain';
 import { useGame } from '@/stores/game';
-import { Tile } from '@/stores/map';
 import { debugOptions } from './debug-options';
 import { random } from './random';
 import { Centrifuge } from '@/entities/centrifuge';
@@ -10,6 +9,7 @@ import { ItemInMap } from '@/entities/items/item-in-map';
 import { ShotGun } from '@/entities/weapons/gun';
 import { Dir } from './map';
 import { CentrifugeTerminal } from '@/entities/controller/centrifuge-terminal';
+import { Tile } from '@/tile';
 
 type Map = Tile[][];
 

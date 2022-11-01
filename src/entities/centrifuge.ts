@@ -1,5 +1,6 @@
 import { TURN, useGame } from '@/stores/game';
-import { useMap, type Tile } from '@/stores/map';
+import { useMap } from '@/stores/map';
+import type { Tile } from '@/tile';
 import bresenham from '@/utils/bresenham';
 import { coordsEqual } from '@/utils/map';
 import { angle, angularDifference, polarToCartesian } from '@/utils/math';

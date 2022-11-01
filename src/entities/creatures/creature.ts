@@ -5,7 +5,7 @@ import {
   useAnimations,
 } from '@/stores/animations';
 import { TURN, useGame } from '@/stores/game';
-import type { Tile } from '@/stores/map';
+import type { Tile } from '@/tile';
 import {
   addPolarToCartesian,
   coordsEqual,

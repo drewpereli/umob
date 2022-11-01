@@ -1,8 +1,8 @@
 import { useGame } from '@/stores/game';
-import { useMap, type Tile } from '@/stores/map';
+import { useMap } from '@/stores/map';
+import type { Tile } from '@/tile';
 import { random } from '@/utils/random';
 import { Actor } from './actor';
-import { isDamageable } from './damageable';
 import {
   defaultBurn,
   defaultStartBurning,

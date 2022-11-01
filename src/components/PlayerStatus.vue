@@ -63,7 +63,7 @@ export default defineComponent({
     <div>Upgrade points: {{ game.player.upgradePoints }}</div>
 
     <div>View Range: {{ game.player.viewRange }}</div>
-    <div>Accuracy: {{ game.player.accuracyMultiplier }}</div>
+    <div>Accuracy: {{ game.player.accuracy }}</div>
 
     <EquippedWeapon />
     <WeaponClipStatus v-if="playerGun" :gun="playerGun" />

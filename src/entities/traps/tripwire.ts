@@ -1,5 +1,5 @@
 import { useGame } from '@/stores/game';
-import type { Tile } from '@/stores/map';
+import type { Tile } from '@/tile';
 import { createExplosion } from '@/utils/explosions';
 import { Dir } from '@/utils/map';
 import { isCreature } from '../creatures/creature';

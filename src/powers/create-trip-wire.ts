@@ -2,7 +2,7 @@ import { TargetedPower } from './targeted-power';
 import { Orientation } from '@/entities/traps/trap';
 import { TURN, useGame } from '@/stores/game';
 import { TripWire } from '@/entities/traps/tripwire';
-import type { Tile } from '@/stores/map';
+import type { Tile } from '@/tile';
 
 export class CreateTripWire extends TargetedPower {
   name = 'create tripwire';

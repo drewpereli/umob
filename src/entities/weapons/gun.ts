@@ -1,5 +1,6 @@
 import { useGame } from '@/stores/game';
-import { Tile, useMap } from '@/stores/map';
+import { useMap } from '@/stores/map';
+import type { Tile } from '@/tile';
 import { coordsEqual, distance } from '@/utils/map';
 import { angle, angularDistance } from '@/utils/math';
 import type { Damageable } from '../damageable';

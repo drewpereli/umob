@@ -1,7 +1,7 @@
 import { TargetedPower } from './targeted-power';
 import { FireProximityMine } from '@/entities/traps/proximity-mine';
 import { TURN } from '@/stores/game';
-import type { Tile } from '@/stores/map';
+import type { Tile } from '@/tile';
 
 export class CreateFireProximityMine extends TargetedPower {
   readonly name = 'create fire proximity mine';

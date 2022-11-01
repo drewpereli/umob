@@ -1,6 +1,7 @@
+import type { Tile } from '@/tile';
 import { defineStore } from 'pinia';
 import { useGame } from './game';
-import { Tile, useMap } from './map';
+import { useMap } from './map';
 
 export const useCamera = defineStore('camera', {
   state: () => ({

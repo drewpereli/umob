@@ -1,5 +1,5 @@
 import { TURN } from '@/stores/game';
-import type { Tile } from '@/stores/map';
+import type { Tile } from '@/tile';
 import { TargetedPower } from './targeted-power';
 
 export class Push extends TargetedPower {

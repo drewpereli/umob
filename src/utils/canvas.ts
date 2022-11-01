@@ -7,11 +7,11 @@ import { FireTripWire } from '@/entities/traps/fire-tripwire';
 import { Orientation } from '@/entities/traps/trap';
 import { TripWire } from '@/entities/traps/tripwire';
 import { BlackHole } from '@/powers/create-black-hole';
-import { FLOOR_TERRAIN_DATA, Tile, type TerrainData } from '@/stores/map';
 import chroma, { scale } from 'chroma-js';
 import { addCoords, Dir } from './map';
 import { random } from './random';
 import { isAsciiDrawable, type AsciiDrawable } from './types';
+import { type TerrainData, FLOOR_TERRAIN_DATA, type Tile } from '@/tile';
 
 export const CELL_LENGTH = 28;
 

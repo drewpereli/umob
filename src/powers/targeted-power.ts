@@ -2,7 +2,7 @@ import type Creature from '@/entities/creatures/creature';
 import { Power } from './power';
 import bresenham from '../utils/bresenham';
 import { distance } from '../utils/map';
-import type { Tile } from '@/stores/map';
+import type { Tile } from '@/tile';
 import type { Damageable } from '@/entities/damageable';
 import type MapEntity from '@/entities/map-entity';
 

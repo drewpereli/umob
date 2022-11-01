@@ -1,4 +1,4 @@
-import type { Tile } from '@/stores/map';
+import type { Tile } from '@/tile';
 import { minBy } from '@/utils/array';
 import { coordsEqual, distance, rotateDir } from '@/utils/map';
 import { random } from '@/utils/random';
@@ -19,7 +19,7 @@ export class RadCrawler extends Creature {
 
   unarmedAttackData = {
     damage: 5,
-    accuracy: Infinity,
+    accuracyBonus: Infinity,
     attackTimeMultiplier: 1,
     knockBack: 0,
     flankingBonus: 0,

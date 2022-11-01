@@ -4,7 +4,7 @@ import { Grenade } from '@/powers/grenade';
 import { Heal } from '@/powers/heal';
 import type { Power } from '@/powers/power';
 import { Burning } from '@/status-effects/burning';
-import type { Tile } from '@/stores/map';
+import type { Tile } from '@/tile';
 import { debugOptions } from '@/utils/debug-options';
 import Creature, { CreatureAlignment } from './creatures/creature';
 import type { Damageable } from './damageable';
@@ -14,7 +14,7 @@ import { ItemInMap } from './items/item-in-map';
 import { Pipe } from './weapons/melee-weapon';
 import { angleFromDir, type Dir } from '@/utils/map';
 import type { Perk } from '@/perks';
-import { DamageType } from './weapons/weapon';
+import { DamageType, Weapon } from './weapons/weapon';
 import { SummonAutoTurret } from '@/powers/summon-auto-turret';
 import { AssaultRifle } from './weapons/gun';
 
@@ -41,7 +41,7 @@ export class Player extends Creature implements Flammable {
   upgradePoints = 1;
 
   inventory: Item[] = [r];
-  equippedWeapon = r;
+  equippedWeapon: Weapon = r;
 
   powers: Power[] = [
     new SummonAutoTurret(this),

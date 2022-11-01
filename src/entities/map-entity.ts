@@ -1,5 +1,5 @@
 import { useGame } from '@/stores/game';
-import type { Tile } from '@/stores/map';
+import type { Tile } from '@/tile';
 import { useMessages } from '@/stores/messages';
 
 export enum EntityLayer {

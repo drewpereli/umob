@@ -1,4 +1,4 @@
-import type { Tile } from '@/stores/map';
+import type { Tile } from '@/tile';
 import { angleFromDir, type Dir } from '@/utils/map';
 import type { AsciiDrawable } from '@/utils/types';
 import type { Damageable } from '../damageable';

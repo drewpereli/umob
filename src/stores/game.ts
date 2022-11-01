@@ -10,7 +10,7 @@ import { angle, angularDistance } from '@/utils/math';
 import { PermissiveFov } from 'permissive-fov';
 import { defineStore } from 'pinia';
 import { useAnimations } from './animations';
-import { Tile, useMap } from './map';
+import { useMap } from './map';
 import {
   coordsEqual,
   coordsInViewCone,
@@ -33,6 +33,7 @@ import {
 import { Rat } from '@/entities/creatures/rat';
 import { canInteractWithFrom, isInteractable } from '@/entities/interactable';
 import { removeElement } from '@/utils/array';
+import { Tile } from '@/tile';
 
 export const TURN = 4; // How many ticks make up a "turn"
 

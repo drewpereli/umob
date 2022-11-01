@@ -1,5 +1,5 @@
 import { useGame } from '@/stores/game';
-import type { Tile } from '@/stores/map';
+import type { Tile } from '@/tile';
 import { Dir } from '@/utils/map';
 import type { AsciiDrawable } from '@/utils/types';
 import { Actor } from './actor';
