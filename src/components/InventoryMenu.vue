@@ -3,34 +3,45 @@ import { useGame } from '@/stores/game';
 import { defineComponent } from 'vue';
 import UiMenu, { type MenuItem } from './UiMenu.vue';
 import WeaponStats from './WeaponStats.vue';
-import { itemIsWeapon, Weapon } from '@/entities/weapons/weapon';
+import type { Item } from '@/entities/items/item';
+import { itemIsWeapon } from '@/entities/weapons/weapon';
+import { itemIsUsable } from '@/entities/items/usable';
+import { TargetedPower } from '@/powers/targeted-power';
 
 export default defineComponent({
   setup() {
     const game = useGame();
-    return { player: game.player };
+    return { player: game.player, itemIsWeapon };
   },
   components: { UiMenu, WeaponStats },
   computed: {
-    items(): MenuItem<Weapon>[] {
-      return this.player.inventory.filter(itemIsWeapon).map((weapon) => {
+    items(): MenuItem<Item>[] {
+      return this.player.inventory.map((item) => {
         const label =
-          weapon === this.player.equippedWeapon
-            ? `* ${weapon.name}`
-            : `${weapon.name}`;
+          item === this.player.equippedWeapon
+            ? `* ${item.name}`
+            : `${item.name}`;
 
         return {
           label,
-          model: weapon,
+          model: item,
         };
       });
     },
   },
   methods: {
-    enter(item: MenuItem<Weapon>) {
-      this.player.equippedWeapon = item.model;
+    enter(item: MenuItem<Item>) {
+      if (itemIsWeapon(item.model)) {
+        this.player.equippedWeapon = item.model;
+      } else if (itemIsUsable(item.model)) {
+        const power = useGame().playerUseUsable(item.model);
+
+        if (power instanceof TargetedPower) {
+          this.$emit('close');
+        }
+      }
     },
-    anyKeyDown(key: string, item: MenuItem<Weapon>) {
+    anyKeyDown(key: string, item: MenuItem<Item>) {
       if (key === 'd') {
         this.player.dropItem(item.model);
       }
@@ -48,10 +59,13 @@ export default defineComponent({
   >
     <template
       #selected-item-description="selectedItemSlotProps: {
-        selectedItem: MenuItem<Weapon>,
+        selectedItem: MenuItem<Item>,
       }"
     >
-      <WeaponStats :weapon="selectedItemSlotProps.selectedItem.model" />
+      <WeaponStats
+        v-if="itemIsWeapon(selectedItemSlotProps.selectedItem.model)"
+        :weapon="selectedItemSlotProps.selectedItem.model"
+      />
 
       <div>
         {{ selectedItemSlotProps.selectedItem.model.description }}

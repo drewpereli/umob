@@ -21,7 +21,7 @@ import { Wall } from '@/entities/terrain';
 import { View } from '@/utils/view';
 import { Actor } from '@/entities/actor';
 import type MapEntity from '@/entities/map-entity';
-import type { TargetedPower } from '@/powers/targeted-power';
+import { TargetedPower } from '@/powers/targeted-power';
 import { Centrifuge } from '@/entities/centrifuge';
 import { CreateTripWire } from '@/powers/create-trip-wire';
 import type { Door } from '@/entities/terrain';
@@ -34,6 +34,10 @@ import { Rat } from '@/entities/creatures/rat';
 import { canInteractWithFrom, isInteractable } from '@/entities/interactable';
 import { removeElement } from '@/utils/array';
 import { Tile } from '@/tile';
+import { Usable } from '@/entities/items/usable';
+import { CreateLavaPool } from '@/powers/create-lava-pool';
+import { ItemInMap } from '@/entities/items/item-in-map';
+import { ActivateTargetingArray } from '@/powers/activate-targeting-array';
 
 export const TURN = 4; // How many ticks make up a "turn"
 
@@ -271,6 +275,11 @@ export const useGame = defineStore('game', {
     },
     playerUsePower() {
       if (this.player.useSelectedPower()) {
+        if (this.player.selectedPowerUsable) {
+          removeElement(this.player.inventory, this.player.selectedPowerUsable);
+          this.player.selectedPowerUsable = null;
+        }
+
         this.view.draw();
         this._tickUntilPlayerCanAct();
       }
@@ -307,6 +316,35 @@ export const useGame = defineStore('game', {
     },
     onPlayerDie() {
       this.actionUiState = ActionUiState.GameOver;
+    },
+    playerUseUsable(usable: Usable) {
+      const power = usable.use(this.player);
+
+      if (power instanceof TargetedPower) {
+        this.player.selectedPower = power;
+        this.player.selectedPowerUsable = usable;
+
+        const playerTile = this.player.tile;
+
+        const target = this.map.adjacentTile(playerTile, this.player.facing);
+
+        if (!target) {
+          return;
+        }
+
+        this.setSelectedTile(target);
+
+        this.actionUiState = ActionUiState.AimingPower;
+      } else {
+        const activated = power.activateIfPossible();
+
+        if (activated) {
+          removeElement(this.player.inventory, usable);
+        }
+      }
+
+      // Return value is used in InventoryMenu component to know whether or not to close the menu
+      return power;
     },
     toggleDirectionViewMode() {
       this.directionViewMode = !this.directionViewMode;

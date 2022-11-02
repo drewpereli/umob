@@ -145,6 +145,8 @@ export const actionHandlers: Partial<
     ArrowLeft: (game) => updateAim(game, Dir.Left),
     Escape: (game) => {
       game.setSelectedTile(null);
+      game.player.selectedPower = null;
+      game.player.selectedPowerUsable = null;
       game.actionUiState = ActionUiState.Default;
     },
     f: (game) => {

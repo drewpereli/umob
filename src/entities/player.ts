@@ -17,6 +17,7 @@ import type { Perk } from '@/perks';
 import { DamageType, Weapon } from './weapons/weapon';
 import { SummonAutoTurret } from '@/powers/summon-auto-turret';
 import { AssaultRifle } from './weapons/gun';
+import type { Usable } from './items/usable';
 
 const r = new Pipe();
 
@@ -50,6 +51,8 @@ export class Player extends Creature implements Flammable {
     new Grenade(this),
     new Heal(this),
   ];
+
+  selectedPowerUsable: Usable | null = null;
 
   powerHotkeys: Record<string, Power> = this.powers.reduce(
     (acc, power, idx) => {
