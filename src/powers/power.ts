@@ -29,8 +29,6 @@ export abstract class Power {
 
   // Return true if activation successful
   activateIfPossible() {
-    console.log(this.canActivate, this.timeUntilUse);
-
     if (this.canActivate) {
       this.activate();
       this.timeUntilUse = this.coolDown;
