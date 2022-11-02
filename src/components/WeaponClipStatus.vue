@@ -21,7 +21,7 @@ export default defineComponent({
 </script>
 
 <template>
-  <div class="weapon-clip-status">
+  <div v-if="isFinite(clipSize)" class="weapon-clip-status">
     <span
       v-for="n in clipSize"
       :key="n"

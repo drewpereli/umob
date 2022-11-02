@@ -8,8 +8,11 @@ import { useMap } from '@/stores/map';
 import type { Tile } from '@/tile';
 import { coordsEqual, distance } from '@/utils/map';
 import { angle, angularDistance } from '@/utils/math';
+import { random } from '@/utils/random';
 import Creature, { isCreature } from '../creatures/creature';
 import type { Damageable } from '../damageable';
+import { isFlammable } from '../flammable';
+import { Water } from '../fluid';
 import type MapEntity from '../map-entity';
 import { Weapon } from './weapon';
 
@@ -134,7 +137,7 @@ export class Flamethrower extends Gun {
 
 export class GiantRailGun extends Gun {
   name = 'giant rail gun';
-  damage = 10;
+  damage = 30;
   range = 15;
   knockBack = 10;
   clipSize = 3;
@@ -145,6 +148,33 @@ export class GiantRailGun extends Gun {
 
   onAttack(attacker: Creature, target: Tile) {
     attacker.receiveKnockBack(0, 1, target);
+  }
+}
+
+export class WaterJetCutterHead extends Gun {
+  name = 'water jet cutter head';
+  description = 'The business end of an industrial water jet cutter';
+  damage = 10;
+  range = 10;
+  clipSize = Infinity;
+  amoLoaded = Infinity;
+  knockBack = 1;
+
+  onAttack(attacker: Creature, tile: Tile) {
+    const game = useGame();
+
+    const tiles = tilesAimedAt(attacker.tile, tile, this);
+
+    tiles.forEach((tile) => {
+      const pressure = random.float() < 0.2 ? 1 : 0;
+      game.addMapEntity(new Water(tile, pressure));
+    });
+  }
+
+  onDamage(damageable: Damageable) {
+    if (isFlammable(damageable) && damageable.isBurning) {
+      damageable.stopBurning();
+    }
   }
 }
 
