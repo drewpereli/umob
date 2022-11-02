@@ -179,6 +179,22 @@ export class WaterJetCutterHead extends Gun {
   }
 }
 
+export class GammaRayLaser extends Gun {
+  name = 'gamma ray laser';
+  description = 'A laser that shoots gamma rays. Irradiates creatures on hit.';
+  damage = 10;
+  range = Infinity;
+  clipSize = 10;
+  amoLoaded = 10;
+  attackTimeMultiplier = 0.5;
+
+  onDamage(damageable: Damageable) {
+    if (isCreature(damageable)) {
+      damageable.receiveRadiation(10);
+    }
+  }
+}
+
 export function tilesAimedAt(
   aimingFrom: Tile,
   aimingTo: Tile,
