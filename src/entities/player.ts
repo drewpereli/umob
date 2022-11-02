@@ -76,7 +76,7 @@ export class Player extends Creature {
   maxEnergy = debugOptions.infiniteEnergy ? Infinity : 100;
 
   baseViewRange = debugOptions.infiniteViewRange ? Infinity : 10;
-  viewAngle = debugOptions.fullViewAngle ? 360 : 90;
+  baseViewAngle = debugOptions.fullViewAngle ? 360 : 90;
 
   mass = 100;
 
