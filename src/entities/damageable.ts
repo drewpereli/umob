@@ -19,6 +19,10 @@ export function damageRoll(accuracy: number, evasion?: number) {
     return true;
   }
 
+  if (accuracy === Infinity) {
+    return true;
+  }
+
   const autoHitOrMiss = random.float() < 0.1;
 
   if (autoHitOrMiss) {
