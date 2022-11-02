@@ -6,7 +6,6 @@ import { isDamageable, type Damageable } from '@/entities/damageable';
 import { Player } from '@/entities/player';
 import { ActionUiState, MetaUiState } from '@/utils/action-handlers';
 import { debugOptions } from '@/utils/debug-options';
-import { angle, angularDistance } from '@/utils/math';
 import { PermissiveFov } from 'permissive-fov';
 import { defineStore } from 'pinia';
 import { useAnimations } from './animations';
@@ -17,12 +16,10 @@ import {
   rotateDir,
   type Dir,
 } from '@/utils/map';
-import { Wall } from '@/entities/terrain';
 import { View } from '@/utils/view';
 import { Actor } from '@/entities/actor';
 import type MapEntity from '@/entities/map-entity';
 import { TargetedPower } from '@/powers/targeted-power';
-import { Centrifuge } from '@/entities/centrifuge';
 import { CreateTripWire } from '@/powers/create-trip-wire';
 import type { Door } from '@/entities/terrain';
 import {
@@ -34,10 +31,7 @@ import { Rat } from '@/entities/creatures/rat';
 import { canInteractWithFrom, isInteractable } from '@/entities/interactable';
 import { removeElement } from '@/utils/array';
 import { Tile } from '@/tile';
-import { Usable } from '@/entities/items/usable';
-import { CreateLavaPool } from '@/powers/create-lava-pool';
-import { ItemInMap } from '@/entities/items/item-in-map';
-import { ActivateTargetingArray } from '@/powers/activate-targeting-array';
+import type { Usable } from '@/entities/items/usable';
 
 export const TURN = 4; // How many ticks make up a "turn"
 
