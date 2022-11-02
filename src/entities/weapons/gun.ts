@@ -10,7 +10,6 @@ import { coordsEqual, distance } from '@/utils/map';
 import { angle, angularDistance } from '@/utils/math';
 import Creature, { isCreature } from '../creatures/creature';
 import type { Damageable } from '../damageable';
-import { isFlammable } from '../flammable';
 import type MapEntity from '../map-entity';
 import { Weapon } from './weapon';
 
@@ -108,7 +107,9 @@ export class Flamethrower extends Gun {
   description = 'Shoot flames';
   spread = 30;
 
-  onAttackTiles(tiles: Tile[]) {
+  onAttack(attacker: Creature, tile: Tile) {
+    const tiles = tilesAimedAt(attacker.tile, tile, this);
+
     tiles.forEach((tile) => {
       tile.flammables.forEach((f) => {
         if (isCreature(f)) {
@@ -128,6 +129,22 @@ export class Flamethrower extends Gun {
 
       useAnimations().addAnimation(anim);
     });
+  }
+}
+
+export class GiantRailGun extends Gun {
+  name = 'giant rail gun';
+  damage = 10;
+  range = 15;
+  knockBack = 10;
+  clipSize = 3;
+  amoLoaded = 3;
+  description =
+    'Electromagnetic force to accelerate a very heavy metal slug to high speeds. Knocks back enemies, and knocks back user slightly when firing';
+  reloadTimeMultiplier = 2;
+
+  onAttack(attacker: Creature, target: Tile) {
+    attacker.receiveKnockBack(0, 1, target);
   }
 }
 

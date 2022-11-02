@@ -518,10 +518,8 @@ export default abstract class Creature
 
     gun.addAnimationOnShoot(this, tile, hit);
 
-    if (gun.onAttackTiles) {
-      const tiles = tilesAimedAt(this.tile, tile, gun);
-
-      gun.onAttackTiles(tiles);
+    if (gun.onAttack) {
+      gun.onAttack(this, tile);
     }
 
     gun.amoLoaded--;
@@ -542,8 +540,8 @@ export default abstract class Creature
   _meleeAttackTile(tile: Tile) {
     const hit = this._attemptAttackAttackableDamageables(tile.damageables);
 
-    if (this.weaponData.onAttackTiles) {
-      this.weaponData.onAttackTiles([tile]);
+    if (this.weaponData.onAttack) {
+      this.weaponData.onAttack(this, tile);
     }
 
     if (tile.damageables.length) {

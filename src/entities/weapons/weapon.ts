@@ -1,4 +1,5 @@
 import type { Tile } from '@/tile';
+import type Creature from '../creatures/creature';
 import type { Damageable } from '../damageable';
 import { Item } from '../items/item';
 
@@ -13,7 +14,7 @@ export interface WeaponData {
   damageType: DamageType;
   attackActionMessageDescription: string;
   onDamage?: (damageable: Damageable) => unknown;
-  onAttackTiles?: (tiles: Tile[]) => unknown;
+  onAttack?: (attacker: Creature, tile: Tile) => unknown;
 }
 
 export abstract class Weapon extends Item implements WeaponData {
@@ -25,7 +26,7 @@ export abstract class Weapon extends Item implements WeaponData {
   damageType = DamageType.Physical;
   abstract attackActionMessageDescription: string;
   onDamage?(damageable: Damageable): unknown;
-  onAttackTiles?(tiles: Tile[]): unknown;
+  onAttack?(attacker: Creature, tile: Tile): unknown;
 }
 
 export function itemIsWeapon(item: Item): item is Weapon {
