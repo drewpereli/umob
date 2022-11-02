@@ -1,7 +1,11 @@
 import type Creature from '@/entities/creatures/creature';
 
 export abstract class StatusEffect {
-  constructor(public creature: Creature, public maxDuration: number) {
+  constructor(
+    public creature: Creature,
+    public maxDuration: number,
+    public source = 'temporary' // Could be armor, a power, a class, etc. Helps us know which one to remove
+  ) {
     this.onCreate?.();
   }
 

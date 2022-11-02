@@ -389,7 +389,9 @@ export default abstract class Creature
   addStatusEffect(statusEffect: StatusEffect) {
     // If the creature already has the status effect, just set its duration to 0
     const existingStatusEffect = this.statusEffects.find(
-      (effect) => effect.name === statusEffect.name
+      (effect) =>
+        effect.name === statusEffect.name &&
+        effect.source === statusEffect.source
     );
 
     if (existingStatusEffect) {
