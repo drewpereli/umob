@@ -29,7 +29,7 @@ export class Player extends Creature implements Flammable {
   color = 'yellow';
 
   get rotateChar() {
-    return angleFromDir(this.facing) + 90;
+    return this.game.directionViewMode ? 0 : angleFromDir(this.facing) + 90;
   }
 
   name = 'you';
