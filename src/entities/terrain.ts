@@ -19,8 +19,22 @@ export type Terrain = MapEntity &
     readonly layer: EntityLayer.Terrain;
   };
 
-export class Wall extends MapEntity implements Terrain, Damageable {
-  type = 'wall';
+export class Wall extends MapEntity implements Terrain {
+  type = 'destructible-wall';
+  char = '#';
+  color = 'white';
+  shouldRemoveFromGame = false;
+  blocksMovement = true;
+  moveTimeMultiplier = null;
+  blocksView = true;
+  mass = 2000;
+  cover = Cover.Full;
+
+  readonly layer = EntityLayer.Terrain;
+}
+
+export class DestructibleWall extends MapEntity implements Terrain, Damageable {
+  type = 'destructible-wall';
   char = '#';
   color = 'white';
   shouldRemoveFromGame = false;
