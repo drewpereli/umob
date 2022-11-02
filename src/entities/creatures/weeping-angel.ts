@@ -20,4 +20,8 @@ export class WeepingAngel extends Creature {
 
     super._act();
   }
+
+  get isBurning() {
+    return false;
+  }
 }
