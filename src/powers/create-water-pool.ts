@@ -5,8 +5,7 @@ import { TargetedPower } from './targeted-power';
 
 export class CreateWaterPool extends TargetedPower {
   static powerName = 'create water pool';
-  readonly description =
-    'Creates a pool of water surrounding the targeted area';
+  static description = 'Creates a pool of water surrounding the targeted area';
 
   range = 5;
   energyCost = 10;
