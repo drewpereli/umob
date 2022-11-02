@@ -1,4 +1,4 @@
-import { useGame } from '@/stores/game';
+import { TURN, useGame } from '@/stores/game';
 import { useMap } from '@/stores/map';
 import type { Tile } from '@/tile';
 import { random } from '@/utils/random';
@@ -140,7 +140,7 @@ export class Oil extends Fluid implements Flammable {
   baseColor = '#301934';
   isBurning = false;
   burningDuration = 0;
-  maxBurningDuration = 300;
+  maxBurningDuration = random.int(80 * TURN, 120 * TURN);
   burnCollocatedChance = 1;
   burnAdjacentChance = 1;
   readonly IMPLEMENTS_FLAMMABLE = true;
