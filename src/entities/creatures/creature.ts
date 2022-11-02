@@ -243,13 +243,12 @@ export default abstract class Creature
   reloadTime = TURN;
 
   baseViewRange = 10;
+  baseViewAngle: number = 90;
 
   baseAccuracy = 8;
-  evasion = 8;
+  baseEvasion = 8;
 
   baseArmor = 0;
-
-  baseViewAngle: number = 90;
 
   resistances: Partial<Record<DamageType, Resistance>> = {};
 
@@ -314,6 +313,10 @@ export default abstract class Creature
     }
 
     return Math.max(acc, 1);
+  }
+
+  get evasion() {
+    return this.baseEvasion;
   }
 
   get armor() {
