@@ -3,7 +3,8 @@ import type { Tile } from '@/tile';
 import { TargetedPower } from './targeted-power';
 
 export class Push extends TargetedPower {
-  name = 'push';
+  static powerName = 'push';
+  static description = 'Push the targeted creatures away from you';
   canTargetMovementBlocker = true;
   energyCost = 20;
   useTime = TURN;

@@ -8,7 +8,9 @@ export class SummonAutoTurret extends TargetedPower {
 
   energyCost = 50;
 
-  name = 'summon auto-turret';
+  static powerName = 'summon auto-turret';
+  static description =
+    'Summon an auto turret that attacks your enemies. It lasts until its killed by something.';
 
   range = 5;
 

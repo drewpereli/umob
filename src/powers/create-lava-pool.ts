@@ -5,7 +5,8 @@ import type { Tile } from '@/tile';
 import { TargetedPower } from './targeted-power';
 
 export class CreateLavaPool extends TargetedPower {
-  readonly name = 'create lava pool';
+  static powerName = 'create lava pool';
+  static description = 'Create a fire proximity mine at the targeted tile';
   range = 5;
   energyCost = 10;
   useTime = 2 * TURN;

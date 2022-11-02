@@ -4,7 +4,8 @@ import { useGame } from '@/stores/game';
 export abstract class Power {
   constructor(public owner: Creature) {}
 
-  abstract readonly name: string;
+  static powerName: string;
+  static description: string;
   abstract useTime: number;
   abstract energyCost: number;
 
@@ -13,4 +14,12 @@ export abstract class Power {
   // Return true if activation successful
   abstract activateIfPossible(): boolean;
   abstract activate(): void;
+
+  get description(): string {
+    return (this.constructor as typeof Power).description;
+  }
+
+  get name(): string {
+    return (this.constructor as typeof Power).powerName;
+  }
 }

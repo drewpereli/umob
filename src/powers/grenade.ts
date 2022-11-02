@@ -5,7 +5,8 @@ import { createExplosion } from '@/utils/explosions';
 import { TargetedPower } from './targeted-power';
 
 export class Grenade extends TargetedPower {
-  readonly name = 'grenade';
+  static powerName = 'grenade';
+  static description = 'Throw a grenade that explodes immediately';
   useTime = 2 * TURN;
   energyCost = 20;
   range = 8;

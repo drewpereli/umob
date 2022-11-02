@@ -6,7 +6,8 @@ import bresenham from '@/utils/bresenham';
 import { TargetedPower } from './targeted-power';
 
 export class Pull extends TargetedPower {
-  name = 'pull';
+  static powerName = 'pull';
+  static description = 'Pull the targeted creatures towards you';
   canTargetMovementBlocker = true;
   energyCost = 20;
   useTime = TURN;

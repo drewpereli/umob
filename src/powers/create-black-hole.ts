@@ -8,7 +8,9 @@ import { random } from '@/utils/random';
 import { TargetedPower } from './targeted-power';
 
 export class CreateBlackHole extends TargetedPower {
-  readonly name = 'create black hole';
+  static powerName = 'create black hole';
+  readonly description =
+    'Summon a black hole at the targeted tile. Black holes have a chance to pull nearby creatures towards them.';
   useTime = 2 * TURN;
   energyCost = 50;
   range = 8;

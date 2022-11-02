@@ -5,7 +5,8 @@ import { TripWire } from '@/entities/traps/tripwire';
 import type { Tile } from '@/tile';
 
 export class CreateTripWire extends TargetedPower {
-  name = 'create tripwire';
+  static powerName = 'create tripwire';
+  static description = 'Create a tripwire trap';
   range = 5;
 
   useTime = TURN;

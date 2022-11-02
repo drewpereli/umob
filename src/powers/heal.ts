@@ -2,14 +2,15 @@ import { TURN } from '@/stores/game';
 import { NonTargetedPower } from './non-targeted-power';
 
 export class Heal extends NonTargetedPower {
-  readonly name = 'heal';
+  static powerName = 'heal';
+  static description = 'Heal for 10 health';
   useTime = 2 * TURN;
   energyCost = 10;
 
   activate() {
     if (this.owner.health >= this.owner.maxHealth) return;
 
-    this.owner.health = Math.min(this.owner.maxHealth, this.owner.health + 10);
+    this.owner.changeHealth(10);
 
     return true;
   }

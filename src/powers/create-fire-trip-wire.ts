@@ -2,7 +2,8 @@ import { CreateTripWire } from './create-trip-wire';
 import { FireTripWire } from '@/entities/traps/fire-tripwire';
 
 export class CreateFireTripWire extends CreateTripWire {
-  readonly name = 'create fire tripwire';
+  static powerName = 'create fire tripwire';
+  static description = 'Create a fire tripwire trap';
 
   activate() {
     const closest = this.closestValidToSelected();

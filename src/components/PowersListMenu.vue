@@ -25,6 +25,7 @@ export default defineComponent({
         return {
           label,
           model: power,
+          description: power.description,
         };
       });
     },
@@ -48,10 +49,5 @@ export default defineComponent({
 </script>
 
 <template>
-  <UiMenu
-    title="Powers"
-    :items="items"
-    :includeDescription="false"
-    @anyKeyDown="anyKeyDown"
-  />
+  <UiMenu title="Powers" :items="items" @anyKeyDown="anyKeyDown" />
 </template>

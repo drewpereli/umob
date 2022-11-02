@@ -4,7 +4,8 @@ import { TURN } from '@/stores/game';
 import type { Tile } from '@/tile';
 
 export class CreateFireProximityMine extends TargetedPower {
-  readonly name = 'create fire proximity mine';
+  static powerName = 'create fire proximity mine';
+  static description = 'Create a fire proximity mine at the targeted tile';
   range = 5;
 
   useTime = TURN;
