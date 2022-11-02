@@ -10,6 +10,9 @@ Weapons have an "accuracy bonus" that can either add to or subtract from your ef
 
 Cover also effects accuracy and evasion. See "Cover system" below.
 
+### Armor
+Every creature has an "armor" value. For most creatures, its 0. Whenever you do physical damage to a creature, the creatures armor will be subtracted from the value.
+
 ## Guns and Gun Effects
 
 ### Knock-back

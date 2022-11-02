@@ -106,6 +106,10 @@ export default abstract class Creature
   receiveDamage(damage: number, type: DamageType) {
     damage *= this.resistanceMultiplierForDamageType(type);
 
+    if (type === DamageType.Physical) {
+      damage -= this.armor;
+    }
+
     if (damage <= 0) return;
 
     this.health = Math.max(this.health - damage, 0);
@@ -185,8 +189,6 @@ export default abstract class Creature
     return this.health > 0;
   }
 
-  evasion = 8;
-
   penetrationBlock = 1;
 
   readonly IMPLEMENTS_DAMAGEABLE = true;
@@ -240,6 +242,9 @@ export default abstract class Creature
   baseViewRange = 10;
 
   baseAccuracy = 8;
+  evasion = 8;
+
+  baseArmor = 0;
 
   viewAngle: number = 90;
 
@@ -298,6 +303,10 @@ export default abstract class Creature
     }
 
     return Math.max(acc, 1);
+  }
+
+  get armor() {
+    return this.baseArmor;
   }
 
   get covers(): Record<Dir, Cover> {
