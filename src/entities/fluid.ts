@@ -128,6 +128,7 @@ export class Water extends Fluid {
   name = 'water';
   baseColor = '#4287f5';
   moveTimeMultiplier = 2;
+  conductsElectricity = true;
 
   _act() {
     super._act();

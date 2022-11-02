@@ -30,6 +30,8 @@ export default abstract class MapEntity {
   abstract blocksMovement: boolean;
   abstract blocksView: boolean;
 
+  conductsElectricity = false;
+
   get coords(): Coords {
     return { x: this.x, y: this.y };
   }

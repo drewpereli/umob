@@ -222,6 +222,7 @@ export default abstract class Creature
   layer = EntityLayer.Creature;
   blocksMovement = true;
   blocksView = false;
+  conductsElectricity = true;
 
   get shouldRemoveFromGame() {
     return this.isDead;

@@ -8,16 +8,19 @@ import { type ItemInMap, isItemInMap } from './entities/items/item-in-map';
 import type MapEntity from './entities/map-entity';
 import { isTerrain, type Terrain } from './entities/terrain';
 import { removeElement } from './utils/array';
+import { isElectrocutable } from './utils/electricity';
 import { Cover } from './utils/map';
 
 export class Tile {
   constructor({ x, y }: Coords) {
     this.x = x;
     this.y = y;
+    this.id = `${x},${y}`;
   }
 
   readonly x;
   readonly y;
+  readonly id;
 
   adjacentTiles: Tile[] = [];
 
@@ -49,10 +52,6 @@ export class Tile {
 
   entities: MapEntity[] = [];
 
-  get id() {
-    return `${this.x},${this.y}`;
-  }
-
   onPlayerSees() {
     const terrain = this.terrain ?? FLOOR_TERRAIN_DATA;
 
@@ -76,6 +75,7 @@ export class Tile {
   flammables: Flammable[] = [];
   creatures: Creature[] = [];
   damageables: Damageable[] = [];
+  electrocutables: (MapEntity & { conductsElectricity: true })[] = [];
 
   addEntity(e: MapEntity) {
     if (isFluid(e)) {
@@ -99,6 +99,9 @@ export class Tile {
     }
     if (isDamageable(e)) {
       this.damageables.push(e);
+    }
+    if (isElectrocutable(e)) {
+      this.electrocutables.push(e);
     }
 
     this.entities.push(e);
@@ -140,6 +143,9 @@ export class Tile {
     }
     if (isDamageable(e)) {
       removeElement(this.damageables, e);
+    }
+    if (isElectrocutable(e)) {
+      removeElement(this.electrocutables, e);
     }
 
     if (e.blocksMovement) {

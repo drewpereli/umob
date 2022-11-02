@@ -6,6 +6,7 @@ import {
 import { useGame } from '@/stores/game';
 import { useMap } from '@/stores/map';
 import type { Tile } from '@/tile';
+import { electrocute } from '@/utils/electricity';
 import { coordsEqual, distance } from '@/utils/map';
 import { angle, angularDistance } from '@/utils/math';
 import { random } from '@/utils/random';
@@ -192,6 +193,23 @@ export class GammaRayLaser extends Gun {
     if (isCreature(damageable)) {
       damageable.receiveRadiation(10);
     }
+  }
+}
+
+export class TeslaGun extends Gun {
+  name = 'tesla gun';
+  description = 'Shoots an electric arc.';
+  damage = 0; // Doesn't do any damage by itself, but will electrocute tile shot
+  range = 20;
+  clipSize = Infinity;
+  amoLoaded = Infinity;
+  attackTimeMultiplier = 0.5;
+  damageType = DamageType.Electric;
+  attackActionMessageDescription = 'zapped';
+  accuracyBonus = Infinity;
+
+  onAttack(_attacker: Creature, tile: Tile) {
+    electrocute(tile, 10);
   }
 }
 
