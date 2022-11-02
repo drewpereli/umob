@@ -32,6 +32,10 @@ export const actionHandlers: Partial<
     ArrowRight: (game) => defaultArrowKey(game, Dir.Right),
     ArrowDown: (game) => defaultArrowKey(game, Dir.Down),
     ArrowLeft: (game) => defaultArrowKey(game, Dir.Left),
+    'ArrowUp+Shift': (game) => defaultArrowKey(game, Dir.Up, true),
+    'ArrowRight+Shift': (game) => defaultArrowKey(game, Dir.Right, true),
+    'ArrowDown+Shift': (game) => defaultArrowKey(game, Dir.Down, true),
+    'ArrowLeft+Shift': (game) => defaultArrowKey(game, Dir.Left, true),
     a: (game) => {
       if (
         !game.player.equippedWeapon ||
@@ -182,18 +186,20 @@ function updateAim(game: Game, dir: Dir) {
   game.setSelectedTile(target);
 }
 
-function defaultArrowKey(game: Game, dir: Dir) {
+function defaultArrowKey(game: Game, dir: Dir, shift = false) {
+  const dirCoordOffset = {
+    [Dir.Up]: { y: -1 },
+    [Dir.Right]: { x: 1 },
+    [Dir.Down]: { y: 1 },
+    [Dir.Left]: { x: -1 },
+  };
+
+  const offset = dirCoordOffset[dir];
+
   if (game.player.facing === dir) {
-    const dirCoordOffset = {
-      [Dir.Up]: { y: -1 },
-      [Dir.Right]: { x: 1 },
-      [Dir.Down]: { y: 1 },
-      [Dir.Left]: { x: -1 },
-    };
-
-    const offset = dirCoordOffset[dir];
-
     game.movePlayer(offset);
+  } else if (shift) {
+    game.playerStrafe(offset);
   } else {
     game.turnPlayer(dir);
   }

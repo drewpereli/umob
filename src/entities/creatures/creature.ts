@@ -719,6 +719,15 @@ export default abstract class Creature
       this.moveTime * (tile.moveTimeMultiplier as number);
   }
 
+  strafe(tile: Tile) {
+    if (!this.canAct) return;
+
+    this.updatePosition(tile);
+
+    this.timeUntilNextAction =
+      this.moveTime * (tile.moveTimeMultiplier as number) * 2;
+  }
+
   turn(dir: Dir) {
     if (!this.canAct || dir === this.facing) return;
 

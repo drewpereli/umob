@@ -27,14 +27,20 @@ export default defineComponent({
   },
   methods: {
     // Only will apply when this element is focused, i.e. when there's no menu being shown
-    async onKey({ key }: KeyboardEvent) {
+    async onKey(e: KeyboardEvent) {
       if (this.onKeyIsRunning) return;
       if (useAnimations().isRunning) return;
 
       this.onKeyIsRunning = true;
 
+      let keyStr = e.key;
+
+      if (e.shiftKey) {
+        keyStr += '+Shift';
+      }
+
       try {
-        actionHandlers[this.game.actionUiState]?.[key]?.(this.game);
+        actionHandlers[this.game.actionUiState]?.[keyStr]?.(this.game);
       } finally {
         await new Promise((res) => setTimeout(res, 0));
         this.onKeyIsRunning = false;
