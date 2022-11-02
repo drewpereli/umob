@@ -52,6 +52,7 @@ import { createAttackMessage } from '@/stores/messages';
 import { Burning } from '@/status-effects/burning';
 import { defaultBurn, defaultStopBurning, type Flammable } from '../flammable';
 import { OcclusionVisualizer } from '@/status-effects/occlusion-visualizer';
+import { WearableSlot, type Wearable } from '@/wearables/wearable';
 
 export type Covers = Record<Dir, Cover>;
 
@@ -269,7 +270,14 @@ export default abstract class Creature
       moveTime *= 2;
     }
 
-    return moveTime;
+    const equipmentEffect = this.equippedWearablesArray.reduce(
+      (total, wearable) => total + wearable.moveTimeEffect,
+      0
+    );
+
+    moveTime += equipmentEffect;
+
+    return Math.max(1, moveTime);
   }
 
   get turnTime() {
@@ -321,7 +329,14 @@ export default abstract class Creature
   }
 
   get armor() {
-    return this.baseArmor;
+    const equipmentEffect = this.equippedWearablesArray.reduce(
+      (total, wearable) => total + wearable.armorEffect,
+      0
+    );
+
+    const val = this.baseArmor + equipmentEffect;
+
+    return Math.max(val, 0);
   }
 
   get covers(): Record<Dir, Cover> {
@@ -797,6 +812,14 @@ export default abstract class Creature
       this.timeUntilNextAction = this.moveTime;
     }
   }
+
+  putOn(wearable: Wearable) {
+    this.equippedWearables[wearable.wearableSlot] = wearable;
+  }
+
+  takeOff(wearable: Wearable) {
+    this.equippedWearables[wearable.wearableSlot] = null;
+  }
   /* #endregion */
 
   /* #region  General State */
@@ -842,6 +865,17 @@ export default abstract class Creature
   updateFacing(dir: Dir) {
     this.facing = dir;
     this.updateLastSawEnemy();
+  }
+
+  equippedWearables: Record<WearableSlot, Wearable | null> = {
+    [WearableSlot.Head]: null,
+    [WearableSlot.Body]: null,
+  };
+
+  get equippedWearablesArray() {
+    return Object.values(this.equippedWearables).filter(
+      (w): w is Wearable => w !== null
+    );
   }
   /* #endregion */
 

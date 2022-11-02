@@ -64,7 +64,17 @@ export default defineComponent({
     <div>View Range: {{ game.player.viewRange }}</div>
     <div>Accuracy: {{ game.player.accuracy }}</div>
 
+    <div v-if="game.player.armor">Armor: {{ game.player.armor }}</div>
+
     <EquippedWeapon />
+
+    <div
+      v-for="(wearable, idx) in game.player.equippedWearablesArray"
+      :key="idx"
+    >
+      <div>{{ wearable.name }}</div>
+    </div>
+
     <WeaponClipStatus v-if="playerGun" :gun="playerGun" />
     <CoverIndicators :covers="game.player.covers" />
     <StatusEffect

@@ -7,6 +7,7 @@ import type { Item } from '@/entities/items/item';
 import { itemIsWeapon } from '@/entities/weapons/weapon';
 import { itemIsUsable } from '@/entities/items/usable';
 import { TargetedPower } from '@/powers/targeted-power';
+import { itemIsWearable } from '@/wearables/wearable';
 
 export default defineComponent({
   setup() {
@@ -17,10 +18,12 @@ export default defineComponent({
   computed: {
     items(): MenuItem<Item>[] {
       return this.player.inventory.map((item) => {
-        const label =
-          item === this.player.equippedWeapon
-            ? `* ${item.name}`
-            : `${item.name}`;
+        const isEquipped =
+          item === this.player.equippedWeapon ||
+          (itemIsWearable(item) &&
+            this.player.equippedWearablesArray.includes(item));
+
+        const label = isEquipped ? `* ${item.name}` : `${item.name}`;
 
         return {
           label,
@@ -38,6 +41,12 @@ export default defineComponent({
 
         if (power instanceof TargetedPower) {
           this.$emit('close');
+        }
+      } else if (itemIsWearable(item.model)) {
+        if (this.player.equippedWearablesArray.includes(item.model)) {
+          this.player.takeOff(item.model);
+        } else {
+          this.player.putOn(item.model);
         }
       }
     },
