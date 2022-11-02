@@ -320,7 +320,7 @@ export default abstract class Creature
 
   unarmedAttackData: WeaponData = {
     damage: 1,
-    accuracyBonus: Infinity,
+    accuracyBonus: 5,
     attackTimeMultiplier: 1,
     knockBack: 0,
     flankingBonus: 0,
