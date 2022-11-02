@@ -22,6 +22,8 @@ export default abstract class Gun extends Weapon {
 
   char = '¬';
   color = '#32CD32';
+
+  attackActionMessageDescription = 'shot';
 }
 
 export class ShotGun extends Gun {

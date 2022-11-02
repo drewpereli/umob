@@ -18,7 +18,7 @@ import { DamageType, Weapon } from './weapons/weapon';
 import { SummonAutoTurret } from '@/powers/summon-auto-turret';
 import { AssaultRifle } from './weapons/gun';
 
-const r = new AssaultRifle();
+const r = new Pipe();
 
 export class Player extends Creature implements Flammable {
   constructor(tile: Tile, public alignment = CreatureAlignment.WithPlayer) {

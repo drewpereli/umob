@@ -4,6 +4,7 @@ export default abstract class MeleeWeapon extends Weapon {
   char = '}';
   color = '#32CD32';
   accuracyBonus = 5;
+  attackActionMessageDescription = 'swung at';
 }
 
 export class Pipe extends MeleeWeapon {

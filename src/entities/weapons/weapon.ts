@@ -9,6 +9,7 @@ export interface WeaponData {
   knockBack: number;
   flankingBonus: number;
   damageType: DamageType;
+  attackActionMessageDescription: string;
 }
 
 export abstract class Weapon extends Item implements WeaponData {
@@ -18,6 +19,7 @@ export abstract class Weapon extends Item implements WeaponData {
   knockBack = 0;
   flankingBonus = DEFAULT_FLANKING_BONUS;
   damageType = DamageType.Physical;
+  abstract attackActionMessageDescription: string;
 }
 
 export function itemIsWeapon(item: Item): item is Weapon {

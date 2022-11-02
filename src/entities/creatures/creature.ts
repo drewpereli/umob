@@ -45,6 +45,7 @@ import { Lava } from '../fluid';
 import { angle } from '@/utils/math';
 import bresenham from '@/utils/bresenham';
 import { last } from '@/utils/array';
+import { createAttackMessage } from '@/stores/messages';
 
 export type Covers = Record<Dir, Cover>;
 
@@ -325,6 +326,7 @@ export default abstract class Creature
     knockBack: 0,
     flankingBonus: 0,
     damageType: DamageType.Physical,
+    attackActionMessageDescription: 'swung at',
   };
 
   get weaponData() {
@@ -505,47 +507,28 @@ export default abstract class Creature
 
     gun.amoLoaded--;
 
-    // const damageablesDescription = damageables.length > 1 ? 'the ';
+    const message = createAttackMessage(
+      this,
+      damageables,
+      hit,
+      this.weaponData
+    );
 
-    let damageablesDescription;
-
-    if (damageables.length === 1) {
-      const damageable = damageables[0];
-
-      if (isCreature(damageable)) {
-        damageablesDescription = damageable.messageDescriptor;
-      } else {
-        damageablesDescription = 'something';
-      }
-    } else {
-      if (damageables.every(isCreature)) {
-        damageablesDescription = 'the creatures';
-      } else {
-        damageablesDescription = 'the somethings';
-      }
-    }
-
-    let hitDescription;
-    if (damageables.length == 1) {
-      hitDescription = hit.length === 0 ? 'and missed' : 'and hit';
-    } else {
-      if (damageables.length === hit.length) {
-        hitDescription = 'and hit all of them';
-      } else if (hit.length === 0) {
-        hitDescription = 'and missed all of them';
-      } else {
-        hitDescription = 'and hit some of them';
-      }
-    }
-
-    this.messagesStore.addMessage({
-      content: `${this.messageDescriptor} shot at ${damageablesDescription} ${hitDescription}`,
-    });
+    this.messagesStore.addMessage(message);
   }
 
   // Assumes the tile is in range
   _meleeAttackTile(tile: Tile) {
-    this._attemptAttackAttackableDamageables(tile.damageables);
+    const hit = this._attemptAttackAttackableDamageables(tile.damageables);
+
+    const message = createAttackMessage(
+      this,
+      tile.damageables,
+      hit,
+      this.weaponData
+    );
+
+    this.messagesStore.addMessage(message);
   }
 
   // Assumes we can act
