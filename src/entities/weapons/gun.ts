@@ -14,7 +14,7 @@ import type { Damageable } from '../damageable';
 import { isFlammable } from '../flammable';
 import { Water } from '../fluid';
 import type MapEntity from '../map-entity';
-import { Weapon } from './weapon';
+import { DamageType, Weapon } from './weapon';
 
 export function weaponIsGun(w: Weapon): w is Gun {
   return w instanceof Gun;
@@ -109,6 +109,7 @@ export class Flamethrower extends Gun {
   amoLoaded = 10;
   description = 'Shoot flames';
   spread = 30;
+  damageType = DamageType.Heat;
 
   onAttack(attacker: Creature, tile: Tile) {
     const tiles = tilesAimedAt(attacker.tile, tile, this);
