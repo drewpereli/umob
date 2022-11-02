@@ -3,7 +3,9 @@ import { useMap } from '@/stores/map';
 import type { Tile } from '@/tile';
 import { coordsEqual, distance } from '@/utils/map';
 import { angle, angularDistance } from '@/utils/math';
+import { isCreature } from '../creatures/creature';
 import type { Damageable } from '../damageable';
+import { isFlammable } from '../flammable';
 import type MapEntity from '../map-entity';
 import { Weapon } from './weapon';
 
@@ -84,6 +86,27 @@ export class RailGun extends Gun {
   description =
     'Electromagnetic force to accelerate a metal slug to high speeds. Knocks back enemies.';
   reloadTimeMultiplier = 2;
+}
+
+export class Flamethrower extends Gun {
+  name = 'flamethrower';
+  damage = 5;
+  range = 10;
+  clipSize = 10;
+  amoLoaded = 10;
+  description = 'Shoot flames';
+  spread = 30;
+  onAttackTiles(tiles: Tile[]) {
+    tiles.forEach((tile) => {
+      tile.flammables.forEach((f) => {
+        if (isCreature(f)) {
+          f.startBurning();
+        } else if (!f.isBurning) {
+          f.startBurning();
+        }
+      });
+    });
+  }
 }
 
 export function tilesAimedAt(

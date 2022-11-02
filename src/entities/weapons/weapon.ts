@@ -1,3 +1,5 @@
+import type { Tile } from '@/tile';
+import type { Damageable } from '../damageable';
 import { Item } from '../items/item';
 
 export const DEFAULT_FLANKING_BONUS = 0.5;
@@ -10,6 +12,8 @@ export interface WeaponData {
   flankingBonus: number;
   damageType: DamageType;
   attackActionMessageDescription: string;
+  onDamage?: (damageable: Damageable) => unknown;
+  onAttackTiles?: (tiles: Tile[]) => unknown;
 }
 
 export abstract class Weapon extends Item implements WeaponData {
@@ -20,6 +24,8 @@ export abstract class Weapon extends Item implements WeaponData {
   flankingBonus = DEFAULT_FLANKING_BONUS;
   damageType = DamageType.Physical;
   abstract attackActionMessageDescription: string;
+  onDamage?(damageable: Damageable): unknown;
+  onAttackTiles?(tiles: Tile[]): unknown;
 }
 
 export function itemIsWeapon(item: Item): item is Weapon {

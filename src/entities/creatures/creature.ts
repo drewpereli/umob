@@ -24,7 +24,11 @@ import type { Power } from '@/powers/power';
 import { random } from '@/utils/random';
 import { Actor, actorCache } from '../actor';
 import { damageRoll, type Damageable } from '../damageable';
-import Gun, { damageablesAimedAt, weaponIsGun } from '../weapons/gun';
+import Gun, {
+  damageablesAimedAt,
+  tilesAimedAt,
+  weaponIsGun,
+} from '../weapons/gun';
 import type { AsciiDrawable } from '@/utils/types';
 import MapEntity, { EntityLayer } from '../map-entity';
 import type { StatusEffect } from '@/status-effects/status-effect';
@@ -516,6 +520,12 @@ export default abstract class Creature
       new BulletAnimation(this, tile, hit.length > 0)
     );
 
+    if (gun.onAttackTiles) {
+      const tiles = tilesAimedAt(this.tile, tile, gun);
+
+      gun.onAttackTiles(tiles);
+    }
+
     gun.amoLoaded--;
 
     const message = createAttackMessage(
@@ -531,6 +541,10 @@ export default abstract class Creature
   // Assumes the tile is in range
   _meleeAttackTile(tile: Tile) {
     const hit = this._attemptAttackAttackableDamageables(tile.damageables);
+
+    if (this.weaponData.onAttackTiles) {
+      this.weaponData.onAttackTiles([tile]);
+    }
 
     const message = createAttackMessage(
       this,
@@ -586,6 +600,10 @@ export default abstract class Creature
         hit.push(entity);
       }
     });
+
+    if (weaponData.onDamage) {
+      hit.forEach((entity) => weaponData.onDamage?.(entity));
+    }
 
     this.timeUntilNextAction =
       this.attackTime * weaponData.attackTimeMultiplier;
@@ -821,7 +839,7 @@ export default abstract class Creature
   }
 
   startBurning() {
-    this.addStatusEffect(new Burning(this, 20));
+    this.addStatusEffect(new Burning(this, 10 * TURN));
   }
 
   burn() {
