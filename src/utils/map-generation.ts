@@ -187,8 +187,6 @@ export function addElevatorDown() {
 
   const tile = map.randomFloorTile();
 
-  console.log(tile.id);
-
   const elevatorDown = new ElevatorDown(tile);
 
   const game = useGame();
