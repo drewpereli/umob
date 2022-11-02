@@ -46,6 +46,8 @@ import { angle } from '@/utils/math';
 import bresenham from '@/utils/bresenham';
 import { last } from '@/utils/array';
 import { createAttackMessage } from '@/stores/messages';
+import { Burning } from '@/status-effects/burning';
+import { defaultBurn, defaultStopBurning, type Flammable } from '../flammable';
 
 export type Covers = Record<Dir, Cover>;
 
@@ -95,7 +97,7 @@ const resistanceMultipliers: Record<Resistance, number> = {
 
 export default abstract class Creature
   extends Actor
-  implements Damageable, AsciiDrawable
+  implements Damageable, AsciiDrawable, Flammable
 {
   constructor(tile: Tile, public alignment = CreatureAlignment.AgainstPlayer) {
     super(tile);
@@ -807,6 +809,39 @@ export default abstract class Creature
     this.facing = dir;
     this.updateLastSawEnemy();
   }
+  /* #endregion */
+
+  /* #region  flammable */
+  get isBurning() {
+    return this.statusEffects.some((effect) => effect.name === 'burning');
+  }
+
+  set isBurning(val: boolean) {
+    //
+  }
+
+  startBurning() {
+    this.addStatusEffect(new Burning(this, 20));
+  }
+
+  burn() {
+    defaultBurn(this);
+    this.receiveDamage(1, DamageType.Heat);
+  }
+
+  stopBurning() {
+    defaultStopBurning(this);
+    const burning = this.statusEffects.find((s) => s instanceof Burning);
+
+    if (!burning) return;
+
+    this.removeStatusEffect(burning);
+  }
+
+  burnCollocatedChance = 0.5;
+  burnAdjacentChance = 0.1;
+  burningDuration = 0;
+  readonly IMPLEMENTS_FLAMMABLE = true;
   /* #endregion */
 
   /* #region  stores, tick, and _act */

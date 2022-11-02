@@ -14,14 +14,14 @@ import { ItemInMap } from './items/item-in-map';
 import { Pipe } from './weapons/melee-weapon';
 import { angleFromDir, type Dir } from '@/utils/map';
 import type { Perk } from '@/perks';
-import { DamageType, Weapon } from './weapons/weapon';
+import type { DamageType, Weapon } from './weapons/weapon';
 import { SummonAutoTurret } from '@/powers/summon-auto-turret';
 import { AssaultRifle } from './weapons/gun';
 import type { Usable } from './items/usable';
 
 const r = new Pipe();
 
-export class Player extends Creature implements Flammable {
+export class Player extends Creature {
   constructor(tile: Tile, public alignment = CreatureAlignment.WithPlayer) {
     super(tile);
   }
@@ -79,20 +79,7 @@ export class Player extends Creature implements Flammable {
 
   mass = 100;
 
-  burnCollocatedChance = 0.5;
-  burnAdjacentChance = 0.1;
-  burningDuration = 0;
-  readonly IMPLEMENTS_FLAMMABLE = true;
-
   appliedPerkIds: string[] = [];
-
-  get isBurning() {
-    return this.statusEffects.some((effect) => effect.name === 'burning');
-  }
-
-  set isBurning(val: boolean) {
-    //
-  }
 
   receiveDamage(damage: number, type: DamageType) {
     super.receiveDamage(damage, type);
@@ -118,24 +105,6 @@ export class Player extends Creature implements Flammable {
     if (!this.canAct) return;
 
     this.timeUntilNextAction = 1;
-  }
-
-  startBurning() {
-    this.addStatusEffect(new Burning(this, 20));
-  }
-
-  burn() {
-    defaultBurn(this);
-    this.receiveDamage(1, DamageType.Heat);
-  }
-
-  stopBurning() {
-    defaultStopBurning(this);
-    const burning = this.statusEffects.find((s) => s instanceof Burning);
-
-    if (!burning) return;
-
-    this.removeStatusEffect(burning);
   }
 
   pickupItem(item: Item) {
