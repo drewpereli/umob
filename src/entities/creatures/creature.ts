@@ -815,10 +815,12 @@ export default abstract class Creature
 
   putOn(wearable: Wearable) {
     this.equippedWearables[wearable.wearableSlot] = wearable;
+    wearable.onPutOn?.(this);
   }
 
   takeOff(wearable: Wearable) {
     this.equippedWearables[wearable.wearableSlot] = null;
+    wearable.onTakeOff?.(this);
   }
   /* #endregion */
 

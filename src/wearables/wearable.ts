@@ -1,3 +1,4 @@
+import type Creature from '@/entities/creatures/creature';
 import { Item } from '@/entities/items/item';
 
 export enum WearableSlot {
@@ -21,6 +22,9 @@ export abstract class Wearable extends Item {
 
   armorEffect = 0;
   moveTimeEffect = 0;
+
+  onPutOn?(creature: Creature): unknown;
+  onTakeOff?(creature: Creature): unknown;
 }
 
 export function itemIsWearable(item: Item): item is Wearable {
