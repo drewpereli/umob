@@ -528,14 +528,16 @@ export default abstract class Creature
 
     gun.amoLoaded--;
 
-    const message = createAttackMessage(
-      this,
-      damageables,
-      hit,
-      this.weaponData
-    );
+    if (damageables.length) {
+      const message = createAttackMessage(
+        this,
+        damageables,
+        hit,
+        this.weaponData
+      );
 
-    this.messagesStore.addMessage(message);
+      this.messagesStore.addMessage(message);
+    }
   }
 
   // Assumes the tile is in range
@@ -546,14 +548,16 @@ export default abstract class Creature
       this.weaponData.onAttackTiles([tile]);
     }
 
-    const message = createAttackMessage(
-      this,
-      tile.damageables,
-      hit,
-      this.weaponData
-    );
+    if (tile.damageables.length) {
+      const message = createAttackMessage(
+        this,
+        tile.damageables,
+        hit,
+        this.weaponData
+      );
 
-    this.messagesStore.addMessage(message);
+      this.messagesStore.addMessage(message);
+    }
   }
 
   // Assumes we can act
