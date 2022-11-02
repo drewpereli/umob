@@ -10,7 +10,7 @@ export class Burning extends StatusEffect {
     super(creature, maxDuration);
   }
 
-  name = 'burning';
+  static statusEffectName = 'burning';
 
   onMaxDurationReached(): void {
     this.creature.stopBurning();

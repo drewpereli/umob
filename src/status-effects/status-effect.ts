@@ -5,7 +5,7 @@ export abstract class StatusEffect {
     this.onCreate?.();
   }
 
-  abstract readonly name: string;
+  static statusEffectName: string;
 
   onCreate?(): void;
 
@@ -33,5 +33,9 @@ export abstract class StatusEffect {
     }
 
     this.affectCreature?.();
+  }
+
+  get name() {
+    return (this.constructor as typeof StatusEffect).statusEffectName;
   }
 }
