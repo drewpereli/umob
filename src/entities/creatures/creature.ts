@@ -51,6 +51,7 @@ import { last } from '@/utils/array';
 import { createAttackMessage } from '@/stores/messages';
 import { Burning } from '@/status-effects/burning';
 import { defaultBurn, defaultStopBurning, type Flammable } from '../flammable';
+import { OcclusionVisualizer } from '@/status-effects/occlusion-visualizer';
 
 export type Covers = Record<Dir, Cover>;
 
@@ -248,7 +249,7 @@ export default abstract class Creature
 
   baseArmor = 0;
 
-  viewAngle: number = 90;
+  baseViewAngle: number = 90;
 
   resistances: Partial<Record<DamageType, Resistance>> = {};
 
@@ -291,6 +292,14 @@ export default abstract class Creature
     }
 
     return Math.max(range, 0);
+  }
+
+  get viewAngle() {
+    if (this.hasStatusEffect(OcclusionVisualizer)) {
+      return 360;
+    }
+
+    return this.baseViewAngle;
   }
 
   get accuracy() {
