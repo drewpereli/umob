@@ -8,7 +8,7 @@ export class CreateLavaPool extends TargetedPower {
   static powerName = 'create lava pool';
   static description = 'Create a fire proximity mine at the targeted tile';
   range = 5;
-  energyCost = 10;
+  coolDown = 40 * TURN;
   useTime = 2 * TURN;
 
   canTargetMovementBlocker = true;

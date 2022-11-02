@@ -6,7 +6,7 @@ import { TargetedPower } from './targeted-power';
 export class SummonAutoTurret extends TargetedPower {
   canTargetMovementBlocker = false;
 
-  energyCost = 50;
+  coolDown = 50 * TURN;
 
   static powerName = 'summon auto-turret';
   static description =

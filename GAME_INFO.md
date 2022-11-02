@@ -40,4 +40,4 @@ how many rads you've accumulated.
 * Low (50 rads +): view range reduced by 2 tiles
 * Medium (100 rads +): accuracy reduced by 2
 * High (200 rads +): move time doubled. Take 1% of your max health as damage per turn
-* Extreme (400 rads +): move time tripled. Energy recharge rate is 0. Take 2% of your max health as damage per turn
+* Extreme (400 rads +): move time tripled. Power cool-down halts. Take 2% of your max health as damage per turn

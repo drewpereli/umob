@@ -1,5 +1,4 @@
 import {
-  BulletAnimation,
   DamageAnimation,
   KnockBackAnimation,
   useAnimations,
@@ -237,13 +236,10 @@ export default abstract class Creature
 
   /* #region  Base Attributes */
   maxHealth = 100;
-  maxEnergy = 100;
 
-  baseEnergyRechargePerTick = 0.1;
-
-  baseMoveTime = 2 * TURN;
-  attackTime = 2 * TURN;
-  reloadTime = 4 * TURN;
+  baseMoveTime = TURN;
+  attackTime = TURN;
+  reloadTime = TURN;
 
   baseViewRange = 10;
 
@@ -279,12 +275,12 @@ export default abstract class Creature
     return this.moveTime;
   }
 
-  get energyRechargePerTick() {
+  get powerCoolDownPerTick() {
     if (this.atRadLevelOrHigher(RadLevel.Extreme)) {
       return 0;
     }
 
-    return this.baseEnergyRechargePerTick;
+    return 1;
   }
 
   get viewRange() {
@@ -756,10 +752,8 @@ export default abstract class Creature
 
   useSelectedPower() {
     if (!this.selectedPower) return;
-    if (this.selectedPower.energyCost > this.energy) return;
 
     if (this.selectedPower.activateIfPossible()) {
-      this.energy -= this.selectedPower.energyCost;
       this.timeUntilNextAction = this.selectedPower.useTime;
       return true;
     }
@@ -805,8 +799,6 @@ export default abstract class Creature
   changeHealth(amount: number) {
     this.health = this.health + amount;
   }
-
-  energy = 100;
 
   facing: Dir = random.arrayElement([Dir.Up, Dir.Right, Dir.Down, Dir.Left]);
 
@@ -874,9 +866,8 @@ export default abstract class Creature
   tick() {
     super.tick();
 
-    this.energy = Math.min(
-      this.maxEnergy,
-      this.energy + this.energyRechargePerTick
+    this.powers.forEach((power) =>
+      power.countdownCoolDown(this.powerCoolDownPerTick)
     );
 
     this.rads = Math.max(0, this.rads - this.radsLostPerTick);

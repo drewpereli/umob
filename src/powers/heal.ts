@@ -5,7 +5,7 @@ export class Heal extends NonTargetedPower {
   static powerName = 'heal';
   static description = 'Heal for 10 health';
   useTime = 2 * TURN;
-  energyCost = 10;
+  coolDown = 20 * TURN;
 
   activate() {
     if (this.owner.health >= this.owner.maxHealth) return;

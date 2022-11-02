@@ -2,17 +2,16 @@ import { Actor } from '@/entities/actor';
 import { EntityLayer } from '@/entities/map-entity';
 import { TURN, useGame } from '@/stores/game';
 import type { Tile } from '@/tile';
-import bresenham from '@/utils/bresenham';
 import { dirsBetween, distance } from '@/utils/map';
 import { random } from '@/utils/random';
 import { TargetedPower } from './targeted-power';
 
 export class CreateBlackHole extends TargetedPower {
   static powerName = 'create black hole';
-  readonly description =
+  static description =
     'Summon a black hole at the targeted tile. Black holes have a chance to pull nearby creatures towards them.';
   useTime = 2 * TURN;
-  energyCost = 50;
+  coolDown = 50 * TURN;
   range = 8;
 
   canTargetMovementBlocker = false;

@@ -55,15 +55,6 @@ export abstract class TargetedPower extends Power {
   }
 
   get canActivate() {
-    return this.tilesAimedAt().length > 0;
-  }
-
-  activateIfPossible() {
-    if (this.canActivate) {
-      this.activate();
-      return true;
-    }
-
-    return false;
+    return super.canActivate && this.tilesAimedAt().length > 0;
   }
 }

@@ -9,7 +9,7 @@ export class CreateFireProximityMine extends TargetedPower {
   range = 5;
 
   useTime = TURN;
-  energyCost = 20;
+  coolDown = 20 * TURN;
 
   canTargetMovementBlocker = true;
 

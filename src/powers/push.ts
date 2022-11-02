@@ -6,7 +6,7 @@ export class Push extends TargetedPower {
   static powerName = 'push';
   static description = 'Push the targeted creatures away from you';
   canTargetMovementBlocker = true;
-  energyCost = 20;
+  coolDown = 5 * TURN;
   useTime = TURN;
   range = 7;
 

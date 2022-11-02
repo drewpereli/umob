@@ -18,6 +18,7 @@ import type { DamageType, Weapon } from './weapons/weapon';
 import { SummonAutoTurret } from '@/powers/summon-auto-turret';
 import { AssaultRifle } from './weapons/gun';
 import type { Usable } from './items/usable';
+import { Blink } from '@/powers/blink';
 
 const r = new Pipe();
 
@@ -45,7 +46,7 @@ export class Player extends Creature {
   equippedWeapon: Weapon = r;
 
   powers: Power[] = [
-    new SummonAutoTurret(this),
+    new Blink(this),
     new BuildCover(this),
     new CreateBlackHole(this),
     new Grenade(this),

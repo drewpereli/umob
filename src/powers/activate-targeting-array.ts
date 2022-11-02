@@ -1,4 +1,5 @@
 import { TargetingArray } from '@/status-effects/targeting-array';
+import { TURN } from '@/stores/game';
 import { NonTargetedPower } from './non-targeted-power';
 
 export class ActivateTargetingArray extends NonTargetedPower {
@@ -6,7 +7,7 @@ export class ActivateTargetingArray extends NonTargetedPower {
   static description =
     'Activate a targeting array that greatly raises your accuracy while active';
   useTime = 0;
-  energyCost = 50;
+  coolDown = 50 * TURN;
 
   activate() {
     const effect = new TargetingArray(this.owner, 50);

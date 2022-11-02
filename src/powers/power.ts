@@ -7,12 +7,12 @@ export abstract class Power {
   static powerName: string;
   static description: string;
   abstract useTime: number;
-  abstract energyCost: number;
+  abstract coolDown: number;
+
+  timeUntilUse = 0;
 
   game = useGame();
 
-  // Return true if activation successful
-  abstract activateIfPossible(): boolean;
   abstract activate(): void;
 
   get description(): string {
@@ -21,5 +21,26 @@ export abstract class Power {
 
   get name(): string {
     return (this.constructor as typeof Power).powerName;
+  }
+
+  get canActivate() {
+    return this.timeUntilUse === 0;
+  }
+
+  // Return true if activation successful
+  activateIfPossible() {
+    console.log(this.canActivate, this.timeUntilUse);
+
+    if (this.canActivate) {
+      this.activate();
+      this.timeUntilUse = this.coolDown;
+      return true;
+    }
+
+    return false;
+  }
+
+  countdownCoolDown(val: number) {
+    this.timeUntilUse = Math.max(this.timeUntilUse - val, 0);
   }
 }

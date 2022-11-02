@@ -9,7 +9,7 @@ export class Pull extends TargetedPower {
   static powerName = 'pull';
   static description = 'Pull the targeted creatures towards you';
   canTargetMovementBlocker = true;
-  energyCost = 20;
+  coolDown = 5 * TURN;
   useTime = TURN;
   range = 7;
 

@@ -9,6 +9,7 @@ import StatusEffect from './StatusEffect.vue';
 import EnergyBar from './player-status/EnergyBar.vue';
 import { weaponIsGun } from '@/entities/weapons/gun';
 import RadiationIndicator from './RadiationIndicator.vue';
+import PowerStatus from './player-status/PowerStatus.vue';
 
 export default defineComponent({
   components: {
@@ -19,6 +20,7 @@ export default defineComponent({
     EnergyBar,
     StatusEffect,
     RadiationIndicator,
+    PowerStatus,
   },
   setup() {
     return { game: useGame() };
@@ -74,11 +76,14 @@ export default defineComponent({
       :statusEffect="statusEffect"
     />
 
-    <div>
+    <div class="powers-container">
       <h3>Powers:</h3>
-      <div v-for="powerData in powerHotKeys" :key="powerData.key">
-        {{ powerData.key }}. {{ powerData.power.name }}
-      </div>
+      <PowerStatus
+        v-for="powerData in powerHotKeys"
+        :key="powerData.key"
+        :hotKey="powerData.key"
+        :power="powerData.power"
+      />
     </div>
   </div>
 </template>
@@ -97,4 +102,9 @@ export default defineComponent({
 
   .rads
     color lime
+
+.powers-container > *
+  margin-top 1rem
+  &:first-child
+    margin-top 0rem
 </style>

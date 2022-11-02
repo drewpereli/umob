@@ -8,7 +8,7 @@ export class Grenade extends TargetedPower {
   static powerName = 'grenade';
   static description = 'Throw a grenade that explodes immediately';
   useTime = 2 * TURN;
-  energyCost = 20;
+  coolDown = 4 * TURN;
   range = 8;
   radius = 3;
 

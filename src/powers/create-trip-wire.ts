@@ -10,7 +10,7 @@ export class CreateTripWire extends TargetedPower {
   range = 5;
 
   useTime = TURN;
-  energyCost = 40;
+  coolDown = 40 * TURN;
 
   canTargetMovementBlocker = true;
 
