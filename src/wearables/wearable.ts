@@ -1,5 +1,7 @@
+import type { Resistance } from '@/entities/creatures/creature';
 import type Creature from '@/entities/creatures/creature';
 import { Item } from '@/entities/items/item';
+import type { DamageType } from '@/entities/weapons/weapon';
 
 export enum WearableSlot {
   Head = 'head',
@@ -22,6 +24,8 @@ export abstract class Wearable extends Item {
 
   armorEffect = 0;
   moveTimeEffect = 0;
+
+  resistances: Partial<Record<DamageType, Resistance>> = {};
 
   onPutOn?(creature: Creature): unknown;
   onTakeOff?(creature: Creature): unknown;

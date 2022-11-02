@@ -18,6 +18,7 @@ export class RadCrawler extends Creature {
   _health = 20;
 
   unarmedAttackData = {
+    ...super.unarmedAttackData,
     damage: 5,
     accuracyBonus: Infinity,
     attackTimeMultiplier: 1,
@@ -26,7 +27,7 @@ export class RadCrawler extends Creature {
     damageType: DamageType.Radiation,
   };
 
-  resistances = {
+  baseResistances = {
     [DamageType.Radiation]: Resistance.Immune,
   };
 

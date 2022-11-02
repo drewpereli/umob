@@ -252,11 +252,21 @@ export default abstract class Creature
 
   baseArmor = 0;
 
-  resistances: Partial<Record<DamageType, Resistance>> = {};
+  baseResistances: Partial<Record<DamageType, Resistance>> = {};
 
   resistanceMultiplierForDamageType(type: DamageType) {
-    const resistance = this.resistances[type] ?? Resistance.None;
-    return resistanceMultipliers[resistance];
+    const baseResistance = this.baseResistances[type] ?? Resistance.None;
+
+    const baseMultiplier = resistanceMultipliers[baseResistance];
+
+    const armorEffectMultiplier = this.equippedWearablesArray
+      .filter((w) => {
+        return type in w.resistances;
+      })
+      .map((w) => w.resistances[type] as Resistance)
+      .map((r) => resistanceMultipliers[r]);
+
+    return Math.min(baseMultiplier, ...armorEffectMultiplier);
   }
   /* #endregion */
 
@@ -901,7 +911,9 @@ export default abstract class Creature
 
   stopBurning() {
     defaultStopBurning(this);
-    const burning = this.statusEffects.find((s) => s instanceof Burning);
+    const burning = this.statusEffects.find(
+      (s) => s instanceof Burning && s.source === 'temp'
+    );
 
     if (!burning) return;
 

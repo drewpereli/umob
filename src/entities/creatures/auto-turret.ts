@@ -19,7 +19,7 @@ export class AutoTurret extends Creature {
   mass = 200;
   name = 'auto-turret';
 
-  viewAngle = 360;
+  baseViewAngle = 360;
   baseViewRange = 5;
 
   equippedWeapon = new AutoTurretGun();
@@ -28,7 +28,7 @@ export class AutoTurret extends Creature {
 
   baseAccuracyMultiplier = 2;
 
-  resistances = {
+  baseResistances = {
     [DamageType.Radiation]: Resistance.Immune,
     [DamageType.Heat]: Resistance.Resistant,
     [DamageType.Electric]: Resistance.Vulnerable,
