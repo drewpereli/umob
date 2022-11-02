@@ -516,9 +516,7 @@ export default abstract class Creature
 
     const hit = this._attemptAttackAttackableDamageables(damageables);
 
-    this.game.animations.addAnimation(
-      new BulletAnimation(this, tile, hit.length > 0)
-    );
+    gun.addAnimationOnShoot(this, tile, hit);
 
     if (gun.onAttackTiles) {
       const tiles = tilesAimedAt(this.tile, tile, gun);

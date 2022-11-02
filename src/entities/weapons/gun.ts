@@ -1,9 +1,14 @@
+import {
+  BulletAnimation,
+  ExplosionAnimation,
+  useAnimations,
+} from '@/stores/animations';
 import { useGame } from '@/stores/game';
 import { useMap } from '@/stores/map';
 import type { Tile } from '@/tile';
 import { coordsEqual, distance } from '@/utils/map';
 import { angle, angularDistance } from '@/utils/math';
-import { isCreature } from '../creatures/creature';
+import Creature, { isCreature } from '../creatures/creature';
 import type { Damageable } from '../damageable';
 import { isFlammable } from '../flammable';
 import type MapEntity from '../map-entity';
@@ -26,6 +31,12 @@ export default abstract class Gun extends Weapon {
   color = '#32CD32';
 
   attackActionMessageDescription = 'shot';
+
+  addAnimationOnShoot(attacker: Creature, tile: Tile, hit: Damageable[]) {
+    useAnimations().addAnimation(
+      new BulletAnimation(attacker, tile, hit.length > 0)
+    );
+  }
 }
 
 export class ShotGun extends Gun {
@@ -96,6 +107,7 @@ export class Flamethrower extends Gun {
   amoLoaded = 10;
   description = 'Shoot flames';
   spread = 30;
+
   onAttackTiles(tiles: Tile[]) {
     tiles.forEach((tile) => {
       tile.flammables.forEach((f) => {
@@ -105,6 +117,16 @@ export class Flamethrower extends Gun {
           f.startBurning();
         }
       });
+    });
+  }
+
+  addAnimationOnShoot(attacker: Creature, tile: Tile): void {
+    const tiles = tilesAimedAt(attacker.tile, tile, this);
+
+    tiles.forEach((tile) => {
+      const anim = new ExplosionAnimation(tile, 0);
+
+      useAnimations().addAnimation(anim);
     });
   }
 }
