@@ -71,9 +71,7 @@ export const useGame = defineStore('game', {
       return [state.player, ...this.nonPlayerActors];
     },
     enemies(): Creature[] {
-      return this.creatures.filter(
-        (e) => e.alignment === CreatureAlignment.AgainstPlayer
-      );
+      return this.creaturesByAlignment[CreatureAlignment.AgainstPlayer];
     },
     creatures(state): Creature[] {
       return state.mapEntities.filter(isCreature);
@@ -246,8 +244,9 @@ export const useGame = defineStore('game', {
         this.player.interact(interactableEntity);
       } else if (this.creatureCanOccupy(targetTile)) {
         this.player.move(targetTile);
+        this.enemies.forEach((actor) => actor.updateLastSawEnemy());
       } else if (
-        this.damageablesAt(targetTile) &&
+        this.damageablesAt(targetTile).length &&
         (!this.player.equippedWeapon ||
           !weaponIsGun(this.player.equippedWeapon))
       ) {
@@ -255,8 +254,6 @@ export const useGame = defineStore('game', {
       } else {
         return;
       }
-
-      this.enemies.forEach((actor) => actor.updateLastSawEnemy());
 
       this.view.draw();
 
