@@ -6,7 +6,6 @@ import { useGame } from '@/stores/game';
 import CoverIndicators from './CoverIndicators.vue';
 import WeaponClipStatus from './WeaponClipStatus.vue';
 import StatusEffect from './StatusEffect.vue';
-import EnergyBar from './player-status/EnergyBar.vue';
 import { weaponIsGun } from '@/entities/weapons/gun';
 import RadiationIndicator from './RadiationIndicator.vue';
 import PowerStatus from './player-status/PowerStatus.vue';
@@ -17,7 +16,6 @@ export default defineComponent({
     EquippedWeapon,
     CoverIndicators,
     WeaponClipStatus,
-    EnergyBar,
     StatusEffect,
     RadiationIndicator,
     PowerStatus,
@@ -58,7 +56,6 @@ export default defineComponent({
 <template>
   <div class="player-status">
     <HealthBar :actor="game.player" />
-    <EnergyBar :actor="game.player" />
 
     <RadiationIndicator :rads="game.player.rads" />
 
