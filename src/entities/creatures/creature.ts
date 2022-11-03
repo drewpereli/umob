@@ -55,6 +55,7 @@ import { OcclusionVisualizer } from '@/status-effects/occlusion-visualizer';
 import { WearableSlot, type Wearable } from '@/wearables/wearable';
 import { TURN } from '@/utils/turn';
 import { HypnoticMirroring } from '@/status-effects/hypnotic-mirroring';
+import { generateId } from '@/utils/id';
 
 export type Covers = Record<Dir, Cover>;
 
@@ -870,6 +871,8 @@ export default abstract class Creature
   /* #endregion */
 
   /* #region  General State */
+  id = generateId();
+
   _health = this.maxHealth;
 
   get health() {

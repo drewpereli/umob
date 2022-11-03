@@ -1,5 +1,6 @@
 import type Creature from '@/entities/creatures/creature';
 import { useGame } from '@/stores/game';
+import type { Tile } from '@/tile';
 import type { Upgradeable } from '@/utils/types';
 
 export abstract class Power implements Upgradeable {
@@ -14,7 +15,7 @@ export abstract class Power implements Upgradeable {
 
   game = useGame();
 
-  abstract activate(): void;
+  abstract activate(tile?: Tile): void;
 
   get description(): string {
     return (this.constructor as typeof Power).description;
@@ -57,4 +58,8 @@ export abstract class Power implements Upgradeable {
   }
 
   abstract levelDescriptions: string[];
+
+  get ownerIsPlayer() {
+    return this.owner.id === 'PLAYER';
+  }
 }

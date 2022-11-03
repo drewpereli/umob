@@ -55,6 +55,10 @@ export abstract class TargetedPower extends Power {
   }
 
   get canActivate() {
-    return super.canActivate && this.tilesAimedAt().length > 0;
+    if (this.ownerIsPlayer) {
+      return super.canActivate && this.tilesAimedAt().length > 0;
+    } else {
+      return super.canActivate;
+    }
   }
 }

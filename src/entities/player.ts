@@ -22,6 +22,8 @@ export class Player extends Creature {
     super(tile);
   }
 
+  id = 'PLAYER';
+
   defaultChar = '@';
   color = 'yellow';
 

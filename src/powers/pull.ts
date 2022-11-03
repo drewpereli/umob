@@ -13,12 +13,18 @@ export class Pull extends TargetedPower {
   useTime = TURN;
 
   get canActivate() {
-    const closest = this.closestValidToSelected() as Tile;
-    return super.canActivate && closest.creatures.length > 0;
+    if (this.ownerIsPlayer) {
+      const closest = this.closestValidToSelected() as Tile;
+      return super.canActivate && closest.creatures.length > 0;
+    } else {
+      return super.canActivate;
+    }
   }
 
-  activate() {
-    const tile = this.closestValidToSelected() as Tile;
+  activate(t?: Tile) {
+    const tile = (
+      this.ownerIsPlayer ? this.closestValidToSelected() : t
+    ) as Tile;
 
     tile.creatures.forEach((creature) => {
       const line = bresenham(creature, this.owner).slice(1);
