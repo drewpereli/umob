@@ -16,6 +16,8 @@ export abstract class Gas extends Actor {
   abstract readonly name: string;
   abstract readonly color: string;
 
+  viscosity = 1;
+
   blocksMovement = false;
   blocksView = false;
   mass = 0;
@@ -39,7 +41,7 @@ export abstract class Gas extends Actor {
   }
 
   _maybeExpand() {
-    const expandChance = (0.5 * this.pressure) / 10;
+    const expandChance = (0.5 * this.pressure) / this.viscosity / 10;
 
     const willExpand = random.float() < expandChance;
 
@@ -75,4 +77,11 @@ export abstract class Gas extends Actor {
 export class Steam extends Gas {
   name = 'steam';
   color = 'rgba(255,255,255,0.4)';
+}
+
+export class Smoke extends Gas {
+  blocksView = true;
+  name = 'smoke';
+  color = 'rgba(50, 50, 50, 0.8)';
+  viscosity = 2;
 }
