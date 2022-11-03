@@ -634,7 +634,12 @@ export default abstract class Creature
           const flankingDir = flankingDirBetween(this, entity, entity.facing);
           const bonusMultiplier = entity.flankingDamageMultipliers[flankingDir];
 
-          damage += damage * weaponData.flankingBonus * bonusMultiplier;
+          // If the bonus multiplier is -Infinity, the entity is immune to damage from this direction
+          if (bonusMultiplier === -Infinity) {
+            damage = 0;
+          } else {
+            damage += damage * weaponData.flankingBonus * bonusMultiplier;
+          }
         }
 
         entity.receiveDamage(damage, weaponData.damageType);
