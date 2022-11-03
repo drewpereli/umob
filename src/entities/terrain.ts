@@ -1,12 +1,16 @@
 import { useGame } from '@/stores/game';
+import { useMap } from '@/stores/map';
 import type { Tile } from '@/tile';
 import { Cover, Dir } from '@/utils/map';
+import { TURN } from '@/utils/turn';
 import type { AsciiDrawable } from '@/utils/types';
+import { Actor } from './actor';
 import type { Centrifuge } from './centrifuge';
 import { Controller } from './controller/controller';
 import type { Damageable } from './damageable';
 import type { Interactable } from './interactable';
 import MapEntity, { EntityLayer } from './map-entity';
+import { DamageType } from './weapons/weapon';
 
 export type Terrain = MapEntity &
   AsciiDrawable & {
@@ -239,4 +243,103 @@ export class ElevatorDown extends MapEntity implements Terrain {
   readonly layer = EntityLayer.Terrain;
   cover = Cover.Half;
   moveTimeMultiplier = 1;
+}
+
+export class CondensedSteamGenerator extends Actor implements Terrain {
+  constructor(tile: Tile, public facing: Dir) {
+    super(tile);
+  }
+
+  type = 'fire-ball-turret';
+  char = '#';
+  color = 'red';
+  shouldRemoveFromGame = false;
+  blocksMovement = true;
+  moveTimeMultiplier = null;
+  penetrationBlock = 2;
+  blocksView = true;
+  mass = 2000;
+  cover = Cover.Full;
+
+  readonly layer = EntityLayer.Terrain;
+
+  get canAct() {
+    return this.timeUntilNextAction <= 0;
+  }
+
+  _act() {
+    const game = useGame();
+    const tile = game.map.adjacentTile(this.tile, this.facing);
+
+    if (!tile) return;
+
+    if (tile.gas || tile.terrain?.blocksMovement) {
+      return;
+    }
+
+    const steam = new CondensedSteam(tile, this.facing);
+
+    game.addMapEntity(steam);
+
+    this.timeUntilNextAction = 4 * TURN;
+  }
+}
+
+class CondensedSteam extends Actor implements AsciiDrawable {
+  constructor(tile: Tile, public facing: Dir) {
+    super(tile);
+  }
+
+  char = '*';
+  color = 'white';
+
+  blocksMovement = false;
+  blocksView = false;
+  layer = EntityLayer.Gas;
+  mass = 0;
+  shouldRemoveFromGame = false;
+
+  timeUntilNextAction = TURN;
+
+  get canAct() {
+    return this.timeUntilNextAction <= 0;
+  }
+
+  _act() {
+    if (this.tile.damageables.length) {
+      this.tile.damageables.forEach((d) =>
+        d.receiveDamage(10, DamageType.Heat)
+      );
+      this.markForRemoval();
+      return;
+    }
+
+    if (this.tile.hasEntityThatBlocksMovement) {
+      this.markForRemoval();
+      return;
+    }
+
+    const game = useGame();
+    const tile = game.map.adjacentTile(this.tile, this.facing);
+
+    if (!tile) {
+      this.markForRemoval();
+      return;
+    }
+
+    if (tile.damageables.length) {
+      tile.damageables.forEach((d) => d.receiveDamage(10, DamageType.Heat));
+      this.markForRemoval();
+      return;
+    }
+
+    if (tile.hasEntityThatBlocksMovement || tile.gas) {
+      this.markForRemoval();
+      return;
+    }
+
+    this.updatePosition(tile);
+
+    this.timeUntilNextAction = TURN;
+  }
 }

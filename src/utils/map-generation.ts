@@ -1,4 +1,9 @@
-import { Door, ElevatorDown, isDoor } from '@/entities/terrain';
+import {
+  CondensedSteamGenerator,
+  Door,
+  ElevatorDown,
+  isDoor,
+} from '@/entities/terrain';
 import { Lava, ToxicWaste } from '@/entities/fluid';
 import { Wall, HalfWall } from '@/entities/terrain';
 import { useGame } from '@/stores/game';
@@ -7,7 +12,7 @@ import { random } from './random';
 import { Centrifuge } from '@/entities/centrifuge';
 import { ItemInMap } from '@/entities/items/item-in-map';
 import { ShotGun } from '@/entities/weapons/gun';
-import { Dir } from './map';
+import { Dir, DIRS } from './map';
 import { CentrifugeTerminal } from '@/entities/controller/centrifuge-terminal';
 import { Tile } from '@/tile';
 import { useMap } from '@/stores/map';
@@ -132,9 +137,8 @@ export function generateTilesAndWalls(
 }
 
 export function addRooms(map: Map, rooms: Room[]) {
-  return;
   rooms.forEach((room) => {
-    const g = new RadPoolRoom(room, map);
+    const g = new CondensedSteamGeneratorRoom(room, map);
     g.generate();
   });
 }
@@ -575,6 +579,33 @@ abstract class RoomGenerator {
     });
   }
 
+  get nonCornerWallInfo(): Record<Dir, Tile[]> {
+    const top = this.map[this.room.y - 1].slice(
+      this.room.x,
+      this.room.x + this.room.w
+    );
+
+    const bottom = this.map[this.room.y + this.room.h].slice(
+      this.room.x,
+      this.room.x + this.room.w
+    );
+
+    const left = this.map
+      .slice(this.room.y, this.room.y + this.room.h)
+      .map((tiles) => tiles[this.room.x - 1]);
+
+    const right = this.map
+      .slice(this.room.y, this.room.y + this.room.h)
+      .map((tiles) => tiles[this.room.x + this.room.w]);
+
+    return {
+      [Dir.Up]: bottom.filter((t) => t.terrain instanceof Wall),
+      [Dir.Right]: left.filter((t) => t.terrain instanceof Wall),
+      [Dir.Down]: top.filter((t) => t.terrain instanceof Wall),
+      [Dir.Left]: right.filter((t) => t.terrain instanceof Wall),
+    };
+  }
+
   get game() {
     return useGame();
   }
@@ -640,3 +671,25 @@ class RadPoolRoom extends RoomGenerator {
     });
   }
 }
+
+class CondensedSteamGeneratorRoom extends RoomGenerator {
+  generate() {
+    const count = random.int(1, 5);
+
+    for (let i = 0; i < count; i++) {
+      const dir = random.arrayElement(DIRS);
+
+      const tiles = this.nonCornerWallInfo[dir];
+
+      const tile = random.arrayElement(tiles);
+
+      if (!tile) continue;
+
+      const g = new CondensedSteamGenerator(tile, dir);
+
+      this.game.addMapEntity(g);
+    }
+  }
+}
+
+const roomClasses = [CentrifugeRoom, RadPoolRoom, CondensedSteamGeneratorRoom];
