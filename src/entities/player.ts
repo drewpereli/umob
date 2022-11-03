@@ -43,7 +43,6 @@ export class Player extends Creature {
   equippedWeapon: Weapon = r;
 
   powers: Power[] = [
-    new Blink(this),
     new BuildCover(this),
     new CreateBlackHole(this),
     new Grenade(this),
