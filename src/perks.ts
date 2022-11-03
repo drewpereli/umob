@@ -26,14 +26,6 @@ const perksWithoutIds: Omit<Perk, 'id'>[] = [
     },
   },
   {
-    name: 'quick charge',
-    description: 'double energy recharge rate',
-    applyEffect(player: Player) {
-      player.baseEnergyRechargePerTick *= 2;
-      player.energy = player.maxEnergy;
-    },
-  },
-  {
     name: 'permanent targeting array',
     description: 'install a targeting array that gives you 100% accuracy',
     applyEffect(player: Player) {
