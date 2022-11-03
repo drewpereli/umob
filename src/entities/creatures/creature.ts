@@ -708,7 +708,14 @@ export default abstract class Creature
       if (this.mustReload) {
         this.reload();
       } else if (attackableEnemy) {
-        this.attackTile(attackableEnemy.tile);
+        const dirsBetweenThisAndEnemy = dirsBetween(this, attackableEnemy);
+        const isFacingEnemy = dirsBetweenThisAndEnemy.includes(this.facing);
+
+        if (isFacingEnemy) {
+          this.attackTile(attackableEnemy.tile);
+        } else {
+          this.turn(random.arrayElement(dirsBetweenThisAndEnemy));
+        }
       } else if (visibleEnemy) {
         this._moveTowards(visibleEnemy);
       }
