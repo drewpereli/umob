@@ -1,10 +1,11 @@
-import { TURN, useGame } from '@/stores/game';
+import { useGame } from '@/stores/game';
 import { useMap } from '@/stores/map';
 import type { Tile } from '@/tile';
 import bresenham from '@/utils/bresenham';
 import { coordsEqual } from '@/utils/map';
 import { angle, angularDifference, polarToCartesian } from '@/utils/math';
 import { random } from '@/utils/random';
+import { TURN } from '@/utils/turn';
 import type { AsciiDrawable } from '@/utils/types';
 import { Actor } from './actor';
 import { isDamageable } from './damageable';

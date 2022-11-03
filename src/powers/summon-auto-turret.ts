@@ -1,6 +1,6 @@
 import { AutoTurret } from '@/entities/creatures/auto-turret';
-import { TURN } from '@/stores/game';
 import type { Tile } from '@/tile';
+import { TURN } from '@/utils/turn';
 import { upgradeWithLevel } from '@/utils/types';
 import { TargetedPower } from './targeted-power';
 

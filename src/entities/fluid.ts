@@ -1,7 +1,8 @@
-import { TURN, useGame } from '@/stores/game';
+import { useGame } from '@/stores/game';
 import { useMap } from '@/stores/map';
 import type { Tile } from '@/tile';
 import { random } from '@/utils/random';
+import { TURN } from '@/utils/turn';
 import { Actor } from './actor';
 import {
   defaultBurn,

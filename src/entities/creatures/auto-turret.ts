@@ -1,4 +1,4 @@
-import { TURN } from '@/stores/game';
+import { TURN } from '@/utils/turn';
 import Gun from '../weapons/gun';
 import { DamageType } from '../weapons/weapon';
 import Creature, { Resistance } from './creature';

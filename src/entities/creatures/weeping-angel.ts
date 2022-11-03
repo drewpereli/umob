@@ -1,4 +1,4 @@
-import { TURN } from '@/stores/game';
+import { TURN } from '@/utils/turn';
 import Creature from './creature';
 
 export class WeepingAngel extends Creature {
@@ -11,7 +11,7 @@ export class WeepingAngel extends Creature {
 
   baseViewRange = 30;
 
-  viewAngle = 360;
+  baseViewAngle = 360;
 
   _act() {
     const playerVisibleTiles = this.game.visibleTiles;

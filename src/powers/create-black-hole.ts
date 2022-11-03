@@ -1,9 +1,10 @@
 import { Actor } from '@/entities/actor';
 import { EntityLayer } from '@/entities/map-entity';
-import { TURN, useGame } from '@/stores/game';
+import { useGame } from '@/stores/game';
 import type { Tile } from '@/tile';
 import { dirsBetween, distance } from '@/utils/map';
 import { random } from '@/utils/random';
+import { TURN } from '@/utils/turn';
 import { upgradeWithLevel } from '@/utils/types';
 import { TargetedPower } from './targeted-power';
 

@@ -1,7 +1,7 @@
 import { ExplosionAnimation } from '@/stores/animations';
-import { TURN } from '@/stores/game';
 import type { Tile } from '@/tile';
 import { createExplosion } from '@/utils/explosions';
+import { TURN } from '@/utils/turn';
 import { upgradeWithLevel } from '@/utils/types';
 import { TargetedPower } from './targeted-power';
 

@@ -3,7 +3,7 @@ import {
   KnockBackAnimation,
   useAnimations,
 } from '@/stores/animations';
-import { TURN, useGame } from '@/stores/game';
+import { useGame } from '@/stores/game';
 import type { Tile } from '@/tile';
 import {
   addPolarToCartesian,
@@ -53,6 +53,7 @@ import { Burning } from '@/status-effects/burning';
 import { defaultBurn, defaultStopBurning, type Flammable } from '../flammable';
 import { OcclusionVisualizer } from '@/status-effects/occlusion-visualizer';
 import { WearableSlot, type Wearable } from '@/wearables/wearable';
+import { TURN } from '@/utils/turn';
 
 export type Covers = Record<Dir, Cover>;
 

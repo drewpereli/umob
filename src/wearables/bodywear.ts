@@ -2,7 +2,7 @@ import type Creature from '@/entities/creatures/creature';
 import { Resistance } from '@/entities/creatures/creature';
 import { DamageType } from '@/entities/weapons/weapon';
 import { Burning } from '@/status-effects/burning';
-import { TURN } from '@/stores/game';
+import { TURN } from '@/utils/turn';
 import { Wearable, WearableSlot } from './wearable';
 
 export abstract class BodyWear extends Wearable {

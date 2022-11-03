@@ -1,8 +1,8 @@
 import { TargetedPower } from './targeted-power';
 import { ProximityMine } from '@/entities/traps/proximity-mine';
-import { TURN } from '@/stores/game';
 import type { Tile } from '@/tile';
 import { upgradeWithLevel } from '@/utils/types';
+import { TURN } from '@/utils/turn';
 
 export class CreateProximityMine extends TargetedPower {
   static powerName = 'create proximity mine';

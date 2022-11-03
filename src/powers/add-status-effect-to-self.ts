@@ -2,7 +2,7 @@ import type Creature from '@/entities/creatures/creature';
 import { OcclusionVisualizer } from '@/status-effects/occlusion-visualizer';
 import type { StatusEffect } from '@/status-effects/status-effect';
 import { TargetingArray } from '@/status-effects/targeting-array';
-import { TURN } from '@/stores/game';
+import { TURN } from '@/utils/turn';
 import { upgradeWithLevel } from '@/utils/types';
 import { NonTargetedPower } from './non-targeted-power';
 

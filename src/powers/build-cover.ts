@@ -1,5 +1,5 @@
 import { HalfWall } from '@/entities/terrain';
-import { TURN } from '@/stores/game';
+import { TURN } from '@/utils/turn';
 import { upgradeWithLevel } from '@/utils/types';
 import { TargetedPower } from './targeted-power';
 

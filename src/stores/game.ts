@@ -33,8 +33,6 @@ import { removeElement } from '@/utils/array';
 import { Tile } from '@/tile';
 import type { Usable } from '@/entities/items/usable';
 
-export const TURN = 4; // How many ticks make up a "turn"
-
 export const useGame = defineStore('game', {
   state: () => ({
     player: null as unknown as Player,

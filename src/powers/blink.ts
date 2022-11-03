@@ -1,7 +1,7 @@
 import { TargetedPower } from './targeted-power';
 import type { Tile } from '@/tile';
-import { TURN } from '@/stores/game';
 import { upgradeWithLevel } from '@/utils/types';
+import { TURN } from '@/utils/turn';
 
 export class Blink extends TargetedPower {
   static powerName = 'blink';

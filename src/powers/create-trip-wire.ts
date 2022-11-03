@@ -1,9 +1,10 @@
 import { TargetedPower } from './targeted-power';
 import { Orientation } from '@/entities/traps/trap';
-import { TURN, useGame } from '@/stores/game';
+import { useGame } from '@/stores/game';
 import { TripWire } from '@/entities/traps/tripwire';
 import type { Tile } from '@/tile';
 import { upgradeWithLevel } from '@/utils/types';
+import { TURN } from '@/utils/turn';
 
 export class CreateTripWire extends TargetedPower {
   static powerName = 'create tripwire';

@@ -1,6 +1,6 @@
 <script lang="ts">
 import type { Power } from '@/powers/power';
-import { TURN } from '@/stores/game';
+import { TURN } from '@/utils/turn';
 import { defineComponent, type PropType } from 'vue';
 
 export default defineComponent({

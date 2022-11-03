@@ -1,4 +1,4 @@
-import { TURN } from '@/stores/game';
+import { TURN } from '@/utils/turn';
 import { upgradeWithLevel } from '@/utils/types';
 import { NonTargetedPower } from './non-targeted-power';
 

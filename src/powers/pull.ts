@@ -1,8 +1,8 @@
 import { isTrap } from '@/entities/traps/trap';
-import { TURN } from '@/stores/game';
 import type { Tile } from '@/tile';
 import { last } from '@/utils/array';
 import bresenham from '@/utils/bresenham';
+import { TURN } from '@/utils/turn';
 import { upgradeWithLevel } from '@/utils/types';
 import { TargetedPower } from './targeted-power';
 
