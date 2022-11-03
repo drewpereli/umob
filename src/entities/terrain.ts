@@ -125,7 +125,10 @@ export class Door
   }
 
   color = '#e6c66e';
-  backgroundColor = '#9c7406';
+
+  get backgroundColor() {
+    return this.isLocked ? '#8D918D' : '#9c7406';
+  }
 
   readonly IMPLEMENTS_DAMAGEABLE = true;
   readonly IMPLEMENTS_INTERACTABLE = true;
