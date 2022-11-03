@@ -3,6 +3,7 @@ import { OcclusionVisualizer } from '@/status-effects/occlusion-visualizer';
 import type { StatusEffect } from '@/status-effects/status-effect';
 import { TargetingArray } from '@/status-effects/targeting-array';
 import { TURN } from '@/stores/game';
+import { upgradeWithLevel } from '@/utils/types';
 import { NonTargetedPower } from './non-targeted-power';
 
 export abstract class AddStatusEffectToSelf extends NonTargetedPower {
@@ -16,7 +17,6 @@ export abstract class AddStatusEffectToSelf extends NonTargetedPower {
 
   useTime = TURN;
   coolDown = 40 * TURN;
-  statusEffectMaxDuration = 20 * TURN;
 
   activate() {
     const effect = new this.statusEffect(
@@ -28,6 +28,17 @@ export abstract class AddStatusEffectToSelf extends NonTargetedPower {
 
     return true;
   }
+
+  maxUpgradeLevel = 3;
+
+  @upgradeWithLevel([10 * TURN, 20 * TURN, 30 * TURN])
+  declare statusEffectMaxDuration: number;
+
+  levelDescriptions = [
+    'Duration: 10 Turns',
+    'Duration: 20 Turns',
+    'Duration: 30 Turns',
+  ];
 }
 
 export class ActivateOcclusionVisualizer extends AddStatusEffectToSelf {

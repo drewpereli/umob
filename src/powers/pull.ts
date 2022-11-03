@@ -3,15 +3,14 @@ import { TURN } from '@/stores/game';
 import type { Tile } from '@/tile';
 import { last } from '@/utils/array';
 import bresenham from '@/utils/bresenham';
+import { upgradeWithLevel } from '@/utils/types';
 import { TargetedPower } from './targeted-power';
 
 export class Pull extends TargetedPower {
   static powerName = 'pull';
   static description = 'Pull the targeted creatures towards you';
   canTargetMovementBlocker = true;
-  coolDown = 5 * TURN;
   useTime = TURN;
-  range = 7;
 
   get canActivate() {
     const closest = this.closestValidToSelected() as Tile;
@@ -49,4 +48,15 @@ export class Pull extends TargetedPower {
       }
     });
   }
+
+  @upgradeWithLevel([5, 10, 15]) declare range: number;
+  @upgradeWithLevel([5 * TURN, 3 * TURN, 0]) declare coolDown: number;
+
+  levelDescriptions = [
+    'Range: 5. Cooldown: 5 Turns',
+    'Range: 10. Cooldown: 3 Turns',
+    'Range: 15. Cooldown: None',
+  ];
+
+  maxUpgradeLevel = 3;
 }

@@ -1,6 +1,7 @@
 import { AutoTurret } from '@/entities/creatures/auto-turret';
 import { TURN } from '@/stores/game';
 import type { Tile } from '@/tile';
+import { upgradeWithLevel } from '@/utils/types';
 import { TargetedPower } from './targeted-power';
 
 export class SummonAutoTurret extends TargetedPower {
@@ -18,6 +19,19 @@ export class SummonAutoTurret extends TargetedPower {
 
   activate() {
     const tile = this.closestValidToSelected() as Tile;
-    this.game.addMapEntity(new AutoTurret(tile, this.owner.alignment));
+    const turret = new AutoTurret(tile, this.owner.alignment);
+    turret.health = this.turretHealth;
+    turret.maxHealth = this.turretHealth;
+    this.game.addMapEntity(turret);
   }
+
+  @upgradeWithLevel([50, 100, 200]) declare turretHealth: number;
+
+  levelDescriptions = [
+    'Turret health: 50',
+    'Turret health: 100',
+    'Turret health: 200',
+  ];
+
+  maxUpgradeLevel = 3;
 }

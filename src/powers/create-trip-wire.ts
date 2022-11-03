@@ -3,13 +3,12 @@ import { Orientation } from '@/entities/traps/trap';
 import { TURN, useGame } from '@/stores/game';
 import { TripWire } from '@/entities/traps/tripwire';
 import type { Tile } from '@/tile';
+import { upgradeWithLevel } from '@/utils/types';
 
 export class CreateTripWire extends TargetedPower {
   static powerName = 'create tripwire';
   static description = 'Create a tripwire trap';
-  range = 5;
 
-  useTime = TURN;
   coolDown = 40 * TURN;
 
   canTargetMovementBlocker = true;
@@ -43,4 +42,11 @@ export class CreateTripWire extends TargetedPower {
         ? Orientation.Vertical
         : Orientation.Horizontal;
   }
+
+  levelDescriptions = ['Range: 5', 'Range: 10', 'Use time: Instant'];
+
+  @upgradeWithLevel([5, 10, 10]) declare range: number;
+  @upgradeWithLevel([TURN, TURN, 0]) declare useTime: number;
+
+  maxUpgradeLevel = 3;
 }

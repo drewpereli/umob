@@ -2,13 +2,12 @@ import { TargetedPower } from './targeted-power';
 import { ProximityMine } from '@/entities/traps/proximity-mine';
 import { TURN } from '@/stores/game';
 import type { Tile } from '@/tile';
+import { upgradeWithLevel } from '@/utils/types';
 
 export class CreateProximityMine extends TargetedPower {
   static powerName = 'create proximity mine';
   static description = 'Create a proximity mine at the targeted tile';
-  range = 5;
 
-  useTime = TURN;
   coolDown = 20 * TURN;
 
   canTargetMovementBlocker = true;
@@ -18,4 +17,11 @@ export class CreateProximityMine extends TargetedPower {
     const mine = new ProximityMine(tile);
     this.game.addMapEntity(mine);
   }
+
+  levelDescriptions = ['Range: 5', 'Range: 10', 'Use time: Instant'];
+
+  @upgradeWithLevel([5, 10, 10]) declare range: number;
+  @upgradeWithLevel([TURN, TURN, 0]) declare useTime: number;
+
+  maxUpgradeLevel = 3;
 }

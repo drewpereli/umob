@@ -1,7 +1,8 @@
 import type Creature from '@/entities/creatures/creature';
 import { useGame } from '@/stores/game';
+import type { Upgradeable } from '@/utils/types';
 
-export abstract class Power {
+export abstract class Power implements Upgradeable {
   constructor(public owner: Creature) {}
 
   static powerName: string;
@@ -41,4 +42,19 @@ export abstract class Power {
   countdownCoolDown(val: number) {
     this.timeUntilUse = Math.max(this.timeUntilUse - val, 0);
   }
+
+  currentUpgradeLevel = 1;
+  abstract maxUpgradeLevel: number;
+
+  get canUpgrade() {
+    return this.currentUpgradeLevel < this.maxUpgradeLevel;
+  }
+
+  upgrade() {
+    if (this.canUpgrade) {
+      this.currentUpgradeLevel++;
+    }
+  }
+
+  abstract levelDescriptions: string[];
 }

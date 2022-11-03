@@ -2,15 +2,14 @@ import { ExplosionAnimation } from '@/stores/animations';
 import { TURN } from '@/stores/game';
 import type { Tile } from '@/tile';
 import { createExplosion } from '@/utils/explosions';
+import { upgradeWithLevel } from '@/utils/types';
 import { TargetedPower } from './targeted-power';
 
 export class Grenade extends TargetedPower {
   static powerName = 'grenade';
   static description = 'Throw a grenade that explodes immediately';
-  useTime = 2 * TURN;
+  useTime = TURN;
   coolDown = 4 * TURN;
-  range = 8;
-  radius = 3;
 
   canTargetMovementBlocker = true;
 
@@ -25,7 +24,7 @@ export class Grenade extends TargetedPower {
   activate() {
     const tile = this.closestValidToSelected() as Tile;
 
-    createExplosion(tile, this.radius, 5);
+    createExplosion(tile, this.radius, this.damage);
 
     this.game.animations.addAnimation(
       new ExplosionAnimation(tile, this.radius)
@@ -33,4 +32,16 @@ export class Grenade extends TargetedPower {
 
     return true;
   }
+
+  maxUpgradeLevel = 3;
+
+  @upgradeWithLevel([3, 5, 10]) declare radius: number;
+  @upgradeWithLevel([8, 12, 20]) declare range: number;
+  @upgradeWithLevel([20, 30, 40]) declare damage: number;
+
+  levelDescriptions = [
+    'Radius: 3. Range: 8. Damage: 20',
+    'Radius: 5. Range: 12. Damage: 30',
+    'Radius: 10. Range: 20. Damage: 40',
+  ];
 }
