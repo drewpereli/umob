@@ -13,7 +13,7 @@ import { angleFromDir, type Dir } from '@/utils/map';
 import type { Perk } from '@/perks';
 import type { DamageType, Weapon } from './weapons/weapon';
 import type { Usable } from './items/usable';
-import { Blink } from '@/powers/blink';
+import { generateId } from '@/utils/id';
 
 const r = new Pipe();
 
@@ -156,4 +156,61 @@ export class Player extends Creature {
     throw new Error('Use game.visibleTiles');
     return [];
   }
+
+  move(tile: Tile) {
+    const oldTile = this.tile;
+
+    const success = super.move(tile);
+
+    if (success) {
+      this.movementsTaken.push({
+        id: generateId(),
+        type: 'move',
+        from: oldTile,
+        to: this.tile,
+      });
+    }
+
+    return success;
+  }
+
+  strafe(tile: Tile) {
+    const oldTile = this.tile;
+
+    const success = super.strafe(tile);
+
+    if (success) {
+      this.movementsTaken.push({
+        id: generateId(),
+        type: 'strafe',
+        from: oldTile,
+        to: this.tile,
+      });
+    }
+
+    return success;
+  }
+
+  turn(dir: Dir) {
+    const oldDir = this.facing;
+
+    const success = super.turn(dir);
+
+    if (success) {
+      this.movementsTaken.push({
+        id: generateId(),
+        type: 'turn',
+        from: oldDir,
+        to: this.facing,
+      });
+    }
+
+    return success;
+  }
+
+  movementsTaken: (
+    | { id: string; type: 'turn'; from: Dir; to: Dir }
+    | { id: string; type: 'move'; from: Tile; to: Tile }
+    | { id: string; type: 'strafe'; from: Tile; to: Tile }
+  )[] = [];
 }

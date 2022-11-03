@@ -54,6 +54,7 @@ import { defaultBurn, defaultStopBurning, type Flammable } from '../flammable';
 import { OcclusionVisualizer } from '@/status-effects/occlusion-visualizer';
 import { WearableSlot, type Wearable } from '@/wearables/wearable';
 import { TURN } from '@/utils/turn';
+import { HypnoticMirroring } from '@/status-effects/hypnotic-mirroring';
 
 export type Covers = Record<Dir, Cover>;
 
@@ -454,7 +455,7 @@ export default abstract class Creature
   // Pass the actual status effect class
   // i.e. hasStatusEffect(TargetingArray)
   hasStatusEffect(statusEffect: Function) {
-    return this.statusEffects.some((e) => e instanceof statusEffect);
+    return this.statusEffects.find((e) => e instanceof statusEffect);
   }
   /* #endregion */
 
@@ -779,12 +780,14 @@ export default abstract class Creature
   }
 
   move(tile: Tile) {
-    if (!this.canAct) return;
+    if (!this.canAct) return false;
 
     this.updatePosition(tile);
 
     this.timeUntilNextAction =
       this.moveTime * (tile.moveTimeMultiplier as number);
+
+    return true;
   }
 
   strafe(tile: Tile) {
@@ -794,6 +797,8 @@ export default abstract class Creature
 
     this.timeUntilNextAction =
       this.moveTime * (tile.moveTimeMultiplier as number) * 2;
+
+    return true;
   }
 
   turn(dir: Dir) {
@@ -802,6 +807,8 @@ export default abstract class Creature
     this.updateFacing(dir);
 
     this.timeUntilNextAction = this.turnTime;
+
+    return true;
   }
 
   reload() {
@@ -990,6 +997,25 @@ export default abstract class Creature
   }
 
   _act() {
+    const effect = this.hasStatusEffect(HypnoticMirroring) as
+      | HypnoticMirroring
+      | undefined;
+
+    if (effect) {
+      const lastPlayerMove = last(this.game.player.movementsTaken);
+
+      if (!lastPlayerMove) return;
+
+      // If we've already mirrored this move, return
+      if (effect.moveIdsMirrored.includes(lastPlayerMove.id)) return;
+
+      this._mirrorMove(lastPlayerMove);
+
+      effect.moveIdsMirrored.push(lastPlayerMove.id);
+
+      return;
+    }
+
     if (debugOptions.docileEnemies) return;
 
     if (debugOptions.wanderingEnemies) return this._wander();
@@ -997,6 +1023,28 @@ export default abstract class Creature
     this._updateAiStateIfNeeded();
 
     this._aiStateActions[this.aiState]();
+  }
+
+  _mirrorMove(move: typeof this['game']['player']['movementsTaken'][number]) {
+    if (move.type === 'turn') {
+      const dir = rotateDir(move.to, 2);
+
+      this.turn(dir);
+    } else if (move.type === 'move') {
+      const tile = this.game.map.adjacentTile(this, this.facing);
+
+      if (tile && this.game.creatureCanOccupy(tile)) {
+        this.move(tile);
+      }
+    } else {
+      const dir = rotateDir(dirsBetween(move.from, move.to)[0], 2);
+
+      const tile = this.game.map.adjacentTile(this, dir);
+
+      if (tile && this.game.creatureCanOccupy(tile)) {
+        this.strafe(tile);
+      }
+    }
   }
   /* #endregion */
 }
