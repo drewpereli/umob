@@ -34,9 +34,7 @@ export abstract class AddStatusEffectToOther extends TargetedPower {
     return closest;
   }
 
-  activate() {
-    const tile = this.closestValidToSelected() as Tile;
-
+  onActivate(tile: Tile) {
     tile.creatures.forEach((creature) => {
       const effect = new this.statusEffect(
         creature,

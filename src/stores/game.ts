@@ -349,7 +349,7 @@ export const useGame = defineStore('game', {
 
         this.actionUiState = ActionUiState.AimingPower;
       } else {
-        const activated = power.activateIfPossible();
+        const activated = power.playerActivateIfPossible();
 
         if (activated) {
           removeElement(this.player.inventory, usable);

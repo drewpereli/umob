@@ -8,7 +8,7 @@ export class Heal extends NonTargetedPower {
   useTime = 2 * TURN;
   coolDown = 20 * TURN;
 
-  activate() {
+  onActivate() {
     if (this.owner.health >= this.owner.maxHealth) return;
 
     this.owner.changeHealth(this.amount);

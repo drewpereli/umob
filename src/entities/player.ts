@@ -214,4 +214,20 @@ export class Player extends Creature {
     | { id: string; type: 'move'; from: Tile; to: Tile }
     | { id: string; type: 'strafe'; from: Tile; to: Tile }
   )[] = [];
+
+  selectedPower: Power | null = null;
+
+  useSelectedPower() {
+    if (!this.selectedPower) return;
+
+    if (this.selectedPower.playerActivateIfPossible()) {
+      this.timeUntilNextAction = this.selectedPower.useTime;
+      return true;
+    }
+  }
+
+  usePower() {
+    throw new Error('Don\'t call "usePower" on player. Use "useSelectedPower"');
+    return false;
+  }
 }

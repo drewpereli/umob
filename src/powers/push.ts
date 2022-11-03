@@ -15,9 +15,7 @@ export class Push extends TargetedPower {
     return super.canActivate && closest.creatures.length > 0;
   }
 
-  activate() {
-    const tile = this.closestValidToSelected() as Tile;
-
+  onActivate(tile: Tile) {
     tile.creatures.forEach((creature) => {
       creature.receiveKnockBack(0, this.amount, this.owner);
     });

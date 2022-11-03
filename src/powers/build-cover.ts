@@ -1,4 +1,5 @@
 import { HalfWall } from '@/entities/terrain';
+import type { Tile } from '@/tile';
 import { TURN } from '@/utils/turn';
 import { upgradeWithLevel } from '@/utils/types';
 import { TargetedPower } from './targeted-power';
@@ -10,9 +11,7 @@ export class BuildCover extends TargetedPower {
 
   canTargetMovementBlocker = false;
 
-  activate() {
-    const tile = this.tilesAimedAt()[0];
-
+  onActivate(tile: Tile) {
     this.game.addMapEntity(new HalfWall(tile));
   }
 

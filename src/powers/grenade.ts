@@ -21,9 +21,7 @@ export class Grenade extends TargetedPower {
     return this.game.map.tilesInRadius(closest, this.radius);
   }
 
-  activate() {
-    const tile = this.closestValidToSelected() as Tile;
-
+  onActivate(tile: Tile) {
     createExplosion(tile, this.radius, this.damage);
 
     this.game.animations.addAnimation(

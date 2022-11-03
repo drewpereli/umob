@@ -17,8 +17,7 @@ export class SummonAutoTurret extends TargetedPower {
 
   useTime = TURN;
 
-  activate() {
-    const tile = this.closestValidToSelected() as Tile;
+  onActivate(tile: Tile) {
     const turret = new AutoTurret(tile, this.owner.alignment);
     turret.health = this.turretHealth;
     turret.maxHealth = this.turretHealth;

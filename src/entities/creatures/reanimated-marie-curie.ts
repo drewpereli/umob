@@ -30,7 +30,7 @@ export class ReanimatedMarieCurie extends Creature {
           const activate = random.float() < 0.05;
 
           if (activate) {
-            pukeToxicWaste.activate();
+            this.usePower(pukeToxicWaste);
             return;
           }
         }
@@ -45,7 +45,7 @@ export class ReanimatedMarieCurie extends Creature {
             const activate = random.float() < 0.05;
 
             if (activate) {
-              pull.activate(this.game.player.tile);
+              this.usePower(pull, this.game.player.tile);
               return;
             }
           }
@@ -102,7 +102,7 @@ class PukeToxicWaste extends NonTargetedPower {
 
   coolDown = 30 * TURN;
 
-  activate() {
+  onActivate() {
     const tiles = [this.owner.tile, ...this.owner.tile.adjacentTiles].filter(
       (t) => !t.hasEntityThatBlocksMovement && !t.fluid
     );

@@ -11,8 +11,7 @@ export class Blink extends TargetedPower {
 
   canTargetMovementBlocker = false;
 
-  activate() {
-    const tile = this.closestValidToSelected() as Tile;
+  onActivate(tile: Tile) {
     this.owner.updatePosition(tile);
   }
 

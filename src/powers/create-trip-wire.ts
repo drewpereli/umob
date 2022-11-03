@@ -31,8 +31,7 @@ export class CreateTripWire extends TargetedPower {
     ).tiles;
   }
 
-  activate() {
-    const tile = this.closestValidToSelected() as Tile;
+  onActivate(tile: Tile) {
     const mine = new TripWire(tile, this.currentOrientation);
     this.game.addMapEntity(mine);
   }

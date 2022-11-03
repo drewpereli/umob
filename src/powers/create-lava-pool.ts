@@ -28,8 +28,7 @@ export class CreateLavaPool extends TargetedPower {
     return closest;
   }
 
-  activate() {
-    const tile = this.closestValidToSelected() as Tile;
+  onActivate(tile: Tile) {
     const pool = new Lava(tile, 7);
     this.game.addMapEntity(pool);
   }

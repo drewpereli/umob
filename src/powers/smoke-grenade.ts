@@ -14,9 +14,7 @@ export class SmokeGrenade extends TargetedPower {
 
   canTargetMovementBlocker = true;
 
-  activate() {
-    const tile = this.closestValidToSelected() as Tile;
-
+  onActivate(tile: Tile) {
     const smoke = new Smoke(tile, 7);
 
     this.game.addMapEntity(smoke);

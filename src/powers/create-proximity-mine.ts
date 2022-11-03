@@ -12,8 +12,7 @@ export class CreateProximityMine extends TargetedPower {
 
   canTargetMovementBlocker = true;
 
-  activate() {
-    const tile = this.closestValidToSelected() as Tile;
+  onActivate(tile: Tile) {
     const mine = new ProximityMine(tile);
     this.game.addMapEntity(mine);
   }

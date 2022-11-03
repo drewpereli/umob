@@ -23,9 +23,7 @@ export class CreateWaterPool extends TargetedPower {
     return closest;
   }
 
-  activate() {
-    const tile = this.closestValidToSelected() as Tile;
-
+  onActivate(tile: Tile) {
     const pool = new Water(tile, 7);
 
     this.game.addMapEntity(pool);

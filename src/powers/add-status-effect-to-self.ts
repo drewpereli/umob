@@ -18,7 +18,7 @@ export abstract class AddStatusEffectToSelf extends NonTargetedPower {
   useTime = TURN;
   coolDown = 40 * TURN;
 
-  activate() {
+  onActivate() {
     const effect = new this.statusEffect(
       this.owner,
       this.statusEffectMaxDuration

@@ -835,13 +835,14 @@ export default abstract class Creature
     }
   }
 
-  useSelectedPower() {
-    if (!this.selectedPower) return;
-
-    if (this.selectedPower.activateIfPossible()) {
-      this.timeUntilNextAction = this.selectedPower.useTime;
+  usePower(power: Power, tile?: Tile) {
+    if (power.canActivate) {
+      power.activate(tile);
+      this.timeUntilNextAction = power.useTime;
       return true;
     }
+
+    return false;
   }
 
   interact(entity: Interactable) {
@@ -902,7 +903,6 @@ export default abstract class Creature
   inventory: Item[] = [new Pipe()];
 
   powers: Power[] = [];
-  selectedPower: Power | null = null;
 
   get canAct() {
     return this.timeUntilNextAction === 0 && !this.isDead;

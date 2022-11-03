@@ -17,8 +17,7 @@ export class CreateBlackHole extends TargetedPower {
 
   canTargetMovementBlocker = false;
 
-  activate() {
-    const tile = this.closestValidToSelected() as Tile;
+  onActivate(tile: Tile) {
     this.game.addMapEntity(new BlackHole(tile, this.blackHoleLifespan));
   }
 

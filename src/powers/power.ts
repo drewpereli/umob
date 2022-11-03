@@ -15,7 +15,7 @@ export abstract class Power implements Upgradeable {
 
   game = useGame();
 
-  abstract activate(tile?: Tile): void;
+  abstract onActivate(tile?: Tile): void;
 
   get description(): string {
     return (this.constructor as typeof Power).description;
@@ -29,15 +29,23 @@ export abstract class Power implements Upgradeable {
     return this.timeUntilUse === 0;
   }
 
+  // Player only
   // Return true if activation successful
-  activateIfPossible() {
+  playerActivateIfPossible() {
     if (this.canActivate) {
       this.activate();
-      this.timeUntilUse = this.coolDown;
       return true;
     }
 
     return false;
+  }
+
+  // Call onActivate and set cooldown
+  // Player should not call this directly, only AI creatures.
+  // Player should use "playerActivateIfPossible"
+  activate(tile?: Tile) {
+    this.onActivate(tile);
+    this.timeUntilUse = this.coolDown;
   }
 
   countdownCoolDown(val: number) {

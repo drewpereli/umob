@@ -21,11 +21,7 @@ export class Pull extends TargetedPower {
     }
   }
 
-  activate(t?: Tile) {
-    const tile = (
-      this.ownerIsPlayer ? this.closestValidToSelected() : t
-    ) as Tile;
-
+  onActivate(tile: Tile) {
     tile.creatures.forEach((creature) => {
       const line = bresenham(creature, this.owner).slice(1);
 
