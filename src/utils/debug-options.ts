@@ -8,7 +8,7 @@ const activeOptions = {
   randomLavaInEmptyMap: 0,
   docileEnemies: false,
   wanderingEnemies: false,
-  extraEnemies: 5,
+  extraEnemies: 1,
   infiniteHealth: false,
   infiniteEnergy: false,
   infiniteAccuracy: false,

@@ -64,12 +64,6 @@ const dirChars: Record<Dir, string> = {
   [Dir.Left]: '←',
 };
 
-const flankingDirBonusMultipliers: Record<FlankingDir, number> = {
-  [FlankingDir.Front]: 0,
-  [FlankingDir.Side]: 1,
-  [FlankingDir.Back]: 2,
-};
-
 export enum CreatureAlignment {
   WithPlayer = 'with-layer',
   AgainstPlayer = 'against-player',
@@ -253,6 +247,13 @@ export default abstract class Creature
 
   baseArmor = 0;
 
+  // Multipliers when receiving flanking damage
+  baseFlankingDamageMultipliers: Record<FlankingDir, number> = {
+    [FlankingDir.Front]: 0,
+    [FlankingDir.Side]: 1,
+    [FlankingDir.Back]: 2,
+  };
+
   baseResistances: Partial<Record<DamageType, Resistance>> = {};
 
   resistanceMultiplierForDamageType(type: DamageType) {
@@ -355,6 +356,10 @@ export default abstract class Creature
       acc[dir] = this.coverInDirection(dir);
       return acc;
     }, {} as Record<Dir, Cover>);
+  }
+
+  get flankingDamageMultipliers() {
+    return this.baseFlankingDamageMultipliers;
   }
 
   coverInDirection(dir: Dir) {
@@ -627,7 +632,7 @@ export default abstract class Creature
 
         if (entity instanceof Creature && weaponData.flankingBonus) {
           const flankingDir = flankingDirBetween(this, entity, entity.facing);
-          const bonusMultiplier = flankingDirBonusMultipliers[flankingDir];
+          const bonusMultiplier = entity.flankingDamageMultipliers[flankingDir];
 
           damage += damage * weaponData.flankingBonus * bonusMultiplier;
         }
