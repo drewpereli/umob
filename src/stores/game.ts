@@ -29,7 +29,7 @@ import {
 } from '@/entities/weapons/gun';
 import { Rat } from '@/entities/creatures/rat';
 import { canInteractWithFrom, isInteractable } from '@/entities/interactable';
-import { removeElement } from '@/utils/array';
+import { removeElement, removeElementNoPreserveOrder } from '@/utils/array';
 import { Tile } from '@/tile';
 import type { Usable } from '@/entities/items/usable';
 
@@ -437,14 +437,17 @@ export const useGame = defineStore('game', {
         entity.tilesOccupied.forEach((t) => t.removeEntity(entity));
 
         if (entity instanceof Actor) {
-          removeElement(this.nonPlayerActors, entity);
+          removeElementNoPreserveOrder(this.nonPlayerActors, entity);
 
           if (isCreature(entity)) {
-            removeElement(this.creaturesByAlignment[entity.alignment], entity);
+            removeElementNoPreserveOrder(
+              this.creaturesByAlignment[entity.alignment],
+              entity
+            );
           }
         }
 
-        removeElement(this.mapEntities, entity);
+        removeElementNoPreserveOrder(this.mapEntities, entity);
       });
 
       this.entitiesToCull = [];

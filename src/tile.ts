@@ -7,7 +7,7 @@ import { type Gas, isGas } from './entities/gas';
 import { type ItemInMap, isItemInMap } from './entities/items/item-in-map';
 import type MapEntity from './entities/map-entity';
 import { isTerrain, type Terrain } from './entities/terrain';
-import { removeElement } from './utils/array';
+import { removeElementNoPreserveOrder } from './utils/array';
 import { isElectrocutable } from './utils/electricity';
 import { Cover } from './utils/map';
 
@@ -121,7 +121,7 @@ export class Tile {
   }
 
   removeEntity(e: MapEntity) {
-    removeElement(this.entities, e);
+    removeElementNoPreserveOrder(this.entities, e);
 
     // if (e === this.terrain) {
     //   this.terrain === undefined;
@@ -133,19 +133,19 @@ export class Tile {
     if (isGas(e)) this.gas = undefined;
 
     if (isItemInMap(e)) {
-      removeElement(this.items, e);
+      removeElementNoPreserveOrder(this.items, e);
     }
     if (isFlammable(e)) {
-      removeElement(this.flammables, e);
+      removeElementNoPreserveOrder(this.flammables, e);
     }
     if (isCreature(e)) {
-      removeElement(this.creatures, e);
+      removeElementNoPreserveOrder(this.creatures, e);
     }
     if (isDamageable(e)) {
-      removeElement(this.damageables, e);
+      removeElementNoPreserveOrder(this.damageables, e);
     }
     if (isElectrocutable(e)) {
-      removeElement(this.electrocutables, e);
+      removeElementNoPreserveOrder(this.electrocutables, e);
     }
 
     if (e.blocksMovement) {
