@@ -2,7 +2,7 @@ import type { Tile } from '@/tile';
 import Creature, { CreatureAlignment } from './creature';
 
 export class Rat extends Creature {
-  constructor(tile: Tile, alignment: CreatureAlignment) {
+  constructor(tile: Tile, alignment?: CreatureAlignment) {
     super(tile, alignment);
 
     this.unarmedAttackData = {

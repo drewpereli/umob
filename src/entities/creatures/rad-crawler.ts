@@ -7,7 +7,7 @@ import { DamageType } from '../weapons/weapon';
 import Creature, { AiState, CreatureAlignment, Resistance } from './creature';
 
 export class RadCrawler extends Creature {
-  constructor(tile: Tile, alignment: CreatureAlignment) {
+  constructor(tile: Tile, alignment?: CreatureAlignment) {
     super(tile, alignment);
 
     this.unarmedAttackData = {
