@@ -4,9 +4,23 @@ import { coordsEqual, distance, rotateDir } from '@/utils/map';
 import { random } from '@/utils/random';
 import { ToxicWaste } from '../fluid';
 import { DamageType } from '../weapons/weapon';
-import Creature, { AiState, Resistance } from './creature';
+import Creature, { AiState, CreatureAlignment, Resistance } from './creature';
 
 export class RadCrawler extends Creature {
+  constructor(tile: Tile, alignment: CreatureAlignment) {
+    super(tile, alignment);
+
+    this.unarmedAttackData = {
+      ...this.unarmedAttackData,
+      damage: 5,
+      accuracyBonus: Infinity,
+      attackTimeMultiplier: 1,
+      knockBack: 0,
+      flankingBonus: 0,
+      damageType: DamageType.Radiation,
+    };
+  }
+
   name = 'radCrawler';
   description =
     'Heals from radiation. Constantly loses health if not exposed to radiation.';
@@ -16,16 +30,6 @@ export class RadCrawler extends Creature {
 
   maxHealth = 20;
   _health = 20;
-
-  unarmedAttackData = {
-    ...super.unarmedAttackData,
-    damage: 5,
-    accuracyBonus: Infinity,
-    attackTimeMultiplier: 1,
-    knockBack: 0,
-    flankingBonus: 0,
-    damageType: DamageType.Radiation,
-  };
 
   baseResistances = {
     [DamageType.Radiation]: Resistance.Immune,
