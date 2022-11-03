@@ -18,14 +18,6 @@ const perksWithoutIds: Omit<Perk, 'id'>[] = [
     },
   },
   {
-    name: 'capacity boost',
-    description: 'increase energy by 50%',
-    applyEffect(player: Player) {
-      player.maxEnergy *= 1.5;
-      player.energy = player.maxEnergy;
-    },
-  },
-  {
     name: 'permanent targeting array',
     description: 'install a targeting array that gives you 100% accuracy',
     applyEffect(player: Player) {
