@@ -18,7 +18,11 @@ export function isFluid(entity: MapEntity): entity is Fluid {
 }
 
 export abstract class Fluid extends Actor {
-  constructor(tile: Tile, public pressure = 0) {
+  constructor(
+    tile: Tile,
+    public pressure = 0,
+    public lifeSpan: number | null = null
+  ) {
     super(tile);
   }
 
@@ -32,6 +36,8 @@ export abstract class Fluid extends Actor {
   shouldRemoveFromGame = false;
 
   reactedThisTick = false; // Whether this fluid has already reacted with another fluid this tick
+
+  timeAlive = 0;
 
   readonly layer: EntityLayer = EntityLayer.Fluid;
 
@@ -91,6 +97,11 @@ export abstract class Fluid extends Actor {
   tick() {
     super.tick();
     this.reactedThisTick = false;
+    this.timeAlive++;
+
+    if (this.lifeSpan !== null && this.timeAlive >= this.lifeSpan) {
+      this.markForRemoval();
+    }
   }
 
   // Returns fluids on adjacent tiles
