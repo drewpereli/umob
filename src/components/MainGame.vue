@@ -12,8 +12,8 @@ import InventoryMenu from './InventoryMenu.vue';
 import EntityDescription from './EntityDescription.vue';
 import { useAnimations } from '@/stores/animations';
 import PowersListMenu from './PowersListMenu.vue';
-import PerkMenu from './PerkMenu.vue';
 import GameMessages from './GameMessages.vue';
+import UpgradeMenu from './UpgradeMenu.vue';
 
 export default defineComponent({
   components: {
@@ -22,8 +22,8 @@ export default defineComponent({
     InventoryMenu,
     EntityDescription,
     PowersListMenu,
-    PerkMenu,
     GameMessages,
+    UpgradeMenu,
   },
   methods: {
     // Only will apply when this element is focused, i.e. when there's no menu being shown
@@ -113,7 +113,7 @@ export default defineComponent({
 
     <PowersListMenu v-if="showPowersList" class="menu" @close="closeMenu" />
 
-    <PerkMenu v-if="showPerksList" @close="closeMenu" />
+    <UpgradeMenu v-if="showPerksList" @close="closeMenu" />
   </div>
 </template>
 

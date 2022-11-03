@@ -19,8 +19,10 @@ export default defineComponent({
         const existingHotKey = this.player.hotKeyForPower(power);
 
         if (existingHotKey) {
-          label += ` (${existingHotKey})`;
+          label = `${existingHotKey}. ${label}`;
         }
+
+        label += ` (Lvl. ${power.currentUpgradeLevel})`;
 
         return {
           label,

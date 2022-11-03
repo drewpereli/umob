@@ -151,7 +151,6 @@ export class Player extends Creature {
   applyPerk(perk: Perk) {
     perk.applyEffect(this);
     this.appliedPerkIds.push(perk.id);
-    this.upgradePoints--;
   }
 
   hasPerk(perk: Perk) {

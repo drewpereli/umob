@@ -37,7 +37,7 @@ export default defineComponent({
         :style="{ width: `${coolDownPercentDone}%` }"
       />
 
-      <span>{{ power.name }}</span>
+      <span>{{ power.name }} (Lvl. {{ power.currentUpgradeLevel }})</span>
 
       <span v-if="turnsLeftOnCoolDown">({{ turnsLeftOnCoolDown }})</span>
     </div>
