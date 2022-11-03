@@ -105,8 +105,8 @@ export function generateTilesAndWalls(
       const left = map[y][x - 1];
 
       if (
-        up.terrain?.type === 'wall' &&
-        down.terrain?.type === 'wall' &&
+        up.terrain?.blocksMovement &&
+        down.terrain?.blocksMovement &&
         !left.terrain &&
         !right.terrain
       ) {
@@ -114,8 +114,8 @@ export function generateTilesAndWalls(
       }
 
       if (
-        left.terrain?.type === 'wall' &&
-        right.terrain?.type === 'wall' &&
+        left.terrain?.blocksMovement &&
+        right.terrain?.blocksMovement &&
         !up.terrain &&
         !down.terrain
       ) {
