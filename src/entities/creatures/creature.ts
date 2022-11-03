@@ -105,6 +105,12 @@ export default abstract class Creature
   }
 
   /* #region  Damageable */
+  receiveAttack(damage: number, type: DamageType, from: Creature) {
+    this.receiveDamage(damage, type);
+
+    this.lastSawEnemyAt = from.tile;
+  }
+
   receiveDamage(damage: number, type: DamageType) {
     damage *= this.resistanceMultiplierForDamageType(type);
 
@@ -642,7 +648,11 @@ export default abstract class Creature
           }
         }
 
-        entity.receiveDamage(damage, weaponData.damageType);
+        if (isCreature(entity)) {
+          entity.receiveAttack(damage, weaponData.damageType, this);
+        } else {
+          entity.receiveDamage(damage, weaponData.damageType);
+        }
 
         hit.push(entity);
       }
