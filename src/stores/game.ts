@@ -255,6 +255,27 @@ export const useGame = defineStore('game', {
 
       this._tickUntilPlayerCanAct();
     },
+    playerStrafe({ x, y }: { x?: number; y?: number }) {
+      const targetCoords: Coords = {
+        x: this.player.x + (x ?? 0),
+        y: this.player.y + (y ?? 0),
+      };
+
+      const targetTile = this.map.tileAt(targetCoords);
+
+      if (!targetTile) return;
+
+      if (!this.creatureCanOccupy(targetTile)) {
+        return;
+      }
+
+      this.player.strafe(targetTile);
+      this.enemies.forEach((actor) => actor.updateLastSawEnemy());
+
+      this.view.draw();
+
+      this._tickUntilPlayerCanAct();
+    },
     turnPlayer(dir: Dir) {
       this.player.turn(dir);
       this.view.draw();
