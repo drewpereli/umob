@@ -16,6 +16,9 @@ export default defineComponent({
   computed: {
     coolDownPercentDone() {
       const coolDown = this.power.coolDown;
+
+      if (coolDown === 0) return 100;
+
       const timeUntilUse = this.power.timeUntilUse;
 
       return Math.round((100 * (coolDown - timeUntilUse)) / coolDown);
