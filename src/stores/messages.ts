@@ -2,6 +2,7 @@ import type Creature from '@/entities/creatures/creature';
 import { isCreature } from '@/entities/creatures/creature';
 import type { Damageable } from '@/entities/damageable';
 import type { WeaponData } from '@/entities/weapons/weapon';
+import type { Power } from '@/powers/power';
 import { defineStore } from 'pinia';
 
 export interface GameMessage {
@@ -58,6 +59,12 @@ export function createAttackMessage(
   }
 
   const content = `${attacker.messageDescriptor} ${weaponData.attackActionMessageDescription} ${damageablesDescription} ${hitDescription}`;
+
+  return { content };
+}
+
+export function createUsePowerMessage(user: Creature, power: Power) {
+  const content = `${user.messageDescriptor} ${power.useMessageDescription}`;
 
   return { content };
 }

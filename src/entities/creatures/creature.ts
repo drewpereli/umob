@@ -48,7 +48,11 @@ import { Lava } from '../fluid';
 import { angle } from '@/utils/math';
 import bresenham from '@/utils/bresenham';
 import { last } from '@/utils/array';
-import { createAttackMessage } from '@/stores/messages';
+import {
+  createAttackMessage,
+  createUsePowerMessage,
+  useMessages,
+} from '@/stores/messages';
 import { Burning } from '@/status-effects/burning';
 import { defaultBurn, defaultStopBurning, type Flammable } from '../flammable';
 import { OcclusionVisualizer } from '@/status-effects/occlusion-visualizer';
@@ -846,6 +850,9 @@ export default abstract class Creature
     if (power.canActivate) {
       power.activate(tile);
       this.timeUntilNextAction = power.useTime;
+
+      useMessages().addMessage(createUsePowerMessage(this, power));
+
       return true;
     }
 

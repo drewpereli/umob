@@ -11,6 +11,10 @@ export abstract class Power implements Upgradeable {
   abstract useTime: number;
   abstract coolDown: number;
 
+  get useMessageDescription() {
+    return `used ${this.name}`;
+  }
+
   timeUntilUse = 0;
 
   game = useGame();
