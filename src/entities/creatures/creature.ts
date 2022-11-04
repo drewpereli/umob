@@ -122,7 +122,9 @@ export default abstract class Creature
 
     if (damage <= 0) return;
 
-    this.health = Math.max(this.health - damage, 0);
+    this.changeHealth(-damage);
+
+    this.setAiState(AiState.Searching);
 
     if (this.game.coordsVisible(this)) {
       const animation = new DamageAnimation(this);
@@ -751,7 +753,12 @@ export default abstract class Creature
         this._moveTowards(this.lastSawEnemyAt as Coords);
       }
     },
-    [AiState.Idle]: () => {},
+    [AiState.Idle]: () => {
+      if (this.timeSpentInAiState < 50 * TURN) {
+        this._wander();
+      }
+      // Else, do nothing
+    },
   };
 
   // Used for pathfinding.
@@ -895,7 +902,12 @@ export default abstract class Creature
   }
 
   changeHealth(amount: number) {
-    this.health = this.health + amount;
+    let val = this.health + amount;
+
+    val = Math.max(val, 0);
+    val = Math.min(val, this.maxHealth);
+
+    this.health = val;
   }
 
   facing: Dir = random.arrayElement([Dir.Up, Dir.Right, Dir.Down, Dir.Left]);
