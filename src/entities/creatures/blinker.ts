@@ -55,7 +55,7 @@ export class Blinker extends Creature {
 
     if (distanceTo > blink.range) return false;
 
-    blink.activate(tileBehindEnemy);
+    this.usePower(blink, tileBehindEnemy);
 
     return true;
   }
