@@ -4,6 +4,7 @@ import { Pull } from '@/powers/pull';
 import type { Tile } from '@/tile';
 import { tap } from '@/utils/general';
 import { distance } from '@/utils/map';
+import type { World } from '@/utils/map-generation';
 import { random } from '@/utils/random';
 import { TURN } from '@/utils/turn';
 import { ToxicWaste } from '../fluid';
@@ -92,6 +93,9 @@ export class ReanimatedMarieCurie extends Creature {
 
     return success;
   }
+
+  static worldRestrictions: World[] = ['radiation-lab'];
+  static boss = true;
 }
 
 class PukeToxicWaste extends NonTargetedPower {

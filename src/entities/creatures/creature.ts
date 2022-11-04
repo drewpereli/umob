@@ -23,11 +23,7 @@ import type { Power } from '@/powers/power';
 import { random } from '@/utils/random';
 import { Actor, actorCache } from '../actor';
 import { damageRoll, type Damageable } from '../damageable';
-import Gun, {
-  damageablesAimedAt,
-  tilesAimedAt,
-  weaponIsGun,
-} from '../weapons/gun';
+import Gun, { damageablesAimedAt, weaponIsGun } from '../weapons/gun';
 import type { AsciiDrawable } from '@/utils/types';
 import MapEntity, { EntityLayer } from '../map-entity';
 import type { StatusEffect } from '@/status-effects/status-effect';
@@ -60,6 +56,7 @@ import { WearableSlot, type Wearable } from '@/wearables/wearable';
 import { TURN } from '@/utils/turn';
 import { HypnoticMirroring } from '@/status-effects/hypnotic-mirroring';
 import { generateId } from '@/utils/id';
+import type { World } from '@/utils/map-generation';
 
 export type Covers = Record<Dir, Cover>;
 
@@ -1068,5 +1065,11 @@ export default abstract class Creature
       }
     }
   }
+  /* #endregion */
+
+  /* #region  World/level gen */
+  static worldRestrictions: World[] = [];
+  static genChance = 1;
+  static boss = false;
   /* #endregion */
 }

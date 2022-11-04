@@ -1,6 +1,7 @@
 import bresenham from '@/utils/bresenham';
 import {
   addElevatorDown,
+  addEnemies,
   addRooms,
   generateTilesAndWalls,
   type World,
@@ -125,6 +126,7 @@ export const useMap = defineStore('map', {
       this.tiles = map;
       addRooms(map, rooms, world);
       addElevatorDown();
+      addEnemies(world);
     },
   },
 });

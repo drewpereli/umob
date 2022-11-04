@@ -1,6 +1,7 @@
 import type { Tile } from '@/tile';
 import { minBy } from '@/utils/array';
 import { coordsEqual, distance, rotateDir } from '@/utils/map';
+import type { World } from '@/utils/map-generation';
 import { random } from '@/utils/random';
 import { ToxicWaste } from '../fluid';
 import { DamageType } from '../weapons/weapon';
@@ -128,4 +129,6 @@ export class RadCrawler extends Creature {
       return super._pathfindingValueForTile;
     }
   }
+
+  static worldRestrictions: World[] = ['radiation-lab'];
 }

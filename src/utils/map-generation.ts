@@ -17,6 +17,7 @@ import { Dir, DIRS } from './map';
 import { CentrifugeTerminal } from '@/entities/controller/centrifuge-terminal';
 import { Tile } from '@/tile';
 import { useMap } from '@/stores/map';
+import { allCreatures } from '@/entities/creatures/all-creatures';
 
 type Map = Tile[][];
 
@@ -167,6 +168,21 @@ export function addRooms(map: Map, rooms: Room[], world: World) {
 
     g.generate();
   });
+}
+
+export function addEnemies(world: World) {
+  // const map = useMap();
+  // const enemyCount = random.int(5, 10);
+  // const creaturesForWorld = allCreatures.filter((creature) => {
+  //   return (
+  //     (creature.worldRestrictions.length === 0 ||
+  //       creature.worldRestrictions.includes(world)) &&
+  //     !creature.boss
+  //   );
+  // });
+  // const creatureGenWeights = creaturesForWorld.map((g) => g.genChance);
+  // for (let i = 0; i < enemyCount; i++) {}
+  // return;
 }
 
 function generateEmpty(width: number, height: number): Map {

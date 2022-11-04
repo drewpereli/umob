@@ -3,6 +3,7 @@ import { useMap } from '@/stores/map';
 import type { Tile } from '@/tile';
 import { tap } from '@/utils/general';
 import { distance, rotateDir } from '@/utils/map';
+import type { World } from '@/utils/map-generation';
 import { Scalpel } from '../weapons/melee-weapon';
 import Creature, { AiState, CreatureAlignment } from './creature';
 
@@ -59,6 +60,8 @@ export class Blinker extends Creature {
 
     return true;
   }
+
+  static worldRestrictions: World[] = ['radiation-lab'];
 }
 
 function tileBehind(creature: Creature): Tile | undefined {
