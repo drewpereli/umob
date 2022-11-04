@@ -16,9 +16,9 @@ export class Heal extends NonTargetedPower {
     return true;
   }
 
-  @upgradeWithLevel([10, 20, 30]) declare amount: number;
+  @upgradeWithLevel([20, 40, 60]) declare amount: number;
 
-  levelDescriptions = ['Heal amount: 10', 'Heal amount: 20', 'Heal amount: 30'];
+  levelDescriptions = ['Heal amount: 20', 'Heal amount: 40', 'Heal amount: 60'];
 
   maxUpgradeLevel = 3;
 }
