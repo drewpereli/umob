@@ -120,7 +120,7 @@ export const actionHandlers: Partial<
       game.playerWait();
     },
     d: (game) => game.toggleDirectionViewMode(),
-    '>': (game) => {
+    '>+Shift': (game) => {
       const playerTile = game.player.tile;
 
       if (playerTile.terrain instanceof ElevatorDown) {
