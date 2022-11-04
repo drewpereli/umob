@@ -9,7 +9,6 @@ import { debugOptions } from '@/utils/debug-options';
 import { PermissiveFov } from 'permissive-fov';
 import { defineStore } from 'pinia';
 import { useAnimations } from './animations';
-import { useMap } from './map';
 import {
   coordsEqual,
   coordsInViewCone,
@@ -32,6 +31,8 @@ import { canInteractWithFrom, isInteractable } from '@/entities/interactable';
 import { removeElement, removeElementNoPreserveOrder } from '@/utils/array';
 import { Tile } from '@/tile';
 import type { Usable } from '@/entities/items/usable';
+import { useMap } from './map';
+import { allCreatures } from '@/entities/creatures/all-creatures';
 
 export const useGame = defineStore('game', {
   state: () => ({
@@ -189,7 +190,7 @@ export const useGame = defineStore('game', {
   },
   actions: {
     initialize() {
-      this.map.generate('radiation-lab');
+      this.map.generate('radiation-lab', allCreatures);
 
       const fov = new PermissiveFov(
         this.map.width,
@@ -379,7 +380,7 @@ export const useGame = defineStore('game', {
 
       this.selectedTile = null;
 
-      this.map.generate('radiation-lab');
+      this.map.generate('radiation-lab', allCreatures);
 
       const tile = this.map.randomFloorTile();
 

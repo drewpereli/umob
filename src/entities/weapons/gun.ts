@@ -44,7 +44,7 @@ export default abstract class Gun extends Weapon {
 
 export class ShotGun extends Gun {
   name = 'shotgun';
-  damage = 10;
+  damage = 40;
   spread = 20;
   range = 10;
   attackTimeMultiplier = 4;
@@ -56,9 +56,9 @@ export class ShotGun extends Gun {
 
 export class Pistol extends Gun {
   name = 'pistol';
-  damage = 5;
+  damage = 10;
   range = 5;
-  attackTimeMultiplier = 4;
+  attackTimeMultiplier = 1;
   clipSize = 16;
   amoLoaded = 16;
   description = 'Not a lot of damage';

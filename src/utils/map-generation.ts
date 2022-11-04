@@ -17,7 +17,7 @@ import { Dir, DIRS } from './map';
 import { CentrifugeTerminal } from '@/entities/controller/centrifuge-terminal';
 import { Tile } from '@/tile';
 import { useMap } from '@/stores/map';
-import { allCreatures } from '@/entities/creatures/all-creatures';
+import type Creature from '@/entities/creatures/creature';
 
 type Map = Tile[][];
 
@@ -170,19 +170,48 @@ export function addRooms(map: Map, rooms: Room[], world: World) {
   });
 }
 
-export function addEnemies(world: World) {
-  // const map = useMap();
-  // const enemyCount = random.int(5, 10);
-  // const creaturesForWorld = allCreatures.filter((creature) => {
-  //   return (
-  //     (creature.worldRestrictions.length === 0 ||
-  //       creature.worldRestrictions.includes(world)) &&
-  //     !creature.boss
-  //   );
-  // });
-  // const creatureGenWeights = creaturesForWorld.map((g) => g.genChance);
-  // for (let i = 0; i < enemyCount; i++) {}
-  // return;
+export function addEnemies(world: World, creatureClasses: typeof Creature[]) {
+  const game = useGame();
+  const map = useMap();
+
+  const enemyGroupCount = random.int(5, 10);
+
+  const creaturesForWorld = creatureClasses.filter((creature) => {
+    return (
+      (creature.worldRestrictions.length === 0 ||
+        creature.worldRestrictions.includes(world)) &&
+      !creature.boss
+    );
+  });
+
+  const creatureGenWeights = creaturesForWorld.map((g) => g.genChance);
+
+  for (let i = 0; i < enemyGroupCount; i++) {
+    const creatureClass = random.weightedArrayElement(
+      creatureClasses,
+      creatureGenWeights
+    );
+
+    const count = creatureClass.groupSize
+      ? random.int(creatureClass.groupSize[0], creatureClass.groupSize[1] + 1)
+      : 1;
+
+    const tile = map.randomFloorTile();
+
+    const tiles = breadthFirstFloodFill(
+      tile,
+      (t) => game.creatureCanOccupy(t),
+      count
+    );
+
+    tiles.forEach((t) => {
+      // @ts-ignore
+      const creature = new creatureClass(t);
+      game.addMapEntity(creature);
+    });
+  }
+
+  return;
 }
 
 function generateEmpty(width: number, height: number): Map {
@@ -846,3 +875,24 @@ const roomGenerators = [
   RadSpitterButtonRoom,
   AutoRadSpitterRoom,
 ];
+
+function breadthFirstFloodFill(
+  start: Tile,
+  tileValid: (tile: Tile) => boolean,
+  maxCount = Infinity
+) {
+  const inspected: Tile[] = [];
+  const toInsect: Tile[] = [start];
+
+  while (toInsect.length && inspected.length < maxCount) {
+    const tile = toInsect.shift() as Tile;
+
+    if (!tileValid(tile)) continue;
+
+    inspected.push(tile);
+
+    toInsect.push(...tile.adjacentTiles.filter(tileValid));
+  }
+
+  return inspected;
+}

@@ -15,4 +15,6 @@ export class Rat extends Creature {
   mass = 1;
   defaultChar = 'r';
   color = 'white';
+
+  static readonly groupSize: [number, number] = [3, 8];
 }

@@ -1068,8 +1068,9 @@ export default abstract class Creature
   /* #endregion */
 
   /* #region  World/level gen */
-  static worldRestrictions: World[] = [];
-  static genChance = 1;
-  static boss = false;
+  static readonly worldRestrictions: World[] = [];
+  static readonly genChance = 1;
+  static readonly groupSize: null | [number, number] = null;
+  static readonly boss = false;
   /* #endregion */
 }

@@ -12,6 +12,7 @@ import { random } from '@/utils/random';
 import { astar, Graph } from '@/utils/astar';
 import { distance, Dir } from '@/utils/map';
 import { Tile } from '@/tile';
+import type Creature from '@/entities/creatures/creature';
 
 export const useMap = defineStore('map', {
   state: () => ({
@@ -121,12 +122,12 @@ export const useMap = defineStore('map', {
     },
   },
   actions: {
-    generate(world: World) {
+    generate(world: World, creatureClasses: typeof Creature[]) {
       const { map, rooms } = generateTilesAndWalls(this.width, this.height);
       this.tiles = map;
       addRooms(map, rooms, world);
       addElevatorDown();
-      addEnemies(world);
+      addEnemies(world, creatureClasses);
     },
   },
 });
