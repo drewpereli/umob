@@ -3,6 +3,9 @@ import {
   Door,
   ElevatorDown,
   isDoor,
+  RadSpitter,
+  RadSpitterButtonWall,
+  Ruble,
 } from '@/entities/terrain';
 import { Lava, ToxicWaste } from '@/entities/fluid';
 import { Wall, HalfWall } from '@/entities/terrain';
@@ -10,14 +13,22 @@ import { useGame } from '@/stores/game';
 import { debugOptions } from './debug-options';
 import { random } from './random';
 import { Centrifuge } from '@/entities/centrifuge';
-import { ItemInMap } from '@/entities/items/item-in-map';
-import { ShotGun } from '@/entities/weapons/gun';
 import { Dir, DIRS } from './map';
 import { CentrifugeTerminal } from '@/entities/controller/centrifuge-terminal';
 import { Tile } from '@/tile';
 import { useMap } from '@/stores/map';
 
 type Map = Tile[][];
+
+const WORLDS = [
+  'radiation-lab',
+  'refinery',
+  'zoo',
+  'psych-lab',
+  'physics-lab',
+] as const;
+
+export type World = typeof WORLDS[number];
 
 export function generateTilesAndWalls(
   width: number,
@@ -136,14 +147,29 @@ export function generateTilesAndWalls(
   return { map, rooms };
 }
 
-export function addRooms(map: Map, rooms: Room[]) {
+export function addRooms(map: Map, rooms: Room[], world: World) {
+  const roomGeneratorsForWorld = roomGenerators.filter((gen) => {
+    return (
+      gen.worldRestrictions.length === 0 ||
+      gen.worldRestrictions.includes(world)
+    );
+  });
+
+  const roomGenWeights = roomGeneratorsForWorld.map((g) => g.genChance);
+
   rooms.forEach((room) => {
-    const g = new CondensedSteamGeneratorRoom(room, map);
+    const roomGen = random.weightedArrayElement(
+      roomGeneratorsForWorld,
+      roomGenWeights
+    );
+
+    const g = new roomGen(room, map);
+
     g.generate();
   });
 }
 
-export function generateEmpty(width: number, height: number): Map {
+function generateEmpty(width: number, height: number): Map {
   const game = useGame();
 
   return Array.from({ length: height }).map((_, y) => {
@@ -171,7 +197,7 @@ export function generateEmpty(width: number, height: number): Map {
   });
 }
 
-export function setAdjacentTiles(map: Map) {
+function setAdjacentTiles(map: Map) {
   map.forEach((row, y) => {
     row.forEach((tile, x) => {
       const adjacent: Tile[] = [
@@ -532,12 +558,17 @@ abstract class RoomGenerator {
   constructor(public room: Room, public map: Map) {
     this.w = this.room.w;
     this.h = this.room.h;
+    this.area = this.w * this.h;
   }
 
   w;
   h;
+  area;
 
   abstract generate(): void;
+
+  static worldRestrictions: World[] = [];
+  static genChance = 1;
 
   get tiles(): Tile[][] {
     return this.map.slice(this.room.y, this.room.y + this.room.h).map((row) => {
@@ -612,6 +643,9 @@ abstract class RoomGenerator {
 }
 
 class CentrifugeRoom extends RoomGenerator {
+  static worldRestrictions: World[] = ['radiation-lab', 'physics-lab'];
+  static genChance = 0.1;
+
   generate() {
     const minDimension = Math.min(this.room.w, this.room.h);
 
@@ -644,7 +678,7 @@ class CentrifugeRoom extends RoomGenerator {
 
     const controller = new CentrifugeTerminal(
       corner.tile,
-      centrifuge,
+      [centrifuge],
       terminalFacing
     );
 
@@ -653,9 +687,12 @@ class CentrifugeRoom extends RoomGenerator {
 }
 
 class RadPoolRoom extends RoomGenerator {
+  static worldRestrictions: World[] = ['radiation-lab'];
+  static genChance = 0.1;
+
   generate() {
-    const tileCount = random.int(1, 4);
-    const tiles = random.arrayElements(this.tilesFlat, tileCount);
+    const countMax = Math.max(Math.round(this.area / 80), 1);
+    const tileCount = random.int(1, countMax + 1);
 
     Array.from({ length: tileCount }).forEach(() => {
       const tilesWithoutFluid = this.tilesFlat.filter((tile) => !tile.fluid);
@@ -673,8 +710,11 @@ class RadPoolRoom extends RoomGenerator {
 }
 
 class CondensedSteamGeneratorRoom extends RoomGenerator {
+  static genChance = 0.1;
+
   generate() {
-    const count = random.int(1, 5);
+    const countMax = Math.max(Math.round(this.area / 80), 1);
+    const count = random.int(1, countMax + 1);
 
     for (let i = 0; i < count; i++) {
       const dir = random.arrayElement(DIRS);
@@ -692,4 +732,70 @@ class CondensedSteamGeneratorRoom extends RoomGenerator {
   }
 }
 
-const roomClasses = [CentrifugeRoom, RadPoolRoom, CondensedSteamGeneratorRoom];
+class RoomWithRuble extends RoomGenerator {
+  static genChance = 0.3;
+
+  generate() {
+    const rubleCount = random.int(2, Math.round(this.area / 10) + 2);
+
+    for (let i = 0; i < rubleCount; i++) {
+      const floorTiles = this.tilesFlat.filter((t) => !t.terrain);
+
+      const tile = random.arrayElement(floorTiles);
+
+      const ruble = new Ruble(tile);
+
+      useGame().addMapEntity(ruble);
+    }
+  }
+}
+
+class RadSpitterRoom extends RoomGenerator {
+  static worldRestrictions: World[] = ['radiation-lab'];
+  static genChance = 0.1;
+
+  generate() {
+    const countMax = Math.max(Math.round(this.area / 40), 1);
+    const count = random.int(1, countMax + 1);
+
+    const spitters: RadSpitter[] = [];
+
+    for (let i = 0; i < count; i++) {
+      const dir = random.arrayElement(DIRS);
+
+      const tiles = this.nonCornerWallInfo[dir];
+
+      const tile = random.arrayElement(tiles);
+
+      if (!tile) continue;
+
+      this.game.immediatelyRemoveMapEntity(tile.terrain as Wall);
+
+      const g = new RadSpitter(tile, dir);
+
+      this.game.addMapEntity(g);
+
+      spitters.push(g);
+    }
+
+    const dir = random.arrayElement(DIRS);
+
+    const tiles = this.nonCornerWallInfo[dir];
+
+    const tile = random.arrayElement(tiles);
+
+    this.game.immediatelyRemoveMapEntity(tile.terrain as Wall);
+
+    const buttonWall = new RadSpitterButtonWall(tile, spitters, dir);
+
+    useGame().addMapEntity(buttonWall);
+  }
+}
+
+const roomGenerators = [
+  CentrifugeRoom,
+  RadPoolRoom,
+  CondensedSteamGeneratorRoom,
+  RoomWithRuble,
+  RadSpitterRoom,
+];

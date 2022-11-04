@@ -3,10 +3,10 @@ import { Terminal } from './terminal';
 
 export class CentrifugeTerminal extends Terminal<Centrifuge> {
   onInteract() {
-    this.controls.toggleOnOff();
+    this.controls.forEach((c) => c.toggleOnOff());
   }
 
   onDestroy() {
-    this.controls.turnOff();
+    this.controls.forEach((c) => c.turnOff());
   }
 }

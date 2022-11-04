@@ -189,7 +189,7 @@ export const useGame = defineStore('game', {
   },
   actions: {
     initialize() {
-      this.map.generate();
+      this.map.generate('radiation-lab');
 
       const fov = new PermissiveFov(
         this.map.width,
@@ -379,7 +379,7 @@ export const useGame = defineStore('game', {
 
       this.selectedTile = null;
 
-      this.map.generate();
+      this.map.generate('radiation-lab');
 
       const tile = this.map.randomFloorTile();
 
@@ -451,6 +451,22 @@ export const useGame = defineStore('game', {
       });
 
       this.entitiesToCull = [];
+    },
+    immediatelyRemoveMapEntity(entity: MapEntity) {
+      entity.tilesOccupied.forEach((t) => t.removeEntity(entity));
+
+      if (entity instanceof Actor) {
+        removeElement(this.nonPlayerActors, entity);
+
+        if (isCreature(entity)) {
+          removeElementNoPreserveOrder(
+            this.creaturesByAlignment[entity.alignment],
+            entity
+          );
+        }
+      }
+
+      removeElementNoPreserveOrder(this.mapEntities, entity);
     },
     addPlayer(player: Player, setTilesOccupied = false) {
       if (setTilesOccupied) {

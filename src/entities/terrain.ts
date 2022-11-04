@@ -2,12 +2,14 @@ import { useGame } from '@/stores/game';
 import { useMap } from '@/stores/map';
 import type { Tile } from '@/tile';
 import { Cover, Dir } from '@/utils/map';
+import { random } from '@/utils/random';
 import { TURN } from '@/utils/turn';
 import type { AsciiDrawable } from '@/utils/types';
 import { Actor } from './actor';
 import type { Centrifuge } from './centrifuge';
 import { Controller } from './controller/controller';
 import type { Damageable } from './damageable';
+import { ToxicWaste } from './fluid';
 import type { Interactable } from './interactable';
 import MapEntity, { EntityLayer } from './map-entity';
 import { DamageType } from './weapons/weapon';
@@ -24,9 +26,9 @@ export type Terrain = MapEntity &
   };
 
 export class Wall extends MapEntity implements Terrain {
-  type = 'destructible-wall';
-  char = '#';
-  color = 'white';
+  type = 'wall';
+  char = '▇';
+  color = '#666';
   shouldRemoveFromGame = false;
   blocksMovement = true;
   moveTimeMultiplier = null;
@@ -39,7 +41,7 @@ export class Wall extends MapEntity implements Terrain {
 
 export class DestructibleWall extends MapEntity implements Terrain, Damageable {
   type = 'destructible-wall';
-  char = '#';
+  char = '▇';
   color = 'white';
   shouldRemoveFromGame = false;
   blocksMovement = true;
@@ -70,7 +72,7 @@ export class DestructibleWall extends MapEntity implements Terrain, Damageable {
 
 export class HalfWall extends MapEntity implements Terrain {
   type = 'half-wall';
-  char = '▄';
+  char = '▟';
   blocksView = false;
   blocksMovement = false;
   moveTimeMultiplier = 2;
@@ -185,13 +187,13 @@ export abstract class ButtonWall<T extends MapEntity>
   extends Controller<T>
   implements Terrain, Damageable, Interactable
 {
-  constructor(tile: Tile, public controls: T, public facing: Dir) {
+  constructor(tile: Tile, controls: T[], public facing: Dir) {
     super(tile, controls);
     this.interactableFromDir = facing;
   }
 
   type = 'wall-with-button';
-  char = '#';
+  char = '▇';
   color = 'white';
   shouldRemoveFromGame = false;
   blocksMovement = true;
@@ -227,18 +229,19 @@ export abstract class ButtonWall<T extends MapEntity>
 
 export class CentrifugeButtonWall extends ButtonWall<Centrifuge> {
   onInteract() {
-    this.controls.toggleOnOff();
+    this.controls.forEach((c) => c.toggleOnOff());
   }
 
   onDestroy() {
-    this.controls.turnOff();
+    this.controls.forEach((c) => c.turnOff());
   }
 }
 
 export class ElevatorDown extends MapEntity implements Terrain {
   type = 'elevator-down';
   char = '>';
-  color = 'purple';
+  color = 'magenta';
+  backgroundColor = 'purple';
   blocksView = false;
   blocksMovement = false;
   mass = Infinity;
@@ -344,5 +347,67 @@ class CondensedSteam extends Actor implements AsciiDrawable {
     this.updatePosition(tile);
 
     this.timeUntilNextAction = TURN;
+  }
+}
+
+export class Ruble extends MapEntity implements Terrain {
+  type = 'ruble';
+  char = '▓';
+  blocksView = false;
+  blocksMovement = false;
+  moveTimeMultiplier = 4;
+  color = 'gray';
+  cover = Cover.Half;
+  mass = 1000;
+  shouldRemoveFromGame = false;
+  readonly layer = EntityLayer.Terrain;
+}
+
+export class Fence extends MapEntity implements Terrain {
+  type = 'fence';
+  char = '〿';
+  blocksView = false;
+  blocksMovement = true;
+  moveTimeMultiplier = null;
+  color = 'gray';
+  cover = Cover.None;
+  mass = 1000;
+  shouldRemoveFromGame = false;
+  readonly layer = EntityLayer.Terrain;
+}
+
+export class RadSpitter extends MapEntity implements Terrain {
+  constructor(tile: Tile, public facing: Dir) {
+    super(tile);
+  }
+
+  type = 'rad-spitter';
+  char = '◙';
+  color = '#32CD32';
+  blocksMovement = true;
+  moveTimeMultiplier = null;
+  blocksView = true;
+  cover = Cover.Full;
+  mass = 2000;
+  shouldRemoveFromGame = false;
+
+  readonly layer = EntityLayer.Terrain;
+
+  spit() {
+    const spitTo = useMap().adjacentTile(this.tile, this.facing);
+
+    if (!spitTo || spitTo.fluid || spitTo.terrain?.blocksMovement) return;
+
+    const turns = random.int(15, 25) * TURN;
+
+    const toxicWaste = new ToxicWaste(spitTo, 7, turns);
+
+    useGame().addMapEntity(toxicWaste);
+  }
+}
+
+export class RadSpitterButtonWall extends ButtonWall<RadSpitter> {
+  onInteract() {
+    this.controls.forEach((c) => c.spit());
   }
 }

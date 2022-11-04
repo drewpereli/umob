@@ -3,6 +3,7 @@ import {
   addElevatorDown,
   addRooms,
   generateTilesAndWalls,
+  type World,
 } from '@/utils/map-generation';
 import { defineStore } from 'pinia';
 import { debugOptions } from '@/utils/debug-options';
@@ -119,10 +120,10 @@ export const useMap = defineStore('map', {
     },
   },
   actions: {
-    generate() {
+    generate(world: World) {
       const { map, rooms } = generateTilesAndWalls(this.width, this.height);
       this.tiles = map;
-      addRooms(map, rooms);
+      addRooms(map, rooms, world);
       addElevatorDown();
     },
   },

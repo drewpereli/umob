@@ -11,7 +11,7 @@ export abstract class Terminal<T extends MapEntity>
   extends Controller<T>
   implements Interactable, Damageable, AsciiDrawable
 {
-  constructor(tile: Tile, public controls: T, public facing: Dir) {
+  constructor(tile: Tile, public controls: T[], public facing: Dir) {
     super(tile, controls);
     this.interactableFromDir = facing;
   }

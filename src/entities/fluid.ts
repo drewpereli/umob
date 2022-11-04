@@ -70,14 +70,18 @@ export abstract class Fluid extends Actor {
     const adjacentTiles = game.map.adjacentTiles(this);
 
     const candidates = adjacentTiles.filter((tile) => {
-      return !tile.terrain && !tile.fluid;
+      return !tile.terrain?.blocksMovement && !tile.fluid;
     });
 
     const growTo = random.arrayElement(candidates);
 
     if (growTo) {
       // @ts-ignore
-      const pool: Fluid = new this.constructor(growTo, this.pressure - 1);
+      const pool: Fluid = new this.constructor(
+        growTo,
+        this.pressure - 1,
+        this.lifeSpan
+      );
       useGame().addMapEntity(pool);
     }
 

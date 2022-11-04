@@ -3,17 +3,21 @@ import type { Door } from '../terrain';
 
 export class DoorTerminal extends Terminal<Door> {
   onInteract() {
-    if (this.controls.isOpen) {
-      if (this.controls.canClose) {
-        this.controls.close();
+    this.controls.forEach((door) => {
+      if (door.isOpen) {
+        if (door.canClose) {
+          door.close();
+        }
+      } else {
+        door.unlock();
+        door.open();
       }
-    } else {
-      this.controls.unlock();
-      this.controls.open();
-    }
+    });
   }
 
   onDestroy() {
-    this.controls.open();
+    this.controls.forEach((door) => {
+      door.open();
+    });
   }
 }

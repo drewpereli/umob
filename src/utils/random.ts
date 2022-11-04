@@ -16,4 +16,20 @@ export const random = {
   polarity() {
     return rand.bool() ? 1 : -1;
   },
+  weightedArrayElement<T>(arr: T[], weights: number[]): T {
+    const weightsSum = weights.reduce((acc, v) => acc + v, 0);
+
+    const randVal = this.float(0, weightsSum);
+
+    let currSum = 0;
+
+    for (const [i, val] of arr.entries()) {
+      const weight = weights[i];
+      currSum += weight;
+
+      if (currSum > randVal) return val;
+    }
+
+    throw new Error('This function is broken');
+  },
 };
