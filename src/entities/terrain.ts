@@ -376,8 +376,8 @@ export class Fence extends MapEntity implements Terrain {
   readonly layer = EntityLayer.Terrain;
 }
 
-export class RadSpitter extends MapEntity implements Terrain {
-  constructor(tile: Tile, public facing: Dir) {
+export class RadSpitter extends Actor implements Terrain {
+  constructor(tile: Tile, public facing: Dir, public actAutomatically = true) {
     super(tile);
   }
 
@@ -393,16 +393,26 @@ export class RadSpitter extends MapEntity implements Terrain {
 
   readonly layer = EntityLayer.Terrain;
 
+  get canAct() {
+    return this.actAutomatically && this.timeUntilNextAction <= 0;
+  }
+
+  _act() {
+    this.spit();
+  }
+
   spit() {
     const spitTo = useMap().adjacentTile(this.tile, this.facing);
 
     if (!spitTo || spitTo.fluid || spitTo.terrain?.blocksMovement) return;
 
-    const turns = random.int(15, 25) * TURN;
+    const turns = this.actAutomatically ? random.int(3, 6) : random.int(15, 25);
 
-    const toxicWaste = new ToxicWaste(spitTo, 7, turns);
+    const toxicWaste = new ToxicWaste(spitTo, 7, turns * TURN);
 
     useGame().addMapEntity(toxicWaste);
+
+    this.timeUntilNextAction = random.int(20, 30) * TURN;
   }
 }
 

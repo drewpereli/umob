@@ -568,7 +568,7 @@ abstract class RoomGenerator {
   abstract generate(): void;
 
   static worldRestrictions: World[] = [];
-  static genChance = 1;
+  static genChance: number;
 
   get tiles(): Tile[][] {
     return this.map.slice(this.room.y, this.room.y + this.room.h).map((row) => {
@@ -750,7 +750,49 @@ class RoomWithRuble extends RoomGenerator {
   }
 }
 
-class RadSpitterRoom extends RoomGenerator {
+class RadSpitterButtonRoom extends RoomGenerator {
+  static worldRestrictions: World[] = ['radiation-lab'];
+  static genChance = 0.1;
+
+  generate() {
+    const countMax = Math.max(Math.round(this.area / 40), 1);
+    const count = random.int(1, countMax + 1);
+
+    const spitters: RadSpitter[] = [];
+
+    for (let i = 0; i < count; i++) {
+      const dir = random.arrayElement(DIRS);
+
+      const tiles = this.nonCornerWallInfo[dir];
+
+      const tile = random.arrayElement(tiles);
+
+      if (!tile) continue;
+
+      this.game.immediatelyRemoveMapEntity(tile.terrain as Wall);
+
+      const g = new RadSpitter(tile, dir, false);
+
+      this.game.addMapEntity(g);
+
+      spitters.push(g);
+    }
+
+    const dir = random.arrayElement(DIRS);
+
+    const tiles = this.nonCornerWallInfo[dir];
+
+    const tile = random.arrayElement(tiles);
+
+    this.game.immediatelyRemoveMapEntity(tile.terrain as Wall);
+
+    const buttonWall = new RadSpitterButtonWall(tile, spitters, dir);
+
+    useGame().addMapEntity(buttonWall);
+  }
+}
+
+class AutoRadSpitterRoom extends RoomGenerator {
   static worldRestrictions: World[] = ['radiation-lab'];
   static genChance = 0.1;
 
@@ -777,18 +819,6 @@ class RadSpitterRoom extends RoomGenerator {
 
       spitters.push(g);
     }
-
-    const dir = random.arrayElement(DIRS);
-
-    const tiles = this.nonCornerWallInfo[dir];
-
-    const tile = random.arrayElement(tiles);
-
-    this.game.immediatelyRemoveMapEntity(tile.terrain as Wall);
-
-    const buttonWall = new RadSpitterButtonWall(tile, spitters, dir);
-
-    useGame().addMapEntity(buttonWall);
   }
 }
 
@@ -797,5 +827,6 @@ const roomGenerators = [
   RadPoolRoom,
   CondensedSteamGeneratorRoom,
   RoomWithRuble,
-  RadSpitterRoom,
+  RadSpitterButtonRoom,
+  AutoRadSpitterRoom,
 ];
