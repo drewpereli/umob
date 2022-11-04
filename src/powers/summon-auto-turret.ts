@@ -33,4 +33,8 @@ export class SummonAutoTurret extends TargetedPower {
   ];
 
   maxUpgradeLevel = 3;
+
+  get useMessageDescription() {
+    return 'summoned an auto-turret';
+  }
 }

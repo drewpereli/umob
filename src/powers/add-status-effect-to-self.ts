@@ -47,6 +47,10 @@ export class ActivateOcclusionVisualizer extends AddStatusEffectToSelf {
     'Activates a network of nanobots that feeds you a 360° view of everything around you.';
 
   statusEffect = OcclusionVisualizer;
+
+  get useMessageDescription() {
+    return 'activated an occlusion visualizer';
+  }
 }
 
 export class ActivateTargetingArray extends AddStatusEffectToSelf {
@@ -56,4 +60,8 @@ export class ActivateTargetingArray extends AddStatusEffectToSelf {
   useTime = 0;
   coolDown = 50 * TURN;
   statusEffect = TargetingArray;
+
+  get useMessageDescription() {
+    return 'activated a targeting array';
+  }
 }

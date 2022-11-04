@@ -42,4 +42,8 @@ export class Grenade extends TargetedPower {
     'Radius: 5. Range: 12. Damage: 30',
     'Radius: 10. Range: 20. Damage: 40',
   ];
+
+  get useMessageDescription() {
+    return 'threw a grenade';
+  }
 }

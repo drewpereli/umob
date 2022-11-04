@@ -32,4 +32,8 @@ export class SmokeGrenade extends TargetedPower {
     'Range: 12. Cooldown: 15',
     'Range: 20. Cooldown: 10',
   ];
+
+  get useMessageDescription() {
+    return 'threw a smoke grenade';
+  }
 }

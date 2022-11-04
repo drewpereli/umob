@@ -43,4 +43,8 @@ export class CreateLavaPool extends TargetedPower {
 
   @upgradeWithLevel([5, 10, 15]) declare range: number;
   @upgradeWithLevel([40 * TURN, 30 * TURN, 20 * TURN]) declare coolDown: number;
+
+  get useMessageDescription() {
+    return 'activated a targeting array';
+  }
 }

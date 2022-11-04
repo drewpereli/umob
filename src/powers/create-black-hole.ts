@@ -33,6 +33,10 @@ export class CreateBlackHole extends TargetedPower {
   declare blackHoleLifespan: number;
 
   @upgradeWithLevel([50 * TURN, 30 * TURN, 10 * TURN]) declare coolDown: number;
+
+  get useMessageDescription() {
+    return 'created a black hole';
+  }
 }
 
 export class BlackHole extends Actor {

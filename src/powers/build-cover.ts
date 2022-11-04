@@ -26,4 +26,8 @@ export class BuildCover extends TargetedPower {
   @upgradeWithLevel([30 * TURN, 20 * TURN, 10 * TURN]) declare coolDown: number;
 
   @upgradeWithLevel([5 * TURN, 3 * TURN, TURN]) declare useTime: number;
+
+  get useMessageDescription() {
+    return 'built some cover';
+  }
 }

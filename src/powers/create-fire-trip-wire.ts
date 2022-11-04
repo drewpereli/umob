@@ -12,4 +12,8 @@ export class CreateFireTripWire extends CreateTripWire {
 
     return true;
   }
+
+  get useMessageDescription() {
+    return 'laid a fire tripwire trap';
+  }
 }

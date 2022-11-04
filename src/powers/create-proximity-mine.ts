@@ -23,4 +23,8 @@ export class CreateProximityMine extends TargetedPower {
   @upgradeWithLevel([TURN, TURN, 0]) declare useTime: number;
 
   maxUpgradeLevel = 3;
+
+  get useMessageDescription() {
+    return 'laid a proximity mine';
+  }
 }
