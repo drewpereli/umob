@@ -3,8 +3,8 @@ import type { Tile } from '@/tile';
 import { useMessages } from '@/stores/messages';
 
 export enum EntityLayer {
-  Terrain = 'terrain',
   Fluid = 'fluid',
+  Terrain = 'terrain',
   Object = 'object',
   Item = 'item',
   Creature = 'creature',
