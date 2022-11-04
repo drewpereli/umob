@@ -76,11 +76,12 @@ export abstract class Fluid extends Actor {
     const growTo = random.arrayElement(candidates);
 
     if (growTo) {
+      const lifeSpan = this.lifeSpan === null ? null : this.lifeSpan - 1;
       // @ts-ignore
       const pool: Fluid = new this.constructor(
         growTo,
         this.pressure - 1,
-        this.lifeSpan
+        lifeSpan
       );
       useGame().addMapEntity(pool);
     }
