@@ -10,7 +10,7 @@ import {
   defaultStopBurning,
   type Flammable,
 } from './flammable';
-import { Steam } from './gas';
+import { RadioactiveSmoke, Steam } from './gas';
 import MapEntity, { EntityLayer } from './map-entity';
 
 export function isFluid(entity: MapEntity): entity is Fluid {
@@ -198,6 +198,8 @@ function reactFluids(a: Fluid, b: Fluid) {
 
   if (names.includes('water') && names.includes('lava')) {
     fluids.forEach((f) => {
+      if (f.tile.gas) return;
+
       f.reactedThisTick = true;
       f.markForRemoval();
 
@@ -216,9 +218,26 @@ function reactFluids(a: Fluid, b: Fluid) {
 
     oil.stopBurning();
 
+    if (oil.tile.gas) return;
+
     const steam = new Steam(oil.tile, Math.round(oil.pressure / 2));
 
     game.addMapEntity(steam);
+
+    return;
+  }
+
+  if (names.includes('toxic-waste') && names.includes('lava')) {
+    fluids.forEach((f) => {
+      if (f.tile.gas) return;
+
+      f.reactedThisTick = true;
+      f.markForRemoval();
+
+      const steam = new RadioactiveSmoke(f.tile, f.pressure);
+
+      game.addMapEntity(steam);
+    });
 
     return;
   }

@@ -85,3 +85,20 @@ export class Smoke extends Gas {
   color = 'rgba(50, 50, 50, 0.8)';
   viscosity = 2;
 }
+
+export class RadioactiveSmoke extends Gas {
+  blocksView = true;
+  name = 'radioactive-smoke';
+  color = 'rgba(50, 100, 50, 0.8)';
+  viscosity = 2;
+
+  _act() {
+    this.tile.creatures.forEach((creature) => {
+      if (random.float() < 0.3) {
+        creature.receiveRadiation(1);
+      }
+    });
+
+    super._act();
+  }
+}
