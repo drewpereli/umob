@@ -207,7 +207,7 @@ export function addEnemies(world: World, creatureClasses: typeof Creature[]) {
   const game = useGame();
   const map = useMap();
 
-  const enemyGroupCount = random.int(5, 10);
+  const enemyGroupCount = random.int(5, 7);
 
   const creaturesForWorld = creatureClasses.filter((creature) => {
     return (
@@ -323,7 +323,7 @@ function generateLevel(
   mapSize: Coords,
   maxRooms = 8,
   minRoomSize = 8,
-  maxRoomSize = 20
+  maxRoomSize = 15
 ) {
   // create empty grid of walls (1 == wall)
   const ret: number[][] = [];
