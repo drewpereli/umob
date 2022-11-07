@@ -8,6 +8,17 @@ import { itemIsWeapon } from '@/entities/weapons/weapon';
 import { itemIsUsable } from '@/entities/items/usable';
 import { TargetedPower } from '@/powers/targeted-power';
 import { itemIsWearable } from '@/wearables/wearable';
+import { groupBy } from '@/utils/array';
+import type { Player } from '@/entities/player';
+
+function itemGroupHasEquippedItem(items: Item[], player: Player) {
+  return items.some((item) => {
+    return (
+      item === player.equippedWeapon ||
+      (itemIsWearable(item) && player.equippedWearablesArray.includes(item))
+    );
+  });
+}
 
 export default defineComponent({
   setup() {
@@ -17,13 +28,20 @@ export default defineComponent({
   components: { UiMenu, WeaponStats },
   computed: {
     items(): MenuItem<Item>[] {
-      return this.player.inventory.map((item) => {
-        const isEquipped =
-          item === this.player.equippedWeapon ||
-          (itemIsWearable(item) &&
-            this.player.equippedWearablesArray.includes(item));
+      const inventory = this.player.inventory;
 
-        const label = isEquipped ? `* ${item.name}` : `${item.name}`;
+      const groupedInventory = groupBy(inventory, 'name');
+
+      return groupedInventory.map((items) => {
+        const isEquipped = itemGroupHasEquippedItem(items, this.player);
+
+        const item = items[0];
+
+        let label = isEquipped ? `* ${item.name}` : `${item.name}`;
+
+        if (items.length > 1) {
+          label += ` (${items.length})`;
+        }
 
         return {
           label,

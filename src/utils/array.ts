@@ -29,3 +29,9 @@ export function minBy<T>(arr: T[], by: (item: T) => number): T {
 export function last<T>(arr: T[]): T {
   return arr[arr.length - 1];
 }
+
+export function groupBy<T>(arr: T[], prop: keyof T): T[][] {
+  const map = new Map(Array.from(arr, (obj) => [obj[prop], []]));
+  arr.forEach((obj) => (map.get(obj[prop]) as T[]).push(obj));
+  return Array.from(map.values());
+}
