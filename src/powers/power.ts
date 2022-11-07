@@ -8,6 +8,9 @@ export abstract class Power implements Upgradeable {
 
   static powerName: string;
   static description: string;
+
+  static foundInUsables = true;
+
   abstract useTime: number;
   abstract coolDown: number;
 

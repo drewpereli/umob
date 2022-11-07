@@ -17,7 +17,7 @@ export class Usable extends Item {
   name: string;
   description: string;
   char = '🜛';
-  color = 'purple';
+  color = 'magenta';
 
   use(creature: Creature) {
     const power = new this.power(creature);

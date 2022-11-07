@@ -1,15 +1,17 @@
-const debugMode = true;
+const debugMode = false;
 
 const activeOptions = {
-  emptyMap: true,
-  smallMap: true,
+  emptyMap: false,
+  smallMap: false,
   randomWallsInEmptyMap: 0,
   randomHalfWallsInEmptyMap: 0,
   randomLavaInEmptyMap: 0,
   docileEnemies: false,
   wanderingEnemies: false,
-  extraEnemies: 1,
-  infiniteHealth: false,
+  extraEnemies: 0,
+  noEnemies: false,
+  noItems: true,
+  infiniteHealth: true,
   infiniteEnergy: false,
   infiniteAccuracy: false,
   infiniteViewRange: true,

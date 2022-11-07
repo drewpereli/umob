@@ -15,6 +15,7 @@ import { distance, Dir } from '@/utils/map';
 import { Tile } from '@/tile';
 import type Creature from '@/entities/creatures/creature';
 import type { findableItems } from '@/entities/items/findable-items';
+import type { allPowers } from '@/powers/all-powers';
 
 export const useMap = defineStore('map', {
   state: () => ({
@@ -127,14 +128,21 @@ export const useMap = defineStore('map', {
     generate(
       world: World,
       creatureClasses: typeof Creature[],
-      items: typeof findableItems
+      items: typeof findableItems,
+      powers: typeof allPowers
     ) {
       const { map, rooms } = generateTilesAndWalls(this.width, this.height);
       this.tiles = map;
       addRooms(map, rooms, world);
       addElevatorDown();
-      addItems(items);
-      addEnemies(world, creatureClasses);
+
+      if (!debugOptions.noItems) {
+        addItems(items, powers);
+      }
+
+      if (!debugOptions.noEnemies) {
+        addEnemies(world, creatureClasses);
+      }
     },
   },
 });

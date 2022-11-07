@@ -34,6 +34,8 @@ import type { Usable } from '@/entities/items/usable';
 import { useMap } from './map';
 import { allCreatures } from '@/entities/creatures/all-creatures';
 import { findableItems } from '@/entities/items/findable-items';
+import { allPowers } from '@/powers/all-powers';
+import { ToxicWaste } from '@/entities/fluid';
 
 export const useGame = defineStore('game', {
   state: () => ({
@@ -191,7 +193,12 @@ export const useGame = defineStore('game', {
   },
   actions: {
     initialize() {
-      this.map.generate('radiation-lab', allCreatures, findableItems);
+      this.map.generate(
+        'radiation-lab',
+        allCreatures,
+        findableItems,
+        allPowers
+      );
 
       const fov = new PermissiveFov(
         this.map.width,
@@ -381,7 +388,12 @@ export const useGame = defineStore('game', {
 
       this.selectedTile = null;
 
-      this.map.generate('radiation-lab', allCreatures, findableItems);
+      this.map.generate(
+        'radiation-lab',
+        allCreatures,
+        findableItems,
+        allPowers
+      );
 
       const tile = this.map.randomFloorTile();
 

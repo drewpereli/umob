@@ -20,6 +20,8 @@ import { useMap } from '@/stores/map';
 import type Creature from '@/entities/creatures/creature';
 import { ItemInMap } from '@/entities/items/item-in-map';
 import type { findableItems } from '@/entities/items/findable-items';
+import type { allPowers } from '@/powers/all-powers';
+import { Usable } from '@/entities/items/usable';
 
 type Map = Tile[][];
 
@@ -172,14 +174,26 @@ export function addRooms(map: Map, rooms: Room[], world: World) {
   });
 }
 
-export function addItems(items: typeof findableItems) {
+export function addItems(
+  items: typeof findableItems,
+  powers: typeof allPowers
+) {
   const itemCount = random.int(5, 10);
 
   for (let i = 0; i < itemCount; i++) {
-    const itemCategory = items.randValue();
-    const itemClass = random.arrayElement(itemCategory);
-    // @ts-ignore
-    const item = new itemClass();
+    let item;
+
+    if (random.bool()) {
+      const itemCategory = items.randValue();
+      const itemClass = random.arrayElement(itemCategory);
+      // @ts-ignore
+      item = new itemClass();
+    } else {
+      const powerClass = random.arrayElement(
+        powers.filter((p) => p.foundInUsables)
+      );
+      item = new Usable(powerClass);
+    }
 
     const tile = useMap().randomFloorTile();
 
