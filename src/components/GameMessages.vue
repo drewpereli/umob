@@ -28,6 +28,7 @@ export default defineComponent({
 .game-messages
   width 300px
   border 1px solid gray
+  z-index -1
 
 .message
   padding 0.25rem 0.5rem
