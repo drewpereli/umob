@@ -4,7 +4,7 @@ export const random = {
   int: rand.int,
   float: rand.float,
   bool: rand.bool,
-  arrayElement<T>(arr: T[]): T {
+  arrayElement<T>(arr: T[] | readonly T[]): T {
     return arr[rand.int(0, arr.length - 1)];
   },
   arrayElements<T>(arr: T[], length: number): T[] {

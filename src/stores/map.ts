@@ -2,6 +2,7 @@ import bresenham from '@/utils/bresenham';
 import {
   addElevatorDown,
   addEnemies,
+  addItems,
   addRooms,
   generateTilesAndWalls,
   type World,
@@ -13,6 +14,7 @@ import { astar, Graph } from '@/utils/astar';
 import { distance, Dir } from '@/utils/map';
 import { Tile } from '@/tile';
 import type Creature from '@/entities/creatures/creature';
+import type { findableItems } from '@/entities/items/findable-items';
 
 export const useMap = defineStore('map', {
   state: () => ({
@@ -122,11 +124,16 @@ export const useMap = defineStore('map', {
     },
   },
   actions: {
-    generate(world: World, creatureClasses: typeof Creature[]) {
+    generate(
+      world: World,
+      creatureClasses: typeof Creature[],
+      items: typeof findableItems
+    ) {
       const { map, rooms } = generateTilesAndWalls(this.width, this.height);
       this.tiles = map;
       addRooms(map, rooms, world);
       addElevatorDown();
+      addItems(items);
       addEnemies(world, creatureClasses);
     },
   },

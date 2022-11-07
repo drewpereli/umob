@@ -18,6 +18,8 @@ import { CentrifugeTerminal } from '@/entities/controller/centrifuge-terminal';
 import { Tile } from '@/tile';
 import { useMap } from '@/stores/map';
 import type Creature from '@/entities/creatures/creature';
+import { ItemInMap } from '@/entities/items/item-in-map';
+import type { findableItems } from '@/entities/items/findable-items';
 
 type Map = Tile[][];
 
@@ -168,6 +170,23 @@ export function addRooms(map: Map, rooms: Room[], world: World) {
 
     g.generate();
   });
+}
+
+export function addItems(items: typeof findableItems) {
+  const itemCount = random.int(5, 10);
+
+  for (let i = 0; i < itemCount; i++) {
+    const itemCategory = items.randValue();
+    const itemClass = random.arrayElement(itemCategory);
+    // @ts-ignore
+    const item = new itemClass();
+
+    const tile = useMap().randomFloorTile();
+
+    const itemInMap = new ItemInMap(tile, item);
+
+    useGame().addMapEntity(itemInMap);
+  }
 }
 
 export function addEnemies(world: World, creatureClasses: typeof Creature[]) {
