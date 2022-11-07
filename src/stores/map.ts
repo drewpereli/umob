@@ -127,6 +127,7 @@ export const useMap = defineStore('map', {
   actions: {
     generate(
       world: World,
+      level: number,
       creatureClasses: typeof Creature[],
       items: typeof findableItems,
       powers: typeof allPowers
@@ -141,7 +142,7 @@ export const useMap = defineStore('map', {
       }
 
       if (!debugOptions.noEnemies) {
-        addEnemies(world, creatureClasses);
+        addEnemies(world, creatureClasses, level);
       }
     },
   },

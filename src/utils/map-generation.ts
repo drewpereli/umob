@@ -203,11 +203,15 @@ export function addItems(
   }
 }
 
-export function addEnemies(world: World, creatureClasses: typeof Creature[]) {
+export function addEnemies(
+  world: World,
+  creatureClasses: typeof Creature[],
+  level: number
+) {
   const game = useGame();
   const map = useMap();
 
-  const enemyGroupCount = random.int(5, 7);
+  const enemyGroupCount = level === 1 ? 0 : random.int(4 + level, 6 + level);
 
   const creaturesForWorld = creatureClasses.filter((creature) => {
     return (

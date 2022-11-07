@@ -36,6 +36,7 @@ import { allCreatures } from '@/entities/creatures/all-creatures';
 import { findableItems } from '@/entities/items/findable-items';
 import { allPowers } from '@/powers/all-powers';
 import { ToxicWaste } from '@/entities/fluid';
+import type { World } from '@/utils/map-generation';
 
 export const useGame = defineStore('game', {
   state: () => ({
@@ -65,6 +66,7 @@ export const useGame = defineStore('game', {
     } as Record<CreatureAlignment, Creature[]>,
     entitiesToCull: [] as MapEntity[],
     mapLevel: 1,
+    mapWorld: 'radiation-lab' as World,
   }),
   getters: {
     allActors(state): Actor[] {
@@ -194,7 +196,8 @@ export const useGame = defineStore('game', {
   actions: {
     initialize() {
       this.map.generate(
-        'radiation-lab',
+        this.mapWorld,
+        this.mapLevel,
         allCreatures,
         findableItems,
         allPowers
@@ -389,13 +392,16 @@ export const useGame = defineStore('game', {
       this.selectedTile = null;
 
       this.map.generate(
-        'radiation-lab',
+        this.mapWorld,
+        this.mapLevel,
         allCreatures,
         findableItems,
         allPowers
       );
 
       const tile = this.map.randomFloorTile();
+
+      this.player.upgradePoints++;
 
       this.player.updatePosition(tile);
 
