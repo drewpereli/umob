@@ -11,6 +11,7 @@ import type { Perk } from '@/perks';
 import type { DamageType, Weapon } from './weapons/weapon';
 import type { Usable } from './items/usable';
 import { generateId } from '@/utils/id';
+import { useMessages } from '@/stores/messages';
 
 const r = new Pipe();
 
@@ -95,6 +96,9 @@ export class Player extends Creature {
 
   pickupItem(item: Item) {
     this.inventory.push(item);
+    useMessages().addMessage({
+      content: `You picked up "${item.name}"`,
+    });
   }
 
   dropItem(item: Item) {
