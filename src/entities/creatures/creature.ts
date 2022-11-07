@@ -254,7 +254,7 @@ export default abstract class Creature
   baseViewAngle: number = 90;
 
   baseAccuracy = 8;
-  baseEvasion = 8;
+  baseEvasion = 1;
 
   baseArmor = 0;
 
