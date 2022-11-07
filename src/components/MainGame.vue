@@ -85,9 +85,9 @@ export default defineComponent({
 
       const actor = this.game.creatureAt(this.game.selectedTile);
 
-      if (!actor) return null;
+      const item = this.game.selectedTile.items[0]?.item;
 
-      return actor;
+      return actor ?? item ?? null;
     },
   },
 });

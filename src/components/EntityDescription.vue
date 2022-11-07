@@ -1,23 +1,21 @@
 <script lang="ts">
 import type Creature from '@/entities/creatures/creature';
+import type { Item } from '@/entities/items/item';
 import { defineComponent, type PropType } from 'vue';
-import HealthBar from './player-status/HealthBar.vue';
 
 export default defineComponent({
   props: {
     entity: {
-      type: Object as PropType<Creature>,
+      type: Object as PropType<Creature | Item>,
       required: true,
     },
   },
-  components: { HealthBar },
 });
 </script>
 
 <template>
   <div class="entity-description">
     <h2>{{ entity.name }}</h2>
-    <HealthBar :actor="entity" />
   </div>
 </template>
 
