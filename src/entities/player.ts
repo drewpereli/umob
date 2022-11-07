@@ -1,6 +1,3 @@
-import { BuildCover } from '@/powers/build-cover';
-import { CreateBlackHole } from '@/powers/create-black-hole';
-import { Grenade } from '@/powers/grenade';
 import { Heal } from '@/powers/heal';
 import type { Power } from '@/powers/power';
 import type { Tile } from '@/tile';
@@ -42,12 +39,7 @@ export class Player extends Creature {
   inventory: Item[] = [r];
   equippedWeapon: Weapon = r;
 
-  powers: Power[] = [
-    new BuildCover(this),
-    new CreateBlackHole(this),
-    new Grenade(this),
-    new Heal(this),
-  ];
+  powers: Power[] = [new Heal(this)];
 
   selectedPowerUsable: Usable | null = null;
 
