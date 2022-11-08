@@ -259,12 +259,16 @@ export class ToxicWaste extends Fluid {
 
     adjacents.forEach((tile) => {
       tile.creatures.forEach((creature) => {
-        creature.receiveRadiation(1);
+        if (random.float() < 0.5) {
+          creature.receiveRadiation(1);
+        }
       });
     });
 
     this.tile.creatures.forEach((creature) => {
-      creature.receiveRadiation(3);
+      if (random.float() < 0.5) {
+        creature.receiveRadiation(3);
+      }
     });
   }
 }
