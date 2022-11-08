@@ -37,6 +37,7 @@ import { findableItems } from '@/entities/items/findable-items';
 import { allPowers } from '@/powers/all-powers';
 import type { World } from '@/utils/map-generation';
 import { useBurning } from './burning';
+import { allBarrels } from '@/entities/barrels/all-barrels';
 
 export const useGame = defineStore('game', {
   state: () => ({
@@ -200,7 +201,8 @@ export const useGame = defineStore('game', {
         this.mapLevel,
         allCreatures,
         findableItems,
-        allPowers
+        allPowers,
+        allBarrels
       );
 
       const fov = new PermissiveFov(
@@ -400,7 +402,8 @@ export const useGame = defineStore('game', {
         this.mapLevel,
         allCreatures,
         findableItems,
-        allPowers
+        allPowers,
+        allBarrels
       );
 
       const tile = this.map.randomFloorTile();

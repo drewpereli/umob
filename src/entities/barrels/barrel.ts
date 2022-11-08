@@ -6,7 +6,7 @@ export abstract class Barrel
   extends MapEntity
   implements AsciiDrawable, Damageable
 {
-  char = 'Ø';
+  char = 'ʘ';
   abstract color: string;
 
   readonly IMPLEMENTS_DAMAGEABLE = true;

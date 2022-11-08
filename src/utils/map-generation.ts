@@ -22,6 +22,7 @@ import { ItemInMap } from '@/entities/items/item-in-map';
 import type { findableItems } from '@/entities/items/findable-items';
 import type { allPowers } from '@/powers/all-powers';
 import { Usable } from '@/entities/items/usable';
+import type { allBarrels } from '@/entities/barrels/all-barrels';
 
 type Map = Tile[][];
 
@@ -205,7 +206,8 @@ export function addRooms(map: Map, rooms: Room[], world: World) {
 
 export function addItems(
   items: typeof findableItems,
-  powers: typeof allPowers
+  powers: typeof allPowers,
+  barrels: typeof allBarrels
 ) {
   const itemCount = random.int(5, 10);
 
@@ -229,6 +231,18 @@ export function addItems(
     const itemInMap = new ItemInMap(tile, item);
 
     useGame().addMapEntity(itemInMap);
+  }
+
+  const barrelCount = random.int(5, 10);
+
+  for (let i = 0; i < barrelCount; i++) {
+    const barrelClass = random.arrayElement(barrels);
+
+    const tile = useMap().randomFloorTile();
+
+    const barrel = new barrelClass(tile);
+
+    useGame().addMapEntity(barrel);
   }
 }
 
