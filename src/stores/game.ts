@@ -35,7 +35,6 @@ import { useMap } from './map';
 import { allCreatures } from '@/entities/creatures/all-creatures';
 import { findableItems } from '@/entities/items/findable-items';
 import { allPowers } from '@/powers/all-powers';
-import { ToxicWaste } from '@/entities/fluid';
 import type { World } from '@/utils/map-generation';
 
 export const useGame = defineStore('game', {
@@ -391,6 +390,8 @@ export const useGame = defineStore('game', {
 
       this.selectedTile = null;
 
+      this.mapLevel++;
+
       this.map.generate(
         this.mapWorld,
         this.mapLevel,
@@ -406,8 +407,6 @@ export const useGame = defineStore('game', {
       this.player.updatePosition(tile);
 
       this.addPlayer(this.player);
-
-      this.mapLevel++;
 
       this.view.draw();
     },
