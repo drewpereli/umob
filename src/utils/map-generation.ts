@@ -211,7 +211,7 @@ export function addEnemies(
   const game = useGame();
   const map = useMap();
 
-  const enemyGroupCount = level === 1 ? 0 : random.int(4 + level, 6 + level);
+  const enemyGroupCount = random.int(4 + level, 6 + level);
 
   const creaturesForWorld = creatureClasses.filter((creature) => {
     return (
