@@ -219,6 +219,8 @@ export const useGame = defineStore('game', {
 
       this.addPlayer(player, true);
 
+      console.debug(this);
+
       if (debugOptions.extraEnemies) {
         Array.from({ length: debugOptions.extraEnemies }).forEach(() => {
           let tile = this.map.randomFloorTile();
