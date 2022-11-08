@@ -43,3 +43,7 @@ export abstract class StatusEffect {
     return (this.constructor as typeof StatusEffect).statusEffectName;
   }
 }
+
+export class HasteStim extends StatusEffect {
+  static statusEffectName = 'haste';
+}

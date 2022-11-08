@@ -26,7 +26,7 @@ import { damageRoll, type Damageable } from '../damageable';
 import Gun, { damageablesAimedAt, weaponIsGun } from '../weapons/gun';
 import type { AsciiDrawable } from '@/utils/types';
 import MapEntity, { EntityLayer } from '../map-entity';
-import type { StatusEffect } from '@/status-effects/status-effect';
+import { HasteStim, type StatusEffect } from '@/status-effects/status-effect';
 import { isTrap } from '../traps/trap';
 import type { Item } from '../items/item';
 import { DamageType, type Weapon, type WeaponData } from '../weapons/weapon';
@@ -293,6 +293,10 @@ export default abstract class Creature
       moveTime *= 2;
     }
 
+    if (this.hasStatusEffect(HasteStim)) {
+      moveTime /= 2;
+    }
+
     const equipmentEffect = this.equippedWearablesArray.reduce(
       (total, wearable) => total + wearable.moveTimeEffect,
       0
@@ -300,7 +304,7 @@ export default abstract class Creature
 
     moveTime += equipmentEffect;
 
-    return Math.max(1, moveTime);
+    return Math.max(1, Math.round(moveTime));
   }
 
   get turnTime() {

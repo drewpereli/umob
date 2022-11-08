@@ -1,6 +1,6 @@
 import type Creature from '@/entities/creatures/creature';
 import { OcclusionVisualizer } from '@/status-effects/occlusion-visualizer';
-import type { StatusEffect } from '@/status-effects/status-effect';
+import { HasteStim, type StatusEffect } from '@/status-effects/status-effect';
 import { TargetingArray } from '@/status-effects/targeting-array';
 import { TURN } from '@/utils/turn';
 import { upgradeWithLevel } from '@/utils/types';
@@ -63,5 +63,17 @@ export class ActivateTargetingArray extends AddStatusEffectToSelf {
 
   get useMessageDescription() {
     return 'activated a targeting array';
+  }
+}
+
+export class UseHasteStim extends AddStatusEffectToSelf {
+  static powerName = 'use haste stim';
+  static description =
+    'Inject a stim that lets you move at double speed for a short time.';
+  useTime = 0;
+  statusEffect = HasteStim;
+
+  get useMessageDescription() {
+    return 'started running';
   }
 }
