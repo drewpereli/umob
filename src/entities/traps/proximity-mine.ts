@@ -1,4 +1,5 @@
 import { ExplosionAnimation } from '@/stores/animations';
+import { useBurning } from '@/stores/burning';
 import { useGame } from '@/stores/game';
 import { createExplosion } from '@/utils/explosions';
 import type { AsciiDrawable } from '@/utils/types';
@@ -21,6 +22,7 @@ export class FireProximityMine extends ProximityMine {
 
   onTrigger() {
     const game = useGame();
+    const burning = useBurning();
 
     const tiles = game.map.tilesInRadius(this.tile, this.radius);
 
@@ -28,7 +30,7 @@ export class FireProximityMine extends ProximityMine {
       tile.entities.forEach((entity) => {
         if (!isFlammable(entity)) return;
 
-        entity.startBurning();
+        burning.startBurning(entity);
       });
     });
 

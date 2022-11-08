@@ -79,6 +79,8 @@ export default defineComponent({
     position absolute
     top 0
     left 0
+    &:first-child
+      background-color black
 
   .game-over-container
     position absolute

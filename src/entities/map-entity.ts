@@ -1,6 +1,7 @@
 import { useGame } from '@/stores/game';
 import type { Tile } from '@/tile';
 import { useMessages } from '@/stores/messages';
+import { generateId } from '@/utils/id';
 
 export enum EntityLayer {
   Fluid = 'fluid',
@@ -20,6 +21,8 @@ export default abstract class MapEntity {
 
     this.tilesOccupied = [tile];
   }
+
+  id = generateId();
 
   x;
   y;

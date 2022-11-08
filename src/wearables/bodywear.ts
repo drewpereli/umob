@@ -2,6 +2,7 @@ import type Creature from '@/entities/creatures/creature';
 import { Resistance } from '@/entities/creatures/creature';
 import { DamageType } from '@/entities/weapons/weapon';
 import { Burning } from '@/status-effects/burning';
+import { useBurning } from '@/stores/burning';
 import { TURN } from '@/utils/turn';
 import { Wearable, WearableSlot } from './wearable';
 
@@ -29,16 +30,15 @@ export class FlameSuit extends BodyWear {
     [DamageType.Heat]: Resistance.Immune,
   };
 
-  effect: Burning | null = null;
+  defaultCreatureBurnDuration: number | null = null;
 
   onPutOn(creature: Creature) {
-    const effect = new Burning(creature, Infinity, this.id);
-    creature.addStatusEffect(effect);
-    this.effect = effect;
+    creature.maxBurningDuration = undefined;
+    useBurning().startBurning(creature);
   }
 
   onTakeOff(creature: Creature) {
-    creature.removeStatusEffect(this.effect as Burning);
-    this.effect = null;
+    creature.maxBurningDuration = creature.defaultMaxBurningDuration;
+    useBurning().stopBurning(creature);
   }
 }

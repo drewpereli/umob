@@ -1,3 +1,4 @@
+import { useBurning } from '@/stores/burning';
 import { useGame } from '@/stores/game';
 import { useMap } from '@/stores/map';
 import type { Tile } from '@/tile';
@@ -5,9 +6,10 @@ import { random } from '@/utils/random';
 import { TURN } from '@/utils/turn';
 import { Actor } from './actor';
 import {
-  defaultBurn,
-  defaultStartBurning,
-  defaultStopBurning,
+  // defaultBurn,
+  // defaultStartBurning,
+  // defaultStopBurning,
+  stopBurning,
   type Flammable,
 } from './flammable';
 import { RadioactiveSmoke, Steam } from './gas';
@@ -118,27 +120,21 @@ export abstract class Fluid extends Actor {
 }
 
 export class Lava extends Fluid implements Flammable {
+  constructor(tile: Tile, pressure?: number, lifeSpan: number | null = null) {
+    super(tile, pressure, lifeSpan);
+
+    useBurning().startBurning(this);
+  }
+
   name = 'lava';
   baseColor = '#f00';
   moveTimeMultiplier = 4;
 
-  isBurning = true;
+  isBurning = false;
   burnCollocatedChance = 1;
   burnAdjacentChance = 0.1;
   burningDuration = 0;
   readonly IMPLEMENTS_FLAMMABLE = true;
-
-  startBurning() {
-    return;
-  }
-
-  burn() {
-    defaultBurn(this);
-  }
-
-  stopBurning() {
-    return;
-  }
 }
 
 export class Water extends Fluid {
@@ -149,7 +145,11 @@ export class Water extends Fluid {
 
   _act() {
     super._act();
-    this.tile.flammables.forEach((f) => f.stopBurning());
+    this.tile.flammables.forEach((f) => {
+      if (f.isBurning) {
+        stopBurning(f);
+      }
+    });
   }
 }
 
@@ -163,30 +163,30 @@ export class Oil extends Fluid implements Flammable {
   burnAdjacentChance = 1;
   readonly IMPLEMENTS_FLAMMABLE = true;
 
-  _act(): void {
-    super._act();
+  // _act(): void {
+  //   super._act();
 
-    if (this.isBurning) {
-      this.burningDuration += 1;
+  //   if (this.isBurning) {
+  //     this.burningDuration += 1;
 
-      if (this.burningDuration >= this.maxBurningDuration) {
-        this.markForRemoval();
-      }
-    }
-  }
+  //     if (this.burningDuration >= this.maxBurningDuration) {
+  //       this.markForRemoval();
+  //     }
+  //   }
+  // }
 
-  startBurning() {
-    defaultStartBurning(this);
-  }
+  // startBurning() {
+  //   defaultStartBurning(this);
+  // }
 
-  burn() {
-    defaultBurn(this);
-  }
+  // burn() {
+  //   defaultBurn(this);
+  // }
 
-  stopBurning() {
-    defaultStopBurning(this);
-    this.markForRemoval();
-  }
+  // stopBurning() {
+  //   defaultStopBurning(this);
+  //   this.markForRemoval();
+  // }
 }
 
 function reactFluids(a: Fluid, b: Fluid) {
@@ -216,7 +216,7 @@ function reactFluids(a: Fluid, b: Fluid) {
 
     if (!oil.isBurning) return;
 
-    oil.stopBurning();
+    useBurning().stopBurning(oil);
 
     if (oil.tile.gas) return;
 
@@ -252,8 +252,9 @@ export class ToxicWaste extends Fluid {
     super._act();
 
     const map = useMap();
+    const burning = useBurning();
 
-    this.tile.flammables.forEach((f) => f.stopBurning());
+    this.tile.flammables.forEach((f) => burning.stopBurning(f));
 
     const adjacents = map.adjacentTiles(this.tile);
 

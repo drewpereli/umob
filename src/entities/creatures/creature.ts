@@ -50,7 +50,7 @@ import {
   useMessages,
 } from '@/stores/messages';
 import { Burning } from '@/status-effects/burning';
-import { defaultBurn, defaultStopBurning, type Flammable } from '../flammable';
+import type { Flammable } from '../flammable';
 import { OcclusionVisualizer } from '@/status-effects/occlusion-visualizer';
 import { WearableSlot, type Wearable } from '@/wearables/wearable';
 import { TURN } from '@/utils/turn';
@@ -430,7 +430,26 @@ export default abstract class Creature
     this.rads += amount;
   }
 
-  statusEffects: StatusEffect[] = [];
+  _statusEffects: StatusEffect[] = [];
+
+  get statusEffects() {
+    const effects: StatusEffect[] = [];
+
+    if (this.isBurning) {
+      const burning = new Burning(this, this.maxBurningDuration ?? Infinity);
+      burning.currentDuration = this.burningDuration;
+
+      effects.push(burning);
+    }
+
+    effects.push(...this._statusEffects);
+
+    return effects;
+  }
+
+  set statusEffects(effects: StatusEffect[]) {
+    this._statusEffects = effects;
+  }
 
   addStatusEffect(statusEffect: StatusEffect) {
     // If the creature already has the status effect, just set its duration to 0
@@ -443,7 +462,7 @@ export default abstract class Creature
     if (existingStatusEffect) {
       existingStatusEffect.currentDuration = 0;
     } else {
-      this.statusEffects.push(statusEffect);
+      this.statusEffects = [...this.statusEffects, statusEffect];
     }
   }
 
@@ -950,37 +969,15 @@ export default abstract class Creature
   /* #endregion */
 
   /* #region  flammable */
-  get isBurning() {
-    return this.statusEffects.some((effect) => effect.name === 'burning');
-  }
 
-  set isBurning(val: boolean) {
-    //
-  }
-
-  startBurning() {
-    this.addStatusEffect(new Burning(this, 10 * TURN));
-  }
-
-  burn() {
-    defaultBurn(this);
-    this.receiveDamage(1, DamageType.Heat);
-  }
-
-  stopBurning() {
-    defaultStopBurning(this);
-    const burning = this.statusEffects.find(
-      (s) => s instanceof Burning && s.source === 'temp'
-    );
-
-    if (!burning) return;
-
-    this.removeStatusEffect(burning);
-  }
+  isBurning = false;
 
   burnCollocatedChance = 0.5;
   burnAdjacentChance = 0.1;
   burningDuration = 0;
+
+  defaultMaxBurningDuration = 10 * TURN;
+  maxBurningDuration? = this.defaultMaxBurningDuration; // Max burn duration can be changed by the flame state
   readonly IMPLEMENTS_FLAMMABLE = true;
   /* #endregion */
 

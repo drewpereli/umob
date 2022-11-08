@@ -1,3 +1,4 @@
+import { useBurning } from '@/stores/burning';
 import { useGame } from '@/stores/game';
 import { Oil } from '../fluid';
 import { Barrel } from './barrel';
@@ -13,7 +14,7 @@ export class OilBarrel extends Barrel {
       .filter((t) => !t.terrain?.blocksMovement)
       .forEach((t) => {
         const oil = new Oil(t, 1);
-        oil.startBurning();
+        useBurning().startBurning(oil);
         game.addMapEntity(oil);
       });
   }

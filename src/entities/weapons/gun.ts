@@ -3,6 +3,7 @@ import {
   ExplosionAnimation,
   useAnimations,
 } from '@/stores/animations';
+import { useBurning } from '@/stores/burning';
 import { useGame } from '@/stores/game';
 import { useMap } from '@/stores/map';
 import type { Tile } from '@/tile';
@@ -113,14 +114,16 @@ export class Flamethrower extends Gun {
   damageType = DamageType.Heat;
 
   onAttack(attacker: Creature, tile: Tile) {
+    const burning = useBurning();
+
     const tiles = tilesAimedAt(attacker.tile, tile, this);
 
     tiles.forEach((tile) => {
       tile.flammables.forEach((f) => {
         if (isCreature(f)) {
-          f.startBurning();
+          burning.startBurning(f);
         } else if (!f.isBurning) {
-          f.startBurning();
+          burning.startBurning(f);
         }
       });
     });
@@ -175,7 +178,7 @@ export class WaterJetCutterHead extends Gun {
 
   onDamage(damageable: Damageable) {
     if (isFlammable(damageable) && damageable.isBurning) {
-      damageable.stopBurning();
+      useBurning().stopBurning(damageable);
     }
   }
 }

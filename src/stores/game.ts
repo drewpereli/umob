@@ -36,6 +36,7 @@ import { allCreatures } from '@/entities/creatures/all-creatures';
 import { findableItems } from '@/entities/items/findable-items';
 import { allPowers } from '@/powers/all-powers';
 import type { World } from '@/utils/map-generation';
+import { useBurning } from './burning';
 
 export const useGame = defineStore('game', {
   state: () => ({
@@ -437,9 +438,7 @@ export const useGame = defineStore('game', {
     _processOneTick() {
       this.nonPlayerActors.forEach((actor) => actor.actIfPossible());
 
-      // this.mapEntities.forEach((entity) => {
-      //   entity.tile.terrain.affectEntityOn?.(entity);
-      // });
+      useBurning().processBurnTick();
 
       this.endOfTickActionQueue.forEach((action) => action());
       this.endOfTickActionQueue = [];

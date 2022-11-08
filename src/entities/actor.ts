@@ -40,10 +40,6 @@ export abstract class Actor extends MapEntity {
       this.timeUntilNextAction--;
     }
 
-    if (isFlammable(this) && this.isBurning) {
-      this.burn();
-    }
-
     this.__cache.tick = {};
   }
 

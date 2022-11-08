@@ -13,6 +13,7 @@ import type { Usable } from './items/usable';
 import { generateId } from '@/utils/id';
 import { useMessages } from '@/stores/messages';
 import { UseHasteStim } from '@/powers/add-status-effect-to-self';
+import { FlameSuit } from '@/wearables/bodywear';
 
 const r = new Pipe();
 
@@ -38,7 +39,7 @@ export class Player extends Creature {
 
   upgradePoints = 1;
 
-  inventory: Item[] = [r];
+  inventory: Item[] = [r, new FlameSuit()];
   equippedWeapon: Weapon = r;
 
   powers: Power[] = [new Heal(this), new UseHasteStim(this)];

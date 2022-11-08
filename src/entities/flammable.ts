@@ -19,25 +19,25 @@ export type Flammable = Actor & {
   burningDuration: number;
   maxBurningDuration?: number;
   readonly IMPLEMENTS_FLAMMABLE: true;
-  startBurning: () => unknown;
-  burn: () => unknown;
-  stopBurning: () => unknown;
+  // startBurning: () => unknown;
+  // burn: () => unknown;
+  // stopBurning: () => unknown;
 };
 
 export function isFlammable(item: unknown): item is Flammable {
   return !!(item as Record<string, unknown>)['IMPLEMENTS_FLAMMABLE'];
 }
 
-export function defaultStartBurning(flammable: Flammable) {
+export function startBurning(flammable: Flammable) {
   flammable.isBurning = true;
 }
 
-export function defaultBurn(flammable: Flammable) {
+export function burn(flammable: Flammable) {
   if (
     typeof flammable.maxBurningDuration === 'number' &&
     flammable.burningDuration >= flammable.maxBurningDuration
   ) {
-    flammable.stopBurning();
+    stopBurning(flammable);
     return;
   }
 
@@ -56,7 +56,7 @@ export function defaultBurn(flammable: Flammable) {
       if (entity instanceof Creature) {
         entity.addStatusEffect(new Burning(entity, 20));
       } else if (!entity.isBurning) {
-        entity.startBurning();
+        startBurning(entity);
       }
     }
   });
@@ -73,12 +73,12 @@ export function defaultBurn(flammable: Flammable) {
     const willBurn = random.float(0, 1) < flammable.burnAdjacentChance;
 
     if (willBurn) {
-      entity.startBurning();
+      startBurning(entity);
     }
   });
 }
 
-export function defaultStopBurning(flammable: Flammable) {
+export function stopBurning(flammable: Flammable) {
   flammable.isBurning = false;
   flammable.burningDuration = 0;
 }
