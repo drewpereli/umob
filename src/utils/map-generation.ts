@@ -170,19 +170,21 @@ export function addRooms(map: Map, rooms: Room[], world: World) {
     );
   });
 
-  if (debugOptions.emptyMap && debugOptions.roomWhenEmptyMap) {
-    const roomGen = roomGeneratorsForWorld.find(
-      (g) => g.name === debugOptions.roomWhenEmptyMap
-    );
-
-    if (!roomGen) {
-      throw new Error(
-        `No room generator named "${debugOptions.roomWhenEmptyMap}"`
+  if (debugOptions.emptyMap) {
+    if (debugOptions.roomWhenEmptyMap) {
+      const roomGen = roomGeneratorsForWorld.find(
+        (g) => g.name === debugOptions.roomWhenEmptyMap
       );
-    }
 
-    const g = new roomGen(rooms[0], map);
-    g.generate();
+      if (!roomGen) {
+        throw new Error(
+          `No room generator named "${debugOptions.roomWhenEmptyMap}"`
+        );
+      }
+
+      const g = new roomGen(rooms[0], map);
+      g.generate();
+    }
 
     return;
   }
