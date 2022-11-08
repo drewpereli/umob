@@ -85,7 +85,17 @@ export function generateTilesAndWalls(
 
     setAdjacentTiles(map);
 
-    return { map, rooms: [] };
+    return {
+      map,
+      rooms: [
+        {
+          x: 1,
+          y: 1,
+          w: width - 2,
+          h: height - 2,
+        },
+      ],
+    };
   }
 
   const { tiles: tileArr, rooms } = generateLevel({ x: width, y: height });
@@ -159,6 +169,23 @@ export function addRooms(map: Map, rooms: Room[], world: World) {
       gen.worldRestrictions.includes(world)
     );
   });
+
+  if (debugOptions.emptyMap && debugOptions.roomWhenEmptyMap) {
+    const roomGen = roomGeneratorsForWorld.find(
+      (g) => g.name === debugOptions.roomWhenEmptyMap
+    );
+
+    if (!roomGen) {
+      throw new Error(
+        `No room generator named "${debugOptions.roomWhenEmptyMap}"`
+      );
+    }
+
+    const g = new roomGen(rooms[0], map);
+    g.generate();
+
+    return;
+  }
 
   const roomGenWeights = roomGeneratorsForWorld.map((g) => g.genChance);
 
